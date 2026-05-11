@@ -6,141 +6,137 @@
     <title>Dark Bulls - Allianz Zentrale V12.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* HINTERGRUND-RIEGEL: Verhindert Chaos, zwingt Bilder in den Hintergrund */
-        html, body { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            background: black; font-family: 'Almendra', serif; color: white;
-            overflow: hidden;
-        }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: black; font-family: 'Almendra', serif; color: white; overflow: hidden; }
         
-        .bg-fixed {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            object-fit: cover; z-index: -1; 
-            display: none;
-        }
+        /* Hintergrund-Fix: bulls_start.jpg ist IMMER der Hintergrund */
+        #main-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -1; opacity: 0.7; }
+
+        #start-portal { display: flex; align-items: center; justify-content: center; height: 100vh; position: relative; z-index: 10; }
         
-        /* Startzustand: bulls_start.jpg aktiv, bulls_dashboard.jpg versteckt */
-        #bg0 { display: block; opacity: 0.7; }
-        #bg1 { display: none; opacity: 0.4; }
-
-        /* --- DEIN V12.1 PANZER-DESIGN --- */
-        #start-portal { 
-            display: flex; align-items: center; justify-content: center; 
-            height: 100vh; position: relative; z-index: 10;
+        /* Das glühende Emblem in der Mitte */
+        #emblem-box { 
+            position: relative; z-index: 5; width: 550px; max-width: 80vw; padding: 20px; 
+            box-shadow: 0 0 100px rgba(255, 0, 0, 0.7); border: 1px solid rgba(255, 0, 0, 0.2); background: rgba(0,0,0,0.6);
         }
+        #emblem-box img { width: 100%; display: block; }
+
+        /* Seitliche Buttons LINKS (Login & Rekrutierung) */
+        .side-l { position: absolute; left: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 40px; }
+        .tab-l { padding: 30px 12px; font-size: 18px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 0 10px 10px 0; width: 50px; color: black; font-family: 'Almendra'; }
+        #btn-login { background: #39d353; box-shadow: 0 0 20px #39d353; }
+        #btn-rekrut { background: #ffd600; box-shadow: 0 0 20px #ffd600; }
+
+        /* Seitliche Buttons RECHTS (Info & Web) */
+        .side-r { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; }
+        .tab-r { padding: 25px 8px; font-size: 14px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 10px 0 0 10px; width: 45px; color: black; font-family: 'Almendra'; }
+        #tab-yt { background: #ff8c00; }
+        #tab-hist { background: #5b5bff; color: white; }
+        #tab-web { background: #00cfd1; }
+
+        /* Modals (Login & Rekrutierung) */
+        .overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; overflow-y: auto; }
+        .modal-card { background: #111; padding: 25px; border: 2px solid #ff3131; border-radius: 15px; width: 400px; max-width: 90%; text-align: center; box-shadow: 0 0 50px red; }
+        .modal-card.gold { border-color: #ffd600; box-shadow: 0 0 50px #ffd600; }
         
-        #emblem-container { 
-            position: relative; z-index: 5; 
-            width: 600px; max-width: 80vw; 
-            padding: 20px; 
-            box-shadow: 0 0 100px rgba(255, 0, 0, 0.7); 
-            border: 1px solid rgba(255, 0, 0, 0.2);
-            background: rgba(0,0,0,0.6);
-        }
-        #emblem-container img { width: 100%; display: block; }
-
-        /* Seitliche Buttons LINKS */
-        .side-menu-left { position: absolute; left: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 40px; z-index: 20; }
-        .side-tab-left { padding: 30px 10px; font-size: 18px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 0 10px 10px 0; width: 45px; color: black; font-family: 'Almendra'; }
-        #side-login { background: #39d353; box-shadow: 0 0 20px rgba(57, 211, 83, 0.4); }
-        #side-reg { background: #ffd600; box-shadow: 0 0 20px rgba(255, 214, 0, 0.4); }
-
-        /* Seitliche Buttons RECHTS */
-        .side-menu-right { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 20; }
-        .side-tab-right { padding: 25px 8px; font-size: 14px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 10px 0 0 10px; width: 40px; color: black; font-family: 'Almendra'; }
-        #side-yt { background: #ff8c00; }
-        #side-hist { background: #5b5bff; color: white; }
-        #side-web { background: #00cfd1; }
-
-        /* Login Modal */
-        .overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
-        .login-box { background: #111; padding: 30px; border: 2px solid #ff3131; border-radius: 15px; width: 320px; text-align: center; box-shadow: 0 0 50px red; }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 18px; text-align: center; }
-        .login-btn { width: 100%; padding: 15px; background: #39d353; border: none; color: black; font-weight: bold; cursor: pointer; font-size: 20px; font-family: 'Almendra'; }
-
-        /* Dashboard-Bereich (wird nach Login sichtbar) */
-        #dashboard { display: none; }
-        #dashboard h1 { color: #ff3131; text-align: center; margin-top: 100px; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 16px; text-align: center; box-sizing: border-box; }
+        .submit-btn { width: 100%; padding: 15px; background: #39d353; border: none; color: black; font-weight: bold; cursor: pointer; font-size: 20px; font-family: 'Almendra'; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-<img id="bg0" class="bg-fixed">
-<img id="bg1" class="bg-fixed">
+    <img src="bulls_start.jpg" id="main-bg">
 
-<div id="start-portal">
-    <div class="side-menu-left">
-        <button class="side-tab-left" id="side-login" onclick="document.getElementById('loginModal').style.display='flex'">LOGIN</button>
-        <button class="side-tab-left" id="side-reg" onclick="window.open('https://darkbulls.jimdofree.com/registrierung/')">REGISTRIEREN</button>
+    <div id="start-portal">
+        <div class="side-l">
+            <button class="tab-l" id="btn-login" onclick="openModal('loginMod')">LOGIN</button>
+            <button class="tab-l" id="btn-rekrut" onclick="openModal('regMod')">REKRUTIEREN</button>
+        </div>
+
+        <div id="emblem-box">
+            <img src="bulls_start.jpg">
+        </div>
+
+        <div class="side-r">
+            <button class="tab-r" id="tab-yt" onclick="window.open('https://www.youtube.com/@DarkBullsGruppe')">YOUTUBE</button>
+            <button class="tab-r" id="tab-hist" onclick="alert('Historie folgt')">HISTORIES</button>
+            <button class="tab-r" id="tab-web" onclick="window.open('https://darkbulls.jimdofree.com/')">INTERNET</button>
+        </div>
     </div>
 
-    <div id="emblem-container">
-        <img src="bulls_start.jpg" alt="Dark Bulls V12.1">
+    <div id="loginMod" class="overlay">
+        <div class="modal-card">
+            <h2 style="color: #ff3131;">ANMELDUNG</h2>
+            <input type="text" id="logName" placeholder="BENUTZERNAME">
+            <input type="password" id="logPin" placeholder="PIN">
+            <button class="submit-btn" onclick="doLogin()">BETRETEN</button>
+            <p onclick="closeModals()" style="color:#555; cursor:pointer; margin-top:15px;">Abbrechen</p>
+        </div>
     </div>
 
-    <div class="side-menu-right">
-        <button class="side-tab-right" id="side-yt" onclick="window.open('https://www.youtube.com/@DarkBullsGruppe')">YOUTUBE</button>
-        <button class="side-tab-right" id="side-hist">HISTORIES</button>
-        <button class="side-tab-right" id="side-web" onclick="window.open('https://darkbulls.jimdofree.com/')">INTERNET</button>
+    <div id="regMod" class="overlay">
+        <div class="modal-card gold">
+            <h2 style="color: #ffd600;">REKRUTIERUNG</h2>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input type="text" id="regName" placeholder="Name im Spiel">
+                <input type="text" id="regKD" placeholder="KD">
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input type="text" id="regAge" placeholder="Alter">
+                <input type="text" id="regTime" placeholder="Spielzeit CoW">
+            </div>
+            <input type="text" id="regFreq" placeholder="Wie viel spielst du am Tag?">
+            <select id="regReason">
+                <option value="" disabled selected>Grund der Anmeldung...</option>
+                <option value="Gast/Besuch">Nur zu Besuch / Gast</option>
+                <option value="Mitgliedschaft">Bestrebung einer Mitgliedschaft</option>
+            </select>
+            <input type="password" id="regPin" placeholder="Wähle eine PIN">
+            <button class="submit-btn" style="background:#ffd600" onclick="doRegister()">ABSCHICKEN & STARTEN</button>
+            <p onclick="closeModals()" style="color:#555; cursor:pointer; margin-top:15px;">Abbrechen</p>
+        </div>
     </div>
-</div>
 
-<div id="loginModal" class="overlay">
-    <div class="login-box">
-        <h2 style="color: #ff3131; margin-top: 0;">ANMELDUNG</h2>
-        <input type="text" id="nameIn" placeholder="NAME">
-        <input type="password" id="pinIn" placeholder="PIN">
-        <button class="login-btn" onclick="checkAuth()">BETRETEN</button>
-        <p onclick="document.getElementById('loginModal').style.display='none'" style="color:#666; cursor:pointer; margin-top:15px;">Abbrechen</p>
-    </div>
-</div>
+    <script>
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ/gviz/tq?tqx=out:csv&gid=1188820112';
+        const WEBHOOK = 'https://discord.com/api/webhooks/1502735246335021267/fpxXtWr5QgSny6rfJzGHKnhYskehC9vDMEl3CvUzjgbBOuKBd8KGzUhCRfvd2KmWcnND';
 
-<div id="dashboard">
-    <h1>Dashboard geladen</h1>
-</div>
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModals() { document.querySelectorAll('.overlay').forEach(m => m.style.display = 'none'); }
 
-<script>
-    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ/gviz/tq?tqx=out:csv&gid=1188820112';
-
-    // FIX: Setzt Bilder beim Laden mit Cache-Buster, damit sie frisch kommen
-    window.onload = function() {
-        const time = new Date().getTime();
-        document.getElementById('bg0').src = 'bulls_start.jpg?t=' + time;
-        document.getElementById('bg1').src = 'bulls_dashboard.jpg?t=' + time;
-        loadData();
-    };
-
-    async function loadData() {
-        try {
+        async function doLogin() {
+            const n = document.getElementById("logName").value.trim().toLowerCase();
+            const p = document.getElementById("logPin").value.trim();
             const res = await fetch(SHEET_URL + '&t=' + new Date().getTime());
             const text = await res.text();
             const rows = text.split('\n').slice(1);
-            users = rows.map(r => {
+            const user = rows.find(r => {
                 const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
-                return { name: c[0], pin: c[2], role: c[3] };
+                return c[0].toLowerCase() === n && c[2] === p;
             });
-        } catch(e) { alert("Fehler beim Datenabgleich."); }
-    }
-
-    function checkAuth() {
-        const n = document.getElementById("nameIn").value.trim().toLowerCase();
-        const p = document.getElementById("pinIn").value.trim();
-        if(!n || !p) return;
-
-        const u = users.find(x => x.name.toLowerCase() === n && x.pin === p);
-        if(u) {
-            // Hintergrund wechseln
-            document.getElementById("bg0").style.display = "none";
-            document.getElementById("bg1").style.display = "block";
-            
-            // Seite umschalten
-            document.getElementById("start-portal").style.display = "none";
-            document.getElementById("loginModal").style.display = "none";
-            document.getElementById("dashboard").style.display = "block";
-        } else {
-            alert("Login falsch!");
+            if(user) {
+                const c = user.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
+                localStorage.setItem('bulls_user', c[0]);
+                localStorage.setItem('bulls_role', c[3]);
+                window.location.href = "dashboard.html";
+            } else { alert("Zutritt verweigert!"); }
         }
-    }
-</script>
+
+        async function doRegister() {
+            const name = document.getElementById('regName').value.trim();
+            const reason = document.getElementById('regReason').value;
+            if(!name || !reason) return alert("Bitte Name und Grund angeben!");
+
+            // Discord Info
+            fetch(WEBHOOK, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ content: `🚨 **NEUE REKRUTIERUNG**\n**Name:** ${name}\n**Grund:** ${reason}\n_User startet als Gast._` })
+            });
+
+            localStorage.setItem('bulls_user', name);
+            localStorage.setItem('bulls_role', 'Gast');
+            window.location.href = "dashboard.html";
+        }
+    </script>
 </body>
 </html>
