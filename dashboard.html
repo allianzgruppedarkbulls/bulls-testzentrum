@@ -65,7 +65,7 @@
         </div>
 
         <div class="right-side">
-           <div class="card" id="box-admin">
+            <div class="card" id="box-admin">
                 <h2>Admin</h2>
                 <div class="btn-stack">
                     <button class="card-btn" onclick="window.location.href='user_admin.html'">User-Verwaltung</button>
@@ -89,15 +89,20 @@
     <script>
         const user = localStorage.getItem('bulls_user');
         const role = localStorage.getItem('bulls_role');
+        const extra = localStorage.getItem('bulls_extra') || ""; // Spezial-Rolle laden
 
         if (!user) {
             window.location.href = "index.html";
         } else {
-            document.getElementById('userDisplay').innerText = user + " (" + role + ")";
-            applyPermissions(role);
+            // Anzeige oben rechts: Name (Hauptrolle | Zusatzrolle)
+            let displayRole = role;
+            if(extra) displayRole += " | " + extra;
+            document.getElementById('userDisplay').innerText = user + " (" + displayRole + ")";
+            
+            applyPermissions(role, extra);
         }
 
-        function applyPermissions(r) {
+        function applyPermissions(r, ex) {
             const boxStats = document.getElementById('btn-stats');
             const boxBlacklist = document.getElementById('box-blacklist');
             const boxPflege = document.getElementById('box-pflege');
@@ -105,7 +110,7 @@
             const boxElo = document.getElementById('box-elo');
             const boxAlliChat = document.getElementById('box-allichat');
 
-            // Reset (Alles erst mal verstecken was wichtig ist)
+            // --- BASIS-LOGIK FÜR HAUPTROLLEN ---
             if (r === "Gast") {
                 boxStats.classList.add('hidden');
                 boxBlacklist.classList.add('hidden');
@@ -124,17 +129,33 @@
             else if (r === "Mitglied") {
                 boxPflege.classList.add('hidden');
                 boxAdmin.classList.add('hidden');
+                boxElo.classList.add('hidden'); // Standardmäßig für Mitglieder weg
             }
             else if (r === "Kampfdivision") {
                 boxStats.classList.add('hidden');
                 boxPflege.classList.add('hidden');
                 boxAdmin.classList.add('hidden');
+                boxElo.classList.add('hidden');
+            }
+            // Ausbilder, Offi, Admin sehen alles standardmäßig.
+
+            // --- SPEZIAL-ÜBERSTEUERUNG FÜR ZUSATZROLLEN ---
+            
+            // Wenn jemand ELO-Beauftragter ist, kriegt er die Box, egal welche Hauptrolle er hat
+            if (ex === "ELO") {
+                boxElo.classList.remove('hidden');
+            }
+
+            // Wenn jemand Buchhalter ist (Beispiel für spätere Funktionen)
+            if (ex === "Buchhalter") {
+                // Hier könnten wir später spezielle Buchhalter-Buttons einblenden
             }
         }
 
         function logout() {
             localStorage.removeItem('bulls_user');
             localStorage.removeItem('bulls_role');
+            localStorage.removeItem('bulls_extra');
             window.location.href = "index.html";
         }
     </script>
