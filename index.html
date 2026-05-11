@@ -6,34 +6,36 @@
     <title>Dark Bulls - Allianz Zentrale V12.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* GRUND-LAYOUT */
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: black; font-family: 'Almendra', serif; color: white; overflow: hidden; }
         
-        /* Hintergrund-Fix: bulls_start.jpg ist IMMER der Hintergrund */
+        /* HINTERGRUND-BILD (Festgenagelt) */
         #main-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -1; opacity: 0.7; }
 
+        /* ZENTRALE (Hier liegt alles drin) */
         #start-portal { display: flex; align-items: center; justify-content: center; height: 100vh; position: relative; z-index: 10; }
         
-        /* Das glühende Emblem in der Mitte */
+        /* DAS GLÜHENDE EMBLEM (Mitte) */
         #emblem-box { 
             position: relative; z-index: 5; width: 550px; max-width: 80vw; padding: 20px; 
             box-shadow: 0 0 100px rgba(255, 0, 0, 0.7); border: 1px solid rgba(255, 0, 0, 0.2); background: rgba(0,0,0,0.6);
         }
-        #emblem-box img { width: 100%; display: block; }
+        #emblem-box img { width: 100%; display: block; filter: drop-shadow(0 0 10px red); }
 
-        /* Seitliche Buttons LINKS (Login & Rekrutierung) */
+        /* BUTTONS LINKS (Login & Rekrutierung) */
         .side-l { position: absolute; left: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 40px; }
         .tab-l { padding: 30px 12px; font-size: 18px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 0 10px 10px 0; width: 50px; color: black; font-family: 'Almendra'; }
         #btn-login { background: #39d353; box-shadow: 0 0 20px #39d353; }
         #btn-rekrut { background: #ffd600; box-shadow: 0 0 20px #ffd600; }
 
-        /* Seitliche Buttons RECHTS (Info & Web) */
+        /* BUTTONS RECHTS (Info & Web) */
         .side-r { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; }
         .tab-r { padding: 25px 8px; font-size: 14px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 10px 0 0 10px; width: 45px; color: black; font-family: 'Almendra'; }
         #tab-yt { background: #ff8c00; }
         #tab-hist { background: #5b5bff; color: white; }
         #tab-web { background: #00cfd1; }
 
-        /* Modals (Login & Rekrutierung) */
+        /* FENSTER FÜR LOGIN & REKRUTIERUNG */
         .overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; overflow-y: auto; }
         .modal-card { background: #111; padding: 25px; border: 2px solid #ff3131; border-radius: 15px; width: 400px; max-width: 90%; text-align: center; box-shadow: 0 0 50px red; }
         .modal-card.gold { border-color: #ffd600; box-shadow: 0 0 50px #ffd600; }
@@ -47,13 +49,14 @@
     <img src="bulls_start.jpg" id="main-bg">
 
     <div id="start-portal">
+        
         <div class="side-l">
             <button class="tab-l" id="btn-login" onclick="openModal('loginMod')">LOGIN</button>
-            <button class="tab-l" id="btn-rekrut" onclick="openModal('regMod')">REKRUTIEREN</button>
+            <button class="tab-l" id="btn-rekrut" onclick="openModal('regMod')">REKRUTIERUNG</button>
         </div>
 
         <div id="emblem-box">
-            <img src="bulls_start.jpg">
+            <img src="bulls_start.jpg" alt="Logo">
         </div>
 
         <div class="side-r">
@@ -106,19 +109,24 @@
         async function doLogin() {
             const n = document.getElementById("logName").value.trim().toLowerCase();
             const p = document.getElementById("logPin").value.trim();
-            const res = await fetch(SHEET_URL + '&t=' + new Date().getTime());
-            const text = await res.text();
-            const rows = text.split('\n').slice(1);
-            const user = rows.find(r => {
-                const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
-                return c[0].toLowerCase() === n && c[2] === p;
-            });
-            if(user) {
-                const c = user.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
-                localStorage.setItem('bulls_user', c[0]);
-                localStorage.setItem('bulls_role', c[3]);
-                window.location.href = "dashboard.html";
-            } else { alert("Zutritt verweigert!"); }
+            if(!n || !p) return alert("Daten eingeben!");
+
+            try {
+                const res = await fetch(SHEET_URL + '&t=' + new Date().getTime());
+                const text = await res.text();
+                const rows = text.split('\n').slice(1);
+                const user = rows.find(r => {
+                    const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
+                    return c[0].toLowerCase() === n && c[2] === p;
+                });
+                
+                if(user) {
+                    const c = user.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
+                    localStorage.setItem('bulls_user', c[0]);
+                    localStorage.setItem('bulls_role', c[3]);
+                    window.location.href = "dashboard.html";
+                } else { alert("Zutritt verweigert!"); }
+            } catch(e) { alert("Server Fehler!"); }
         }
 
         async function doRegister() {
