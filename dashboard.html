@@ -6,69 +6,39 @@
     <title>Dark Bulls - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; padding: 0; font-family: 'Almendra', serif; background: black; color: white; min-height: 100vh; }
-        
-        /* Hintergrundbild Seite 1 */
-        #bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.4; z-index: 1; }
-
-        #top-bar { position: fixed; top: 0; width: 100%; display: flex; justify-content: space-between; padding: 15px 30px; background: rgba(0,0,0,0.8); z-index: 100; border-bottom: 1px solid #333; box-sizing: border-box; }
-        
-        .container { position: relative; z-index: 10; padding-top: 100px; display: flex; flex-wrap: wrap; gap: 25px; justify-content: center; }
-        .panel { background: rgba(20, 20, 20, 0.9); border: 2px solid #444; padding: 20px; border-radius: 10px; width: 280px; text-align: center; }
+        body { margin: 0; background: black; color: white; font-family: 'Almendra'; }
+        #bg { position: fixed; width: 100vw; height: 100vh; object-fit: cover; z-index: -1; opacity: 0.4; }
+        #nav { background: rgba(0,0,0,0.8); padding: 15px; display: flex; justify-content: space-between; border-bottom: 2px solid #ff3131; }
+        .container { padding: 80px 20px; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+        .panel { background: rgba(20,20,20,0.9); border: 1px solid #444; padding: 20px; border-radius: 10px; width: 250px; text-align: center; }
         .panel h2 { color: #ff3131; text-decoration: underline; }
-        .panel button { width: 100%; padding: 12px; margin: 8px 0; background: #39d353; border: none; font-family: 'Almendra'; font-weight: bold; cursor: pointer; border-radius: 5px; }
-
-        #chat-btn { position: fixed; bottom: 30px; right: 30px; background: #ff8c00; color: black; border: none; padding: 20px 40px; font-size: 22px; font-weight: bold; border-radius: 10px; cursor: pointer; z-index: 100; font-family: 'Almendra'; }
+        button { width: 100%; padding: 10px; margin: 5px 0; background: #39d353; border: none; font-weight: bold; cursor: pointer; font-family: 'Almendra'; }
     </style>
 </head>
 <body>
-
-    <img src="page1.jpg" id="bg">
-
-    <div id="top-bar">
-        <div style="font-size: 20px; color: #ff3131;">Willkommen, <span id="u-name"></span> (<span id="u-role"></span>)</div>
-        <button onclick="localStorage.clear(); window.location.href='index.html'" style="background:red; color:white; border:none; padding:8px 15px; cursor:pointer; border-radius:5px;">LOGOUT</button>
+    <img src="bulls_dashboard.jpg" id="bg">
+    <div id="nav">
+        <div id="info"></div>
+        <button onclick="location.href='index.html'" style="width:auto; background:red; color:white;">LOGOUT</button>
     </div>
-
     <div class="container">
-        <div class="panel" id="p-profil">
-            <h2>Persönlich</h2>
-            <button onclick="alert('Folgt...')">PIN ändern</button>
-            <button onclick="alert('Folgt...')">Support Chat</button>
-        </div>
-
-        <div class="panel" id="p-blacklist">
-            <h2>Black Liste</h2>
-            <button onclick="alert('Folgt...')">Anschauen</button>
-        </div>
-
-        <div class="panel" id="p-admin">
-            <h2>Admin Stab</h2>
-            <button onclick="alert('Folgt...')">Verwaltung</button>
-        </div>
-
-        <div class="panel" id="p-elo">
-            <h2>Elo Bereich</h2>
-            <button onclick="alert('Folgt...')">Rechner</button>
-        </div>
+        <div class="panel" id="p_perso"><h2>Persönlich</h2><button>Pin ändern</button></div>
+        <div class="panel" id="p_black"><h2>Black Liste</h2><button>Anschauen</button></div>
+        <div class="panel" id="p_admin"><h2>Admin</h2><button>Verwaltung</button></div>
     </div>
-
-    <button id="chat-btn">ALLIANZ CHAT</button>
-
     <script>
-        const role = localStorage.getItem('bulls_role');
         const name = localStorage.getItem('bulls_user');
-
+        const role = localStorage.getItem('bulls_role');
         if(!name) window.location.href = "index.html";
-
-        document.getElementById('u-name').innerText = name;
-        document.getElementById('u-role').innerText = role;
-
-        // GAST-RIEGEL: Löscht Panels für Gäste
+        document.getElementById('info').innerText = name + " (" + role + ")";
+        
+        // RECHTE-CHECK
         if(role === "Gast") {
-            document.getElementById('p-blacklist').remove();
-            document.getElementById('p-admin').remove();
-            document.getElementById('p-elo').remove();
+            document.getElementById('p_black').remove();
+            document.getElementById('p_admin').remove();
+        }
+        if(role === "Mitglied") {
+            document.getElementById('p_admin').remove();
         }
     </script>
 </body>
