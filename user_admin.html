@@ -8,33 +8,18 @@
     <style>
         body { background: black; color: white; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .admin-container { width: 1000px; max-width: 95vw; background: #0a0a0a; padding: 30px; border: 2px solid #ff3131; border-radius: 15px; box-shadow: 0 0 40px red; }
-        
         h1 { color: #ff3131; text-transform: uppercase; text-align: center; margin-bottom: 25px; }
-
-        /* Suchfeld Styling */
-        .search-box { 
-            width: 100%; padding: 15px; background: #111; border: 1px solid #444; 
-            color: #39d353; font-family: 'Almendra'; font-size: 20px; 
-            border-radius: 8px; margin-bottom: 25px; outline: none; box-sizing: border-box;
-        }
+        .search-box { width: 100%; padding: 15px; background: #111; border: 1px solid #444; color: #39d353; font-family: 'Almendra'; font-size: 20px; border-radius: 8px; margin-bottom: 25px; outline: none; box-sizing: border-box; }
         .search-box:focus { border-color: #ff3131; box-shadow: 0 0 15px rgba(255, 49, 49, 0.3); }
-
-        /* Tabelle */
         table { width: 100%; border-collapse: collapse; }
         th { color: #ff3131; text-align: left; padding: 15px; border-bottom: 2px solid #333; text-transform: uppercase; font-size: 14px; }
         td { padding: 15px; border-bottom: 1px solid #222; cursor: pointer; transition: 0.2s; }
         tr:hover { background: rgba(255, 0, 0, 0.15); }
-
-        /* Modal / Spieler-Karte */
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; }
         .detail-card { background: #111; border: 2px solid #ff3131; padding: 35px; border-radius: 15px; width: 500px; box-shadow: 0 0 60px red; position: relative; }
-        
         .field-group { margin-bottom: 20px; }
         label { display: block; color: #ff3131; font-size: 14px; margin-bottom: 8px; text-transform: uppercase; }
         input, select { width: 100%; padding: 12px; background: black; border: 1px solid #444; color: white; font-family: 'Almendra'; font-size: 18px; box-sizing: border-box; outline: none; }
-        input:focus { border-color: #39d353; }
-
-        /* Buttons in der Akte */
         .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
         .btn { padding: 15px; border: none; cursor: pointer; font-family: 'Almendra'; font-weight: bold; border-radius: 5px; font-size: 16px; text-transform: uppercase; transition: 0.3s; }
         .btn-save { background: #39d353; color: black; grid-column: span 2; font-size: 20px; }
@@ -42,8 +27,6 @@
         .btn-stats { background: #5b5bff; color: white; }
         .btn-del { background: #ff3131; color: white; margin-top: 10px; width: 100%; }
         .btn-close { background: #333; color: white; width: 100%; margin-top: 20px; }
-        .btn:hover { filter: brightness(1.2); transform: scale(1.02); }
-
         .back-btn { color: #5b5bff; cursor: pointer; text-decoration: underline; margin-bottom: 20px; align-self: flex-start; font-size: 18px; }
         #loading { font-size: 24px; color: #ffd600; margin-top: 50px; text-align: center; width: 100%; }
     </style>
@@ -54,9 +37,7 @@
 
     <div class="admin-container">
         <h1>Mitglieder Kontrollzentrum</h1>
-        
-        <input type="text" class="search-box" id="searchInput" placeholder="Spielername tippen zum Filtern..." onkeyup="filterTable()">
-        
+        <input type="text" class="search-box" id="searchInput" placeholder="Spielername filtern..." onkeyup="filterTable()">
         <div id="loading">Datenbank wird abgefragt...</div>
 
         <table id="userTable" style="display:none;">
@@ -64,7 +45,7 @@
                 <tr>
                     <th>Spielername</th>
                     <th>Hauptrolle</th>
-                    <th>Zusatzrolle</th>
+                    <th>Zusatzaufgabe</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -95,23 +76,29 @@
             </div>
 
             <div class="field-group">
-                <label>Spezial-Zusatzrolle</label>
-                <input type="text" id="editExtraRole" placeholder="z.B. Rekrutierer, Spion-Jäger...">
+                <label>Zusätzliche Aufgabe</label>
+                <select id="editExtraRole">
+                    <option value="">Keine</option>
+                    <option value="Buchhalter">Buchhalter</option>
+                    <option value="ELO">ELO</option>
+                </select>
             </div>
 
             <div class="action-grid">
                 <button class="btn btn-save" onclick="saveChanges(event)">Änderungen Speichern</button>
                 <button class="btn btn-pin" onclick="resetPin()">PIN Reset</button>
-                <button class="btn btn-stats" onclick="alert('Statistik Center wird geladen...')">Statistik</button>
+                <button class="btn btn-stats" onclick="alert('Statistik Center folgt...')">Statistik</button>
             </div>
             
-            <button class="btn btn-del" onclick="deleteUser()">Spieler unwiderruflich löschen</button>
+            <button class="btn btn-del" onclick="deleteUser()">Spieler löschen</button>
             <button class="btn btn-close" onclick="closeModal()">Fenster schließen</button>
         </div>
     </div>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzsDDQNqz3UvmHOq9u0RAN2LbMAAW8QUOT_NCWI5JryhDKiiu3xDRgA_HRfxthvdIcC2g/exec';
+        // DEINE NEUE ZENTRALE URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxVrCLO0pOP-pVcoYYfpSJZI_ou27LIr6jZPOzPPcgtYzu57qkqBynnPrC0-gIWbmJUSg/exec';
+        
         let allUsers = [];
         let currentEditingName = "";
 
@@ -128,7 +115,7 @@
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('userTable').style.display = 'table';
             } catch (e) {
-                document.getElementById('loading').innerText = "Verbindung zur Tabelle fehlgeschlagen!";
+                document.getElementById('loading').innerText = "Verbindung fehlgeschlagen!";
             }
         }
 
@@ -141,7 +128,7 @@
                 tr.innerHTML = `
                     <td style="font-weight: bold; font-size: 18px;">${row[0]}</td>
                     <td>${row[3]}</td>
-                    <td style="color: #ffd600;">${row[1] || '-'}</td>
+                    <td style="color: #ffd600;">${row[5] || '-'}</td>
                     <td style="font-size: 12px; color: #555;">${row[4] ? "Aktiv" : "Neu"}</td>
                 `;
                 body.appendChild(tr);
@@ -159,7 +146,7 @@
             document.getElementById('editTitle').innerText = "Akte: " + row[0];
             document.getElementById('editName').value = row[0];
             document.getElementById('editRole').value = row[3];
-            document.getElementById('editExtraRole').value = row[1] || "";
+            document.getElementById('editExtraRole').value = row[5] || ""; // Zusatzrolle aus Index 5
             document.getElementById('detailModal').style.display = 'flex';
         }
 
@@ -193,18 +180,18 @@
 
         async function resetPin() {
             const tempPin = Math.floor(1000 + Math.random() * 9000);
-            if(confirm("PIN wirklich zurücksetzen? Neuer temporärer PIN: " + tempPin)) {
+            if(confirm("PIN zurücksetzen auf: " + tempPin + "?")) {
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     body: JSON.stringify({ action: "resetPin", userName: currentEditingName, newPin: tempPin })
                 });
-                alert("PIN wurde auf " + tempPin + " gesetzt.");
+                alert("PIN ist jetzt " + tempPin);
             }
         }
 
         async function deleteUser() {
-            if(confirm("ACHTUNG: " + currentEditingName + " wirklich löschen?")) {
+            if(confirm(currentEditingName + " wirklich löschen?")) {
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
