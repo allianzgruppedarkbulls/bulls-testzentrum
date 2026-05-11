@@ -9,66 +9,54 @@
         /* GRUND-LAYOUT */
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: black; font-family: 'Almendra', serif; color: white; overflow: hidden; }
         
-        /* HINTERGRUND-BILD (Festgenagelt) */
-        #main-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -1; opacity: 0.7; }
-
-        /* ZENTRALE (Hier liegt alles drin) */
-        #start-portal { display: flex; align-items: center; justify-content: center; height: 100vh; position: relative; z-index: 10; }
-        
-        /* DAS GLÜHENDE EMBLEM (Mitte) */
-        #emblem-box { 
-            position: relative; z-index: 5; width: 550px; max-width: 80vw; padding: 20px; 
-            box-shadow: 0 0 100px rgba(255, 0, 0, 0.7); border: 1px solid rgba(255, 0, 0, 0.2); background: rgba(0,0,0,0.6);
+        /* HINTERGRUND (Einziges Bild) */
+        #main-bg { 
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            object-fit: cover; z-index: -1; opacity: 0.8; 
         }
-        #emblem-box img { width: 100%; display: block; filter: drop-shadow(0 0 10px red); }
 
         /* BUTTONS LINKS (Login & Rekrutierung) */
-        .side-l { position: absolute; left: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 40px; }
-        .tab-l { padding: 30px 12px; font-size: 18px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 0 10px 10px 0; width: 50px; color: black; font-family: 'Almendra'; }
+        .side-l { position: absolute; left: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 40px; z-index: 100; }
+        .tab-l { padding: 35px 15px; font-size: 20px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 0 12px 12px 0; width: 55px; color: black; font-family: 'Almendra'; text-align: center; }
+        
         #btn-login { background: #39d353; box-shadow: 0 0 20px #39d353; }
         #btn-rekrut { background: #ffd600; box-shadow: 0 0 20px #ffd600; }
 
-        /* BUTTONS RECHTS (Info & Web) */
-        .side-r { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; }
-        .tab-r { padding: 25px 8px; font-size: 14px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 10px 0 0 10px; width: 45px; color: black; font-family: 'Almendra'; }
+        /* BUTTONS RECHTS (Youtube, Histories, Internet) */
+        .side-r { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 100; }
+        .tab-r { padding: 25px 10px; font-size: 15px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 12px 0 0 12px; width: 45px; color: black; font-family: 'Almendra'; text-align: center; }
+        
         #tab-yt { background: #ff8c00; }
         #tab-hist { background: #5b5bff; color: white; }
         #tab-web { background: #00cfd1; }
 
-        /* FENSTER FÜR LOGIN & REKRUTIERUNG */
-        .overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; overflow-y: auto; }
-        .modal-card { background: #111; padding: 25px; border: 2px solid #ff3131; border-radius: 15px; width: 400px; max-width: 90%; text-align: center; box-shadow: 0 0 50px red; }
+        /* FENSTER-STYLING (Popups) */
+        .overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
+        .modal-card { background: #111; padding: 30px; border: 2px solid #ff3131; border-radius: 15px; width: 350px; text-align: center; box-shadow: 0 0 50px red; }
         .modal-card.gold { border-color: #ffd600; box-shadow: 0 0 50px #ffd600; }
         
-        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 16px; text-align: center; box-sizing: border-box; }
-        .submit-btn { width: 100%; padding: 15px; background: #39d353; border: none; color: black; font-weight: bold; cursor: pointer; font-size: 20px; font-family: 'Almendra'; margin-top: 10px; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 18px; text-align: center; box-sizing: border-box; }
+        .submit-btn { width: 100%; padding: 15px; background: #39d353; border: none; color: black; font-weight: bold; cursor: pointer; font-size: 22px; font-family: 'Almendra'; margin-top: 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
 
-    <img src="bulls_start.jpg" id="main-bg">
+    <img id="main-bg">
 
-    <div id="start-portal">
-        
-        <div class="side-l">
-            <button class="tab-l" id="btn-login" onclick="openModal('loginMod')">LOGIN</button>
-            <button class="tab-l" id="btn-rekrut" onclick="openModal('regMod')">REKRUTIERUNG</button>
-        </div>
+    <div class="side-l">
+        <button class="tab-l" id="btn-login" onclick="openModal('loginMod')">LOGIN</button>
+        <button class="tab-l" id="btn-rekrut" onclick="openModal('regMod')">REKRUTIERUNG</button>
+    </div>
 
-        <div id="emblem-box">
-            <img src="bulls_start.jpg" alt="Logo">
-        </div>
-
-        <div class="side-r">
-            <button class="tab-r" id="tab-yt" onclick="window.open('https://www.youtube.com/@DarkBullsGruppe')">YOUTUBE</button>
-            <button class="tab-r" id="tab-hist" onclick="alert('Historie folgt')">HISTORIES</button>
-            <button class="tab-r" id="tab-web" onclick="window.open('https://darkbulls.jimdofree.com/')">INTERNET</button>
-        </div>
+    <div class="side-r">
+        <button class="tab-r" id="tab-yt" onclick="window.open('https://www.youtube.com/@DarkBullsGruppe')">YOUTUBE</button>
+        <button class="tab-r" id="tab-hist" onclick="alert('Historie folgt...')">HISTORIES</button>
+        <button class="tab-r" id="tab-web" onclick="window.open('https://darkbulls.jimdofree.com/')">INTERNET</button>
     </div>
 
     <div id="loginMod" class="overlay">
         <div class="modal-card">
-            <h2 style="color: #ff3131;">ANMELDUNG</h2>
+            <h2 style="color: #ff3131; margin-top: 0;">ANMELDUNG</h2>
             <input type="text" id="logName" placeholder="BENUTZERNAME">
             <input type="password" id="logPin" placeholder="PIN">
             <button class="submit-btn" onclick="doLogin()">BETRETEN</button>
@@ -78,69 +66,57 @@
 
     <div id="regMod" class="overlay">
         <div class="modal-card gold">
-            <h2 style="color: #ffd600;">REKRUTIERUNG</h2>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <input type="text" id="regName" placeholder="Name im Spiel">
-                <input type="text" id="regKD" placeholder="KD">
-            </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <input type="text" id="regAge" placeholder="Alter">
-                <input type="text" id="regTime" placeholder="Spielzeit CoW">
-            </div>
-            <input type="text" id="regFreq" placeholder="Wie viel spielst du am Tag?">
+            <h2 style="color: #ffd600; margin-top: 0;">REKRUTIERUNG</h2>
+            <input type="text" id="regName" placeholder="Dein Name im Game">
             <select id="regReason">
                 <option value="" disabled selected>Grund der Anmeldung...</option>
-                <option value="Gast/Besuch">Nur zu Besuch / Gast</option>
+                <option value="Gast">Nur zu Besuch / Gast</option>
                 <option value="Mitgliedschaft">Bestrebung einer Mitgliedschaft</option>
             </select>
             <input type="password" id="regPin" placeholder="Wähle eine PIN">
-            <button class="submit-btn" style="background:#ffd600" onclick="doRegister()">ABSCHICKEN & STARTEN</button>
+            <button class="submit-btn" style="background:#ffd600" onclick="doRegister()">REKRUTIEREN</button>
             <p onclick="closeModals()" style="color:#555; cursor:pointer; margin-top:15px;">Abbrechen</p>
         </div>
     </div>
 
     <script>
         const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ/gviz/tq?tqx=out:csv&gid=1188820112';
-        const WEBHOOK = 'https://discord.com/api/webhooks/1502735246335021267/fpxXtWr5QgSny6rfJzGHKnhYskehC9vDMEl3CvUzjgbBOuKBd8KGzUhCRfvd2KmWcnND';
+
+        // Erzwingt das Bild beim Laden
+        window.onload = function() {
+            document.getElementById('main-bg').src = 'bulls_start.jpg?t=' + new Date().getTime();
+            loadData();
+        };
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModals() { document.querySelectorAll('.overlay').forEach(m => m.style.display = 'none'); }
 
-        async function doLogin() {
-            const n = document.getElementById("logName").value.trim().toLowerCase();
-            const p = document.getElementById("logPin").value.trim();
-            if(!n || !p) return alert("Daten eingeben!");
-
+        async function loadData() {
             try {
                 const res = await fetch(SHEET_URL + '&t=' + new Date().getTime());
                 const text = await res.text();
-                const rows = text.split('\n').slice(1);
-                const user = rows.find(r => {
-                    const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
-                    return c[0].toLowerCase() === n && c[2] === p;
-                });
-                
-                if(user) {
-                    const c = user.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
-                    localStorage.setItem('bulls_user', c[0]);
-                    localStorage.setItem('bulls_role', c[3]);
-                    window.location.href = "dashboard.html";
-                } else { alert("Zutritt verweigert!"); }
-            } catch(e) { alert("Server Fehler!"); }
+                window.userDataRows = text.split('\n').slice(1);
+            } catch(e) { console.error("Cloud Fehler"); }
         }
 
-        async function doRegister() {
-            const name = document.getElementById('regName').value.trim();
-            const reason = document.getElementById('regReason').value;
-            if(!name || !reason) return alert("Bitte Name und Grund angeben!");
-
-            // Discord Info
-            fetch(WEBHOOK, {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ content: `🚨 **NEUE REKRUTIERUNG**\n**Name:** ${name}\n**Grund:** ${reason}\n_User startet als Gast._` })
+        function doLogin() {
+            const n = document.getElementById("logName").value.trim().toLowerCase();
+            const p = document.getElementById("logPin").value.trim();
+            const user = window.userDataRows.find(r => {
+                const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
+                return c[0].toLowerCase() === n && c[2] === p;
             });
+            if(user) {
+                const c = user.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
+                localStorage.setItem('bulls_user', c[0]);
+                localStorage.setItem('bulls_role', c[3]);
+                window.location.href = "dashboard.html";
+            } else { alert("Zutritt verweigert!"); }
+        }
 
+        function doRegister() {
+            const name = document.getElementById('regName').value.trim();
+            if(!name) return alert("Name fehlt!");
             localStorage.setItem('bulls_user', name);
             localStorage.setItem('bulls_role', 'Gast');
             window.location.href = "dashboard.html";
