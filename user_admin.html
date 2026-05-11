@@ -16,7 +16,7 @@
             padding: 30px; border: 2px solid #ff3131; border-radius: 15px; 
             box-shadow: 0 0 40px red; margin-top: 20px;
         }
-        h1 { color: #ff3131; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; }
+        h1 { color: #ff3131; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; text-align: center; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th { color: #ff3131; text-align: left; padding: 15px; border-bottom: 2px solid #333; text-transform: uppercase; }
         td { padding: 15px; border-bottom: 1px solid #222; }
@@ -25,7 +25,7 @@
         .save-btn { background: #39d353; color: black; border: none; padding: 8px 15px; cursor: pointer; font-weight: bold; border-radius: 4px; font-family: 'Almendra'; margin-left: 10px; transition: 0.3s; }
         .save-btn:hover { background: #2fb947; transform: scale(1.1); }
         .back-btn { color: #5b5bff; cursor: pointer; text-decoration: underline; font-size: 18px; margin-bottom: 20px; align-self: flex-start; }
-        #loading { font-size: 24px; color: #ffd600; margin-top: 50px; }
+        #loading { font-size: 24px; color: #ffd600; margin-top: 50px; text-align: center; width: 100%; }
         .role-badge { padding: 4px 8px; border-radius: 4px; font-size: 14px; font-weight: bold; background: #222; color: #ccc; }
     </style>
 </head>
@@ -33,9 +33,12 @@
 
     <div style="width: 900px; max-width: 95vw; display: flex; flex-direction: column;">
         <div class="back-btn" onclick="window.location.href='dashboard.html'"><< Zurück zum Dashboard</div>
+        
         <div class="admin-container">
             <h1>User-Verwaltung</h1>
-            <div id="loading">Datenbank wird geladen...</div>
+            
+            <div id="loading">Greife auf Allianz-Datenbank zu...</div>
+            
             <table id="userTable" style="display:none;">
                 <thead>
                     <tr>
@@ -52,6 +55,7 @@
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzsDDQNqz3UvmHOq9u0RAN2LbMAAW8QUOT_NCWI5JryhDKiiu3xDRgA_HRfxthvdIcC2g/exec';
 
+        // Check: Nur Admins dürfen hier sein
         if (localStorage.getItem('bulls_role') !== "Admin") {
             alert("ZUTRITT VERWEIGERT!");
             window.location.href = "dashboard.html";
@@ -64,9 +68,11 @@
                 const body = document.getElementById('userBody');
                 body.innerHTML = "";
 
+                // Wir starten bei Index 1 (Überschrift überspringen)
                 data.slice(1).forEach(row => {
                     const name = row[0];
                     const currentRole = row[3] || "Gast";
+                    
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td style="font-weight: bold; font-size: 18px;">${name}</td>
@@ -86,36 +92,52 @@
                     `;
                     body.appendChild(tr);
                 });
+
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('userTable').style.display = 'table';
             } catch (e) {
-                document.getElementById('loading').innerText = "Fehler beim Laden!";
+                document.getElementById('loading').innerText = "Fehler beim Laden der Datenbank!";
             }
         }
 
         async function updateUser(evt, name) {
+            // Hier fangen wir das Event ab
+            const btn = evt.target; 
             const newRole = document.getElementById(`sel-${name}`).value;
-            if(!confirm(`${name} zum ${newRole} machen?`)) return;
+            
+            if(!confirm(`${name} wirklich zum ${newRole} ernennen?`)) return;
 
-            const btn = evt.target;
+            // Optisches Feedback
+            const oldText = btn.innerText;
             btn.innerText = "...";
             btn.disabled = true;
 
             try {
+                // Der POST-Request an dein Google Script
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    body: JSON.stringify({ action: "updateRole", userName: name, newRole: newRole })
+                    cache: 'no-cache',
+                    body: JSON.stringify({ 
+                        action: "updateRole", 
+                        userName: name, 
+                        newRole: newRole 
+                    })
                 });
-                alert("Erfolgreich gesendet!");
+
+                alert("Beförderung für " + name + " wurde gesendet!");
+                // Liste nach 1,5 Sekunden neu laden
                 setTimeout(loadUsers, 1500);
             } catch (e) {
-                alert("Fehler!");
-                btn.innerText = "OK";
+                alert("Fehler bei der Übertragung!");
+                btn.innerText = oldText;
                 btn.disabled = false;
             }
         }
+
+        // Seite initial laden
         loadUsers();
     </script>
 </body>
 </html>
+            
