@@ -2,43 +2,111 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dark Bulls - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; background: black; color: white; font-family: 'Almendra'; }
-        #bg { position: fixed; width: 100vw; height: 100vh; object-fit: cover; z-index: -1; opacity: 0.4; }
-        #nav { background: rgba(0,0,0,0.8); padding: 15px; display: flex; justify-content: space-between; border-bottom: 2px solid #ff3131; }
-        .container { padding: 80px 20px; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
-        .panel { background: rgba(20,20,20,0.9); border: 1px solid #444; padding: 20px; border-radius: 10px; width: 250px; text-align: center; }
-        .panel h2 { color: #ff3131; text-decoration: underline; }
-        button { width: 100%; padding: 10px; margin: 5px 0; background: #39d353; border: none; font-weight: bold; cursor: pointer; font-family: 'Almendra'; }
+        /* GRUND-LAYOUT (Fixiert wie auf der Startseite) */
+        html, body { 
+            margin: 0; 
+            padding: 0; 
+            width: 100%; 
+            height: 100vh; 
+            background-color: black;
+            font-family: 'Almendra', serif; 
+            color: white; 
+            overflow: hidden; /* Verhindert Scrollen */
+        }
+
+        /* HINTERGRUND-BILD-KONTROLLE (Das war das Problem) */
+        #dashboard-bg { 
+            position: fixed; 
+            top: 50%; /* Ab in die Mitte */
+            left: 50%;
+            transform: translate(-50%, -50%); /* Exakt zentrieren */
+            
+            /* HIER WIRD DIE GRÖSSE EINGESTELLT */
+            width: 600px; /* GLEICHE BREITE WIE AUF DER STARTSEITE */
+            max-width: 90vw; /* Damit es auf Handys nicht abgeschnitten wird */
+            
+            height: auto; 
+            object-fit: contain; /* Bild wird nicht verzerrt */
+            
+            /* DAS ROTE LEUCHTEN (Vom alten Code) */
+            filter: drop-shadow(0 0 40px rgba(255, 0, 0, 0.6)); 
+            
+            z-index: -1; /* Liegt hinter den Buttons */
+        }
+
+        /* HEADER-BEREICH (Benutzer und Logout) */
+        .header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        .user-info { font-size: 20px; color: #eee; }
+        .logout-btn { padding: 8px 15px; background: #ff3131; color: white; border: none; cursor: pointer; border-radius: 5px; font-weight: bold; font-family: 'Almendra'; }
+
+        /* BUTTONS GRID (Zentral auf der Seite) */
+        .grid-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            z-index: 5;
+        }
+        .card { background: rgba(0, 0, 0, 0.7); padding: 25px; border-radius: 12px; border: 1px solid #333; text-align: center; }
+        .card h2 { color: #ff3131; margin-top: 0; }
+        .card-btn { width: 100%; padding: 12px; background: #39d353; border: none; cursor: pointer; color: black; border-radius: 5px; font-family: 'Almendra'; font-size: 16px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <img src="bulls_dashboard.jpg" id="bg">
-    <div id="nav">
-        <div id="info"></div>
-        <button onclick="location.href='index.html'" style="width:auto; background:red; color:white;">LOGOUT</button>
+
+    <img src="https://image-gen.com/a/darkbulls_logo.png" id="dashboard-bg">
+
+    <div class="header">
+        <div class="user-info" id="userDisplay">Julian (Admin)</div>
+        <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
-    <div class="container">
-        <div class="panel" id="p_perso"><h2>Persönlich</h2><button>Pin ändern</button></div>
-        <div class="panel" id="p_black"><h2>Black Liste</h2><button>Anschauen</button></div>
-        <div class="panel" id="p_admin"><h2>Admin</h2><button>Verwaltung</button></div>
+
+    <div class="grid-container">
+        <div class="card">
+            <h2>Persönlich</h2>
+            <button class="card-btn" onclick="alert('Funktion folgt')">Pin ändern</button>
+        </div>
+        <div class="card">
+            <h2>Black Liste</h2>
+            <button class="card-btn" onclick="alert('Funktion folgt')">Anschauen</button>
+        </div>
+        <div class="card">
+            <h2>Admin</h2>
+            <button class="card-btn" onclick="alert('Funktion folgt')">Verwaltung</button>
+        </div>
     </div>
+
     <script>
-        const name = localStorage.getItem('bulls_user');
-        const role = localStorage.getItem('bulls_role');
-        if(!name) window.location.href = "index.html";
-        document.getElementById('info').innerText = name + " (" + role + ")";
-        
-        // RECHTE-CHECK
-        if(role === "Gast") {
-            document.getElementById('p_black').remove();
-            document.getElementById('p_admin').remove();
+        // Checken ob User eingeloggt ist (Standard-Schutz)
+        if (!localStorage.getItem('bulls_user')) {
+            window.location.href = "index.html";
+        } else {
+            // Namen anzeigen
+            document.getElementById('userDisplay').innerText = `${localStorage.getItem('bulls_user')} (${localStorage.getItem('bulls_role')})`;
         }
-        if(role === "Mitglied") {
-            document.getElementById('p_admin').remove();
+
+        function logout() {
+            localStorage.removeItem('bulls_user');
+            localStorage.removeItem('bulls_role');
+            window.location.href = "index.html";
         }
     </script>
 </body>
