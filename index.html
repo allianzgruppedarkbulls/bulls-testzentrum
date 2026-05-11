@@ -6,148 +6,152 @@
     <title>Dark Bulls - Allianz System V12.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* FIX: Absolut erzwungener Fullscreen-Hintergrund */
-        html, body { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            background: black; font-family: 'Almendra', serif; color: white;
-            overflow: hidden;
-        }
-        
-        .bg-fixed {
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: black; overflow: hidden; font-family: 'Almendra', serif; }
+
+        /* HINTERGRUND-SYSTEM */
+        .bg-layer {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            object-fit: cover; /* Schneidet das Bild passend zu */
-            z-index: -1; 
-            display: none;
+            background-size: cover; background-position: center;
+            z-index: -1; transition: opacity 0.5s ease;
         }
         
-        /* Startzustand */
-        #bg0 { display: block; opacity: 0.7; }
-        #bg1 { display: none; opacity: 0.4; }
+        /* Hier setzen wir die Bilder direkt als Background-Image ein */
+        #bg0 { 
+            background-image: url('page0.jpg'); 
+            opacity: 1; 
+        }
+        #bg1 { 
+            background-image: url('page1.jpg'); 
+            opacity: 0; 
+        }
 
-        /* DEIN DESIGN */
+        /* STARTSEITE DESIGN */
         #start { display: flex; align-items: center; justify-content: center; height: 100vh; position: relative; z-index: 10; }
-        #logo-container img { width: 780px; max-width: 75vw; filter: drop-shadow(0 0 60px rgba(255, 0, 0, 0.9)); }
-        
-        #loginBar { position: absolute; left: 0; top: 35%; transform: translateY(-50%); background: #39d353; padding: 30px 5px; font-size: 20px; font-weight: bold; color: black; cursor: pointer; z-index: 100; border-radius: 0 10px 10px 0; writing-mode: vertical-rl; text-orientation: upright; width: 45px; text-align: center; }
-        #regBar { position: absolute; left: 0; top: 65%; transform: translateY(-50%); background: #ffd600; padding: 25px 5px; font-size: 14px; font-weight: bold; color: black; cursor: pointer; z-index: 100; border-radius: 0 10px 10px 0; writing-mode: vertical-rl; text-orientation: upright; width: 45px; text-align: center; }
-        
-        #side-menu { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 100; }
-        .info-btn { padding: 15px 5px; font-size: 15px; font-weight: bold; border: none; cursor: pointer; font-family: 'Almendra'; writing-mode: vertical-rl; text-orientation: upright; border-radius: 10px 0 0 10px; width: 40px; text-align: center; color: black; min-height: 100px; }
-        #btn-yt { background: #ff8c00; }
-        #btn-hist { background: #5b5bff; color: white; }
-        #btn-web { background: #00cfd1; }
+        #logo-container img { width: 700px; max-width: 80vw; filter: drop-shadow(0 0 50px rgba(255, 0, 0, 0.7)); }
 
-        .modal-overlay { display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; }
-        .dark-modal { background: #1a1a1a; padding: 30px; width: 350px; max-width: 90vw; border: 2px solid #ff3131; text-align: center; border-radius: 12px; box-shadow: 0 0 50px rgba(255,0,0,0.5); }
-        .dark-modal input { width: 100%; padding: 12px; margin-bottom: 12px; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 20px; text-align: center; }
-        .logbtn { padding: 15px; border: none; cursor: pointer; font-family: 'Almendra'; font-weight: bold; font-size: 20px; border-radius: 5px; color: black; width: 100%; background: #39d353; }
+        .side-bar { position: absolute; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
+        .left { left: 0; }
+        .right { right: 0; }
 
-        #dashboard { display: none; position: relative; width: 100vw; min-height: 100vh; padding-top: 80px; }
-        #top-bar { position: fixed; top: 0; width: 100%; display: flex; justify-content: space-between; padding: 15px 40px; z-index: 100; background: rgba(0,0,0,0.85); border-bottom: 1px solid #333; box-sizing: border-box;}
-        
-        .panel { display: none; background: rgba(15, 15, 15, 0.95); border: 1px solid #444; padding: 15px; z-index: 10; border-radius: 8px; width: 260px; margin: 15px; box-shadow: 0 0 20px rgba(255,0,0,0.2); }
-        .panel.visible { display: block; }
-        .panel h2 { color: #ff3131; margin: 0 0 10px 0; font-size: 22px; text-decoration: underline; text-align: center; }
-        .panel button { display: block; width: 100%; margin: 8px 0; background: #39d353; border: none; padding: 12px; font-family: 'Almendra'; font-weight: bold; cursor: pointer; color: black; border-radius: 4px; font-size: 16px; }
-
-        @media (min-width: 801px) {
-            .panel { position: absolute; }
-            #personal { left: 50px; top: 100px; }
-            #blacklistPanel { left: 50px; top: 400px; }
-            #admin { right: 50px; top: 100px; }
+        .bar-btn { 
+            padding: 35px 10px; font-size: 20px; font-weight: bold; border: none; cursor: pointer; 
+            writing-mode: vertical-rl; text-orientation: upright; font-family: 'Almendra'; 
+            border-radius: 0 10px 10px 0; color: black;
         }
+        #btn-login { background: #39d353; }
+        #btn-reg { background: #ffd600; }
+        .info-btn { background: #444; color: white; border-radius: 10px 0 0 10px; writing-mode: vertical-rl; text-orientation: upright; padding: 20px 8px; cursor: pointer; }
+
+        /* MODALS */
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; }
+        .login-card { background: #111; border: 2px solid #ff3131; padding: 30px; border-radius: 15px; width: 300px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: black; border: 1px solid #444; color: #39d353; font-family: 'Almendra'; font-size: 20px; text-align: center; box-sizing: border-box; }
+        .submit-btn { width: 100%; padding: 15px; background: #39d353; border: none; font-weight: bold; font-size: 18px; cursor: pointer; }
+
+        /* DASHBOARD */
+        #dashboard { display: none; position: relative; width: 100vw; height: 100vh; z-index: 20; color: white; }
+        #top-nav { background: rgba(0,0,0,0.8); padding: 15px 30px; display: flex; justify-content: space-between; border-bottom: 2px solid #ff3131; }
+        .panel { background: rgba(0,0,0,0.9); border: 1px solid #444; padding: 15px; width: 250px; border-radius: 10px; position: absolute; }
+        #p-perso { left: 30px; top: 100px; }
+        #p-black { left: 30px; top: 350px; }
+        #p-admin { right: 30px; top: 100px; }
+        .panel h2 { color: #ff3131; margin-top: 0; font-size: 20px; text-decoration: underline; }
+        .panel button { width: 100%; padding: 10px; margin: 5px 0; background: #39d353; border: none; font-weight: bold; cursor: pointer; font-family: 'Almendra'; }
     </style>
 </head>
 <body>
 
-<img id="bg0" class="bg-fixed">
-<img id="bg1" class="bg-fixed">
+<div id="bg0" class="bg-layer"></div>
+<div id="bg1" class="bg-layer"></div>
 
 <div id="start">
-    <div id="loginBar" onclick="document.getElementById('pinModal').style.display='flex'">LOGIN</div>
-    <div id="regBar" onclick="window.open('https://darkbulls.jimdofree.com/registrierung/')">REGISTRIEREN</div>
-    <div id="logo-container"><img src="bulls_start.jpg"></div>
-    <div id="side-menu">
-        <button class="info-btn" id="btn-yt" onclick="window.open('https://www.youtube.com/@DarkBullsGruppe')">YOUTUBE</button>
-        <button class="info-btn" id="btn-hist">HISTORIES</button>
-        <button class="info-btn" id="btn-web" onclick="window.open('https://darkbulls.jimdofree.com/')">INTERNET</button>
+    <div class="side-bar left">
+        <div class="bar-btn" id="btn-login" onclick="openLogin()">LOGIN</div>
+        <div class="bar-btn" id="btn-reg" onclick="window.open('https://darkbulls.jimdofree.com/registrierung/')">REGISTRIEREN</div>
+    </div>
+    
+    <div id="logo-container">
+        <img src="bulls_start.jpg">
+    </div>
+
+    <div class="side-bar right">
+        <div class="info-btn" onclick="window.open('https://www.youtube.com/@DarkBullsGruppe')">YOUTUBE</div>
+        <div class="info-btn" style="background: #5b5bff;">HISTORIES</div>
     </div>
 </div>
 
-<div id="pinModal" class="modal-overlay">
-    <div class="dark-modal">
-        <h1 style="color:#ff3131; margin-top:0;">ANMELDUNG</h1>
-        <input type="text" id="nameInput" placeholder="NAME">
-        <input type="password" id="pinInput" placeholder="PIN">
-        <button class="logbtn" onclick="doLogin()">BETRETEN</button>
-        <p onclick="document.getElementById('pinModal').style.display='none'" style="cursor:pointer; margin-top:15px; color:#666;">Abbrechen</p>
+<div id="loginModal" class="overlay">
+    <div class="login-card">
+        <h2 style="color:#ff3131">ALLIANZ LOGIN</h2>
+        <input type="text" id="nameIn" placeholder="NAME">
+        <input type="password" id="pinIn" placeholder="PIN">
+        <button class="submit-btn" onclick="checkLogin()">IDENTIFIZIEREN</button>
+        <p onclick="closeLogin()" style="color:#555; cursor:pointer; margin-top:15px;">Abbrechen</p>
     </div>
 </div>
 
 <div id="dashboard">
-    <div id="top-bar">
-        <div style="font-size: 20px; color:#ff3131"><span id="userNameDisplay"></span> (<span id="userRoleDisplay"></span>)</div>
-        <button onclick="location.reload()" style="background:#d50000; color:white; border:none; padding:8px 20px; cursor:pointer; border-radius:5px; font-family:'Almendra'; font-weight:bold;">LOGOUT</button>
+    <div id="top-nav">
+        <div id="userInfo" style="color:#ff3131; font-weight:bold; font-size: 20px;"></div>
+        <button onclick="location.reload()" style="background:red; color:white; border:none; padding:5px 15px; cursor:pointer; font-family:'Almendra';">LOGOUT</button>
     </div>
-    
-    <div class="panel" id="personal">
+
+    <div class="panel" id="p-perso">
         <h2>Persönlich</h2>
         <button>Pin ändern</button>
         <button>Support Chat</button>
     </div>
-    <div class="panel" id="blacklistPanel">
+    
+    <div class="panel" id="p-black">
         <h2>Black Liste</h2>
         <button>Anschauen</button>
     </div>
-    <div id="admin" class="panel">
+
+    <div class="panel" id="p-admin" style="display:none;">
         <h2>Admin</h2>
-        <button>User-Verwaltung</button>
+        <button>User Verwaltung</button>
     </div>
 </div>
 
 <script>
-    const SHEET_ID = '1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ';
-    const GID_USERS = '1188820112';
-    let users = [];
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ/gviz/tq?tqx=out:csv&gid=1188820112';
 
-    // FIX: Setzt die Bilderpfade beim Laden der Seite mit Zeitstempel
-    window.onload = function() {
-        const time = new Date().getTime();
-        document.getElementById('bg0').src = 'page0.jpg?t=' + time;
-        document.getElementById('bg1').src = 'page1.jpg?t=' + time;
-        loadData();
-    };
+    function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
+    function closeLogin() { document.getElementById('loginModal').style.display = 'none'; }
 
-    async function loadData() {
-        const res = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID_USERS}&t=${new Date().getTime()}`);
-        const text = await res.text();
-        const rows = text.split('\n').slice(1);
-        users = rows.map(r => {
-            const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            return { name: c[0].replace(/"/g,"").trim(), pin: c[2].replace(/"/g,"").trim(), role: c[3].replace(/"/g,"").trim() };
-        });
-    }
+    async function checkLogin() {
+        const name = document.getElementById('nameIn').value.trim().toLowerCase();
+        const pin = document.getElementById('pinIn').value.trim();
 
-    function doLogin() {
-        const nInput = document.getElementById("nameInput").value.trim().toLowerCase();
-        const pInput = document.getElementById("pinInput").value.trim();
-        const u = users.find(x => x.name.toLowerCase() === nInput && x.pin === pInput);
-        
-        if (u) {
-            document.getElementById("bg0").style.display = "none";
-            document.getElementById("bg1").style.display = "block";
-            document.getElementById("pinModal").style.display = "none";
-            document.getElementById("start").style.display = "none";
-            document.getElementById("dashboard").style.display = "block";
-            document.getElementById("userNameDisplay").innerText = u.name;
-            document.getElementById("userRoleDisplay").innerText = u.role;
+        try {
+            const response = await fetch(SHEET_URL + '&t=' + new Date().getTime());
+            const text = await response.text();
+            const rows = text.split('\n').slice(1);
 
-            document.querySelectorAll('.panel').forEach(p => {
-                if(u.role === "Admin" || p.id === "personal" || (p.id === "blacklistPanel" && u.role !== "Gast")) {
-                    p.classList.add('visible');
+            let found = false;
+            rows.forEach(row => {
+                const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g, "").trim());
+                if(cols[0].toLowerCase() === name && cols[2] === pin) {
+                    found = true;
+                    loginSuccess(cols[0], cols[3]);
                 }
             });
-        } else { alert("Zutritt verweigert!"); }
+
+            if(!found) alert("Zugriff verweigert!");
+        } catch(e) { alert("Datenfehler!"); }
+    }
+
+    function loginSuccess(name, role) {
+        // Hintergrund wechseln
+        document.getElementById('bg0').style.opacity = '0';
+        document.getElementById('bg1').style.opacity = '1';
+        
+        document.getElementById('start').style.display = 'none';
+        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        document.getElementById('userInfo').innerText = name + " [" + role + "]";
+        
+        if(role === "Admin") document.getElementById('p-admin').style.display = 'block';
     }
 </script>
 </body>
