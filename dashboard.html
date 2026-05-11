@@ -50,10 +50,10 @@
             height: 90vh;
         }
 
-        /* LINKS ANORDNUNG: Persönlich oben, Black Liste mitte, Pflege unten */
+        /* LINKS ANORDNUNG */
         .left-side { justify-content: space-between; }
 
-        /* RECHTS ANORDNUNG: Admin oben, Elo mitte, Chat unten */
+        /* RECHTS ANORDNUNG */
         .right-side { justify-content: space-between; align-items: flex-end; }
 
         .card { 
@@ -114,7 +114,7 @@
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card admin-only">
                 <h2>Black List Pflege</h2>
                 <div class="grid-2">
                     <button class="card-btn">Gemeldete</button>
@@ -126,7 +126,7 @@
         </div>
 
         <div class="right-side">
-            <div class="card">
+            <div class="card admin-only">
                 <h2>Admin</h2>
                 <div class="btn-stack">
                     <button class="card-btn">User-Verwaltung</button>
@@ -150,10 +150,19 @@
     <script>
         const user = localStorage.getItem('bulls_user');
         const role = localStorage.getItem('bulls_role');
+
         if (!user) {
             window.location.href = "index.html";
         } else {
             document.getElementById('userDisplay').innerText = user + " (" + role + ")";
+
+            // ROLLEN-CHECK: Wenn nicht Admin, dann Admin-Boxen verstecken
+            if (role !== "Admin") {
+                const adminOnlyBoxen = document.querySelectorAll('.admin-only');
+                adminOnlyBoxen.forEach(box => {
+                    box.style.display = 'none';
+                });
+            }
         }
 
         function logout() {
