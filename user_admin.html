@@ -3,28 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dark Bulls - Admin Center V5</title>
+    <title>Dark Bulls - Admin Center V5.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { background: black; color: white; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .admin-container { width: 1000px; max-width: 95vw; background: #0a0a0a; padding: 25px; border: 2px solid #ff3131; border-radius: 15px; box-shadow: 0 0 40px red; }
-        
         h1 { color: #ff3131; text-transform: uppercase; text-align: center; margin: 0 0 15px 0; }
 
-        /* Suche */
         .search-box { width: 100%; padding: 12px; background: #111; border: 1px solid #444; color: #39d353; font-family: 'Almendra'; font-size: 18px; border-radius: 8px; margin-bottom: 15px; outline: none; box-sizing: border-box; }
 
-        /* Scrollbare Liste wie gewünscht */
-        .table-wrapper { max-height: 350px; overflow-y: auto; border: 1px solid #333; border-radius: 8px; margin-bottom: 20px; background: #000; }
+        /* Scroll-Bereich */
+        .table-wrapper { max-height: 380px; overflow-y: auto; border: 1px solid #333; border-radius: 8px; margin-bottom: 20px; background: #000; }
         table { width: 100%; border-collapse: collapse; }
-        th { position: sticky; top: 0; background: #111; color: #ff3131; text-align: left; padding: 12px; border-bottom: 2px solid #333; z-index: 10; text-transform: uppercase; font-size: 14px; }
+        th { position: sticky; top: 0; background: #111; color: #ff3131; text-align: left; padding: 12px; border-bottom: 2px solid #333; z-index: 10; text-transform: uppercase; }
         td { padding: 12px; border-bottom: 1px solid #222; cursor: pointer; transition: 0.2s; }
         
-        /* Das Markieren-Leuchten */
+        /* Das Markieren/Leuchten */
         .selected-row { background: rgba(255, 0, 0, 0.4) !important; color: #fff !important; font-weight: bold; box-shadow: inset 0 0 15px red; }
         tr:hover:not(.selected-row) { background: rgba(255, 255, 255, 0.05); }
 
-        /* Bearbeitungs-Bereich UNTEN */
+        /* Steuerung unten */
         .edit-area { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; padding: 20px; background: #111; border-radius: 10px; border: 1px solid #333; }
         .field-group { display: flex; flex-direction: column; }
         label { color: #ff3131; font-size: 14px; margin-bottom: 5px; text-transform: uppercase; }
@@ -36,8 +34,7 @@
         .btn-save { background: #39d353; color: black; }
         .btn-pin { background: #ffd600; color: black; }
         .btn-del { background: #ff3131; color: white; }
-        .btn:disabled { opacity: 0.15; cursor: not-allowed; transform: scale(1) !important; }
-        .btn:hover:not(:disabled) { transform: scale(1.05); filter: brightness(1.2); }
+        .btn:disabled { opacity: 0.15; cursor: not-allowed; }
 
         .back-btn { color: #5b5bff; cursor: pointer; text-decoration: underline; margin-bottom: 15px; align-self: flex-start; font-size: 18px; }
         #loading-text { color: #ffd600; text-align: center; padding: 20px; font-size: 20px; }
@@ -45,21 +42,20 @@
 </head>
 <body>
 
-    <div class="back-btn" onclick="window.location.href='dashboard.html'"><< ZURÜCK ZUM DASHBOARD</div>
+    <div class="back-btn" onclick="window.location.href='dashboard.html'"><< ZURÜCK</div>
 
     <div class="admin-container">
         <h1>Mitglieder Kontrollzentrum</h1>
-        
         <input type="text" class="search-box" id="searchInput" placeholder="Nach Spieler suchen..." onkeyup="filterTable()">
         
         <div class="table-wrapper">
-            <div id="loading-text">Greife auf Allianz-Datenbank zu...</div>
+            <div id="loading-text">Lade Allianz-Datenbank...</div>
             <table id="userTable" style="display:none;">
                 <thead>
                     <tr>
                         <th>Name</th>
                         <th>Hauptrolle</th>
-                        <th>Aufgabe</th>
+                        <th>Zusatz</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -101,21 +97,22 @@
     </div>
 
     <script>
+        // HIER DEINE NEUE URL EINTRAGEN!
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyIkj-2rvOpCfZBvyf_yqWZVwT0bBE8j2KSFWLuoiKV3TLg0n02JO8LrrcVC1N_JNme/exec';
+        
         let allUsers = [];
         let selectedUser = null;
 
-        // Datenbank laden
         async function loadUsers() {
             try {
-                const res = await fetch(SCRIPT_URL);
+                const res = await fetch(SCRIPT_URL + '?t=' + new Date().getTime());
                 const data = await res.json();
                 allUsers = data.slice(1);
                 renderTable(allUsers);
                 document.getElementById('loading-text').style.display = 'none';
                 document.getElementById('userTable').style.display = 'table';
             } catch (e) {
-                document.getElementById('loading-text').innerText = "FEHLER: Verbindung zur Datenbank verloren!";
+                document.getElementById('loading-text').innerText = "FEHLER: Verbindung fehlgeschlagen!";
             }
         }
 
@@ -124,37 +121,27 @@
             body.innerHTML = "";
             data.forEach(row => {
                 const tr = document.createElement('tr');
-                // ID erstellen (leerzeichen entfernen)
-                const safeId = "row-" + row[0].replace(/\s/g, '_');
+                const safeId = "row-" + (row[0] ? row[0].toString().replace(/\s/g, '_') : "x");
                 tr.id = safeId;
-                tr.onclick = () => selectPlayer(row, safeId);
+                tr.onclick = () => {
+                    document.querySelectorAll('tr').forEach(r => r.classList.remove('selected-row'));
+                    tr.classList.add('selected-row');
+                    selectedUser = row;
+                    document.getElementById('editName').value = row[0];
+                    document.getElementById('editRole').value = row[3];
+                    document.getElementById('editExtraRole').value = row[4] || "";
+                    document.getElementById('saveBtn').disabled = false;
+                    document.getElementById('pinBtn').disabled = false;
+                    document.getElementById('delBtn').disabled = false;
+                };
                 tr.innerHTML = `
-                    <td style="font-weight: bold;">${row[0]}</td>
-                    <td>${row[3]}</td>
+                    <td style="font-weight: bold;">${row[0] || ''}</td>
+                    <td>${row[3] || ''}</td>
                     <td style="color: #ffd600;">${row[4] || '-'}</td>
                     <td style="font-size: 12px; color: #555;">Aktiv</td>
                 `;
                 body.appendChild(tr);
             });
-        }
-
-        function selectPlayer(row, elementId) {
-            // Markierung bei allen entfernen
-            document.querySelectorAll('tr').forEach(r => r.classList.remove('selected-row'));
-            // Gewählte Zeile leuchten lassen
-            document.getElementById(elementId).classList.add('selected-row');
-            
-            selectedUser = row;
-            
-            // Werte in die Felder unten füllen
-            document.getElementById('editName').value = row[0];
-            document.getElementById('editRole').value = row[3];
-            document.getElementById('editExtraRole').value = row[4] || "";
-            
-            // Buttons freischalten
-            document.getElementById('saveBtn').disabled = false;
-            document.getElementById('pinBtn').disabled = false;
-            document.getElementById('delBtn').disabled = false;
         }
 
         function filterTable() {
@@ -168,46 +155,35 @@
             const newName = document.getElementById('editName').value;
             const newRole = document.getElementById('editRole').value;
             const newExtra = document.getElementById('editExtraRole').value;
-
-            if(!confirm(`${newName} aktualisieren?`)) return;
-
-            btn.innerText = "Sende...";
-            btn.disabled = true;
-
+            if(!confirm("Daten für " + newName + " speichern?")) return;
+            btn.innerText = "...";
             await fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
+                method: 'POST', mode: 'no-cors',
                 body: JSON.stringify({ action: "fullUpdate", oldName: selectedUser[0], newName, newRole, newExtra })
             });
-
-            alert("Daten erfolgreich gesendet!");
+            alert("Erfolg!");
             location.reload();
         }
 
         async function resetPin() {
             const tempPin = Math.floor(1000 + Math.random() * 9000);
-            if(!confirm("PIN für " + selectedUser[0] + " auf " + tempPin + " zurücksetzen?")) return;
-            
+            if(!confirm("PIN für " + selectedUser[0] + " auf " + tempPin + " setzen?")) return;
             await fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
+                method: 'POST', mode: 'no-cors',
                 body: JSON.stringify({ action: "resetPin", userName: selectedUser[0], newPin: tempPin })
             });
-            alert("Neuer PIN ist: " + tempPin);
+            alert("Neuer PIN: " + tempPin);
         }
 
         async function deleteUser() {
-            if(!confirm(selectedUser[0] + " wirklich aus der Allianz löschen?")) return;
-            
+            if(!confirm(selectedUser[0] + " wirklich LÖSCHEN?")) return;
             await fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
+                method: 'POST', mode: 'no-cors',
                 body: JSON.stringify({ action: "deleteUser", userName: selectedUser[0] })
             });
             location.reload();
         }
 
-        // Start
         loadUsers();
     </script>
 </body>
