@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dark Bulls - Allianz System V12.1</title>
+    <title>Dark Bulls - Allianz Zentrale</title>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { 
@@ -12,70 +12,73 @@
             font-family: 'Almendra', serif; color: white; overflow: hidden;
         }
 
-        /* DAS LOGO: Zentral im Hintergrund */
+        /* DAS LOGO IM HINTERGRUND */
         #dashboard-bg { 
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 750px; /* Gleiche Größe wie auf der Startseite */
+            width: 750px; 
             max-width: 95vw;
-            filter: drop-shadow(0 0 50px rgba(255, 0, 0, 0.6));
+            filter: drop-shadow(0 0 50px rgba(255, 0, 0, 0.8));
             z-index: 1;
         }
 
-        /* HEADER: Name und Logout */
+        /* HEADER */
         .header {
             position: absolute;
             top: 15px; right: 20px;
             display: flex; align-items: center; gap: 15px;
             z-index: 100;
         }
-        .user-info { color: #ff3131; font-size: 18px; }
-        .logout-btn { background: #ff0000; color: white; border: none; padding: 8px 15px; cursor: pointer; font-weight: bold; font-family: 'Almendra'; border-radius: 4px; text-transform: uppercase; }
+        .user-info { color: #ff3131; font-size: 20px; font-weight: bold; }
+        .logout-btn { background: #ff0000; color: white; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; font-family: 'Almendra'; border-radius: 4px; text-transform: uppercase; }
 
-        /* BOXEN-LAYOUT: Verteilung an den Seiten */
+        /* CONTAINER FÜR DIE SEITEN-BOXEN */
         .side-container {
             position: absolute;
             width: 100%; height: 100%;
             display: flex;
             justify-content: space-between;
-            padding: 60px 40px;
+            padding: 40px;
             box-sizing: border-box;
             z-index: 10;
         }
 
         .left-side, .right-side {
-            display: flex; flex-direction: column; justify-content: space-between;
-            width: 280px;
+            display: flex; flex-direction: column; 
+            width: 320px; /* Breite der Boxen etwas erhöht */
         }
+
+        .left-side { justify-content: flex-start; gap: 40px; margin-top: 20px; }
+        .right-side { justify-content: space-between; height: 85%; margin-top: 20px; }
 
         .card { 
-            background: rgba(0, 0, 0, 0.85); 
-            padding: 15px; 
-            border: 1px solid #333; 
-            border-radius: 10px; 
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.2);
-            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.9); 
+            padding: 20px; 
+            border: 2px solid #ff3131; 
+            border-radius: 12px; 
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
         }
 
-        .card h2 { color: #ff3131; margin: 0 0 10px 0; font-size: 18px; text-decoration: underline; }
-        .btn-stack { display: flex; flex-direction: column; gap: 8px; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .card h2 { color: #ff3131; margin: 0 0 15px 0; font-size: 22px; text-decoration: underline; text-align: center; }
+        .btn-stack { display: flex; flex-direction: column; gap: 12px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
         .card-btn { 
-            background: #39d353; color: black; border: none; padding: 10px; 
-            cursor: pointer; font-family: 'Almendra'; font-weight: bold; border-radius: 4px;
-            font-size: 14px;
+            background: #39d353; color: black; border: none; padding: 14px; /* Buttons größer gemacht */
+            cursor: pointer; font-family: 'Almendra'; font-weight: bold; border-radius: 6px;
+            font-size: 16px; transition: 0.3s;
         }
+        .card-btn:hover { background: #2fb947; transform: scale(1.02); }
 
-        /* ALLIANZ CHAT BUTTON UNTEN RECHTS */
+        /* ALLIANZ CHAT UNTEN RECHTS */
         .chat-btn {
             position: absolute;
             bottom: 30px; right: 30px;
             background: #ff8c00; color: black; border: none;
-            padding: 15px 40px; font-size: 22px; font-weight: bold;
-            border-radius: 8px; cursor: pointer; font-family: 'Almendra';
-            z-index: 100; box-shadow: 0 0 20px rgba(255, 140, 0, 0.4);
+            padding: 18px 50px; font-size: 26px; font-weight: bold;
+            border-radius: 10px; cursor: pointer; font-family: 'Almendra';
+            z-index: 100; box-shadow: 0 0 25px rgba(255, 140, 0, 0.5);
         }
     </style>
 </head>
@@ -91,41 +94,47 @@
     <div class="side-container">
         <div class="left-side">
             <div class="card">
-                <h2>Persönlich</h2>
-                <div class="btn-stack">
-                    <button class="card-btn">Pin ändern</button>
-                    <button class="card-btn">Support Chat</button>
-                </div>
-            </div>
-
-            <div class="card">
                 <h2>Black Liste</h2>
                 <div class="btn-stack">
-                    <button class="card-btn">Sp. Melden</button>
-                    <button class="card-btn">Anschauen</button>
+                    <button class="card-btn">Spieler Melden</button>
+                    <button class="card-btn">Black Liste Anschauen</button>
                 </div>
             </div>
 
             <div class="card">
-                <h2>Pflege Admin</h2>
+                <h2>Black List Pflege</h2>
                 <div class="grid-2">
                     <button class="card-btn">Gemeldete</button>
                     <button class="card-btn">Pflege</button>
                     <button class="card-btn">Eintragen</button>
-                    <button class="card-btn">Volle Ansicht</button>
+                    <button class="card-btn">Vollansicht</button>
                 </div>
             </div>
         </div>
 
         <div class="right-side">
             <div class="card">
-                <h2>Admin</h2>
-                <button class="card-btn" style="width: 100%;">User-Verwaltung</button>
+                <h2>Persönlich</h2>
+                <div class="btn-stack">
+                    <button class="card-btn">Eigene Statistik</button>
+                    <button class="card-btn">Pin ändern</button>
+                    <button class="card-btn">Support Chat</button>
+                </div>
             </div>
 
             <div class="card">
                 <h2>Elo Bereich</h2>
-                <button class="card-btn" style="width: 100%;">Rohstoffrechner</button>
+                <div class="btn-stack">
+                    <button class="card-btn">Rohstoffrechner</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Admin</h2>
+                <div class="btn-stack">
+                    <button class="card-btn">User-Verwaltung</button>
+                    <button class="card-btn">Chat Verwaltung</button>
+                </div>
             </div>
         </div>
     </div>
