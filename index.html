@@ -9,34 +9,35 @@
         /* GRUND-LAYOUT */
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: black; font-family: 'Almendra', serif; color: white; overflow: hidden; }
         
-        /* HINTERGRUND (Einziges Bild) */
-        #main-bg { 
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
-            object-fit: cover; z-index: -1; opacity: 0.8; 
-        }
+        /* HINTERGRUND */
+        #main-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -1; opacity: 0.8; }
 
         /* BUTTONS LINKS (Login & Rekrutierung) */
         .side-l { position: absolute; left: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 40px; z-index: 100; }
         .tab-l { padding: 35px 15px; font-size: 20px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 0 12px 12px 0; width: 55px; color: black; font-family: 'Almendra'; text-align: center; }
-        
         #btn-login { background: #39d353; box-shadow: 0 0 20px #39d353; }
         #btn-rekrut { background: #ffd600; box-shadow: 0 0 20px #ffd600; }
 
-        /* BUTTONS RECHTS (Youtube, Histories, Internet) */
+        /* BUTTONS RECHTS */
         .side-r { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 100; }
         .tab-r { padding: 25px 10px; font-size: 15px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 12px 0 0 12px; width: 45px; color: black; font-family: 'Almendra'; text-align: center; }
-        
         #tab-yt { background: #ff8c00; }
         #tab-hist { background: #5b5bff; color: white; }
         #tab-web { background: #00cfd1; }
 
-        /* FENSTER-STYLING (Popups) */
-        .overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
-        .modal-card { background: #111; padding: 30px; border: 2px solid #ff3131; border-radius: 15px; width: 350px; text-align: center; box-shadow: 0 0 50px red; }
-        .modal-card.gold { border-color: #ffd600; box-shadow: 0 0 50px #ffd600; }
+        /* FENSTER-STYLING (In Rot wie gewünscht) */
+        .overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; overflow-y: auto; padding: 20px 0; }
+        .modal-card { background: #111; padding: 25px; border: 2px solid #ff3131; border-radius: 15px; width: 450px; max-width: 90%; text-align: center; box-shadow: 0 0 50px rgba(255, 49, 49, 0.5); }
         
-        input, select { width: 100%; padding: 12px; margin: 10px 0; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 18px; text-align: center; box-sizing: border-box; }
-        .submit-btn { width: 100%; padding: 15px; background: #39d353; border: none; color: black; font-weight: bold; cursor: pointer; font-size: 22px; font-family: 'Almendra'; margin-top: 10px; border-radius: 5px; }
+        h2 { color: #ff3131; margin-top: 0; text-transform: uppercase; letter-spacing: 2px; }
+        p { font-size: 14px; color: #bbb; line-height: 1.4; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 16px; text-align: center; box-sizing: border-box; outline: none; }
+        input:focus { border-color: #ff3131; }
+
+        .submit-btn { width: 100%; padding: 15px; background: #39d353; border: none; color: black; font-weight: bold; cursor: pointer; font-size: 20px; font-family: 'Almendra'; margin-top: 15px; border-radius: 5px; }
+        .submit-btn:hover { background: #2eb846; box-shadow: 0 0 15px #39d353; }
     </style>
 </head>
 <body>
@@ -56,7 +57,7 @@
 
     <div id="loginMod" class="overlay">
         <div class="modal-card">
-            <h2 style="color: #ff3131; margin-top: 0;">ANMELDUNG</h2>
+            <h2>Allianz Login</h2>
             <input type="text" id="logName" placeholder="BENUTZERNAME">
             <input type="password" id="logPin" placeholder="PIN">
             <button class="submit-btn" onclick="doLogin()">BETRETEN</button>
@@ -65,24 +66,47 @@
     </div>
 
     <div id="regMod" class="overlay">
-        <div class="modal-card gold">
-            <h2 style="color: #ffd600; margin-top: 0;">REKRUTIERUNG</h2>
-            <input type="text" id="regName" placeholder="Dein Name im Game">
+        <div class="modal-card">
+            <h2>Rekrutierung</h2>
+            <p>Willkommen Rekrut! Fülle deine Akte ehrlich aus. <br>Nach dem Absenden erhältst du sofortigen Gast-Zugriff.</p>
+            
+            <div class="grid-2">
+                <input type="text" id="regCowTime" placeholder="Dabei seit (Jahre/Monate)">
+                <input type="text" id="regInGame" placeholder="InGame Name">
+            </div>
+            
+            <div class="grid-2">
+                <input type="text" id="regKD" placeholder="Deine KD">
+                <input type="text" id="regAge" placeholder="Dein Alter">
+            </div>
+
+            <input type="text" id="regAware" placeholder="Wie auf uns aufmerksam geworden?">
+            <input type="text" id="regPlayTime" placeholder="Wie viel spielst du (Std/Tag)?">
+
             <select id="regReason">
                 <option value="" disabled selected>Grund der Anmeldung...</option>
-                <option value="Gast">Nur zu Besuch / Gast</option>
+                <option value="Gast/Besuch">Bin in anderer Allianz / nur zu Besuch</option>
+                <option value="Gast">Einfach nur als Gast umschauen</option>
                 <option value="Mitgliedschaft">Bestrebung einer Mitgliedschaft</option>
             </select>
-            <input type="password" id="regPin" placeholder="Wähle eine PIN">
-            <button class="submit-btn" style="background:#ffd600" onclick="doRegister()">REKRUTIEREN</button>
+
+            <div style="margin-top: 15px; border-top: 1px solid #333; padding-top: 10px;">
+                <input type="text" id="regLoginName" placeholder="Anmeldename (Wie im Game)">
+                <div class="grid-2">
+                    <input type="password" id="regPin1" placeholder="PIN wählen">
+                    <input type="password" id="regPin2" placeholder="PIN wiederholen">
+                </div>
+            </div>
+
+            <button class="submit-btn" style="background: #ff3131; color: white;" onclick="doRegister()">REKRUTIERUNG ABSCHICKEN</button>
             <p onclick="closeModals()" style="color:#555; cursor:pointer; margin-top:15px;">Abbrechen</p>
         </div>
     </div>
 
     <script>
         const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ/gviz/tq?tqx=out:csv&gid=1188820112';
+        const WEBHOOK = 'https://discord.com/api/webhooks/1502735246335021267/fpxXtWr5QgSny6rfJzGHKnhYskehC9vDMEl3CvUzjgbBOuKBd8KGzUhCRfvd2KmWcnND';
 
-        // Erzwingt das Bild beim Laden
         window.onload = function() {
             document.getElementById('main-bg').src = 'bulls_start.jpg?t=' + new Date().getTime();
             loadData();
@@ -114,11 +138,25 @@
             } else { alert("Zutritt verweigert!"); }
         }
 
-        function doRegister() {
-            const name = document.getElementById('regName').value.trim();
-            if(!name) return alert("Name fehlt!");
+        async function doRegister() {
+            const name = document.getElementById('regLoginName').value.trim();
+            const p1 = document.getElementById('regPin1').value;
+            const p2 = document.getElementById('regPin2').value;
+            const reason = document.getElementById('regReason').value;
+
+            if(!name || !p1 || !reason) return alert("Akte unvollständig! Bitte Name, PIN und Grund angeben.");
+            if(p1 !== p2) return alert("Die PINs stimmen nicht überein!");
+
+            // Discord Nachricht zusammenbauen
+            const msg = {
+                content: `🚨 **NEUE REKRUTIERUNG** 🚨\n**Name:** ${name}\n**KD:** ${document.getElementById('regKD').value}\n**Alter:** ${document.getElementById('regAge').value}\n**Dabei seit:** ${document.getElementById('regCowTime').value}\n**Grund:** ${reason}\n_User startet jetzt als Gast._`
+            };
+
+            await fetch(WEBHOOK, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(msg) });
+
             localStorage.setItem('bulls_user', name);
             localStorage.setItem('bulls_role', 'Gast');
+            alert("Rekrutierung gesendet! Willkommen als Gast.");
             window.location.href = "dashboard.html";
         }
     </script>
