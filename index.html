@@ -1,53 +1,123 @@
-<style>
-    body { margin: 0; padding: 0; font-family: 'Almendra', serif; background: black; color: white; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-    
-    /* FIX: Hintergrundbild füllt immer den Schirm ohne zu scrollen */
-    #bg { 
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
-        object-fit: cover; opacity: 0.7; z-index: -1; 
-    }
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dark Bulls - Allianz System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* FIX: Verhindert Scrollen und fixiert den Viewport */
+        html, body { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            overflow: hidden; background: black; font-family: 'Almendra', serif; 
+        }
 
-    #main-portal { 
-        position: relative; z-index: 5; 
-        width: 550px; max-width: 75vw; 
-        padding: 20px; 
-        box-shadow: 0 0 100px rgba(255, 0, 0, 0.8); 
-        border: 1px solid rgba(255, 0, 0, 0.3);
-        background: rgba(0,0,0,0.6);
-    }
-    /* Rest der Styles (Buttons etc.) bleiben gleich wie im vorigen Code */
-</style>
+        /* Hintergrund-Container: Erzwingt die Größe */
+        #bg-container {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; overflow: hidden;
+        }
+
+        #bg-container img {
+            width: 100%; height: 100%;
+            object-fit: cover; /* Bild wird passend zugeschnitten, nicht verzerrt */
+            opacity: 0.7;
+            display: block;
+        }
+
+        /* Das zentrierte Portal-Logo */
+        #portal-wrapper {
+            height: 100%; display: flex; align-items: center; justify-content: center;
+        }
+
+        #main-portal { 
+            position: relative; z-index: 5; 
+            width: 550px; max-width: 75vw; 
+            padding: 20px; 
+            box-shadow: 0 0 100px rgba(255, 0, 0, 0.8); 
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            background: rgba(0,0,0,0.7);
+            text-align: center;
+        }
+        #main-portal img { width: 100%; display: block; filter: drop-shadow(0 0 15px red); }
+
+        /* Tabs & Modals wie vorher... */
+        .side-l { position: absolute; left: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 30px; z-index: 10; }
+        .side-r { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 10; }
+        .tab { padding: 35px 12px; font-size: 18px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 0 12px 12px 0; width: 50px; color: black; font-family: 'Almendra'; }
+        .tab-small { padding: 25px 8px; font-size: 14px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 12px 0 0 12px; width: 45px; color: black; font-family: 'Almendra'; }
+        #btn-login { background: #39d353; }
+        #btn-reg { background: #ffd600; }
+        #btn-yt { background: #ff8c00; }
+        #btn-hist { background: #5b5bff; color: white; }
+        #btn-web { background: #00cfd1; }
+
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; }
+        .modal-box { background: #111; padding: 40px; border: 2px solid #ff3131; border-radius: 15px; width: 320px; text-align: center; box-shadow: 0 0 50px red; }
+        input { width: 100%; padding: 15px; margin: 10px 0; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 20px; text-align: center; }
+        .log-btn { width: 100%; padding: 15px; background: #39d353; border: none; color: black; font-weight: bold; cursor: pointer; font-size: 22px; font-family: 'Almendra'; }
+    </style>
+</head>
 <body>
-    <img src="page0.jpg" id="bg">
-    ```
 
----
+    <div id="bg-container">
+        <img src="page0.jpg" alt="Hintergrund">
+    </div>
 
-### 2. Das Hauptquartier (`dashboard.html`) – FIX
-Hier war das Bild vermutlich "weg", weil der Pfad oder die Ebene (Z-Index) nicht stimmte. Jetzt ist es fest im Hintergrund.
+    <div class="side-l">
+        <button class="tab" id="btn-login" onclick="document.getElementById('loginMod').style.display='flex'">LOGIN</button>
+        <button class="tab" id="btn-reg" onclick="window.open('https://darkbulls.jimdofree.com/registrierung/')">REGISTRIEREN</button>
+    </div>
 
-```html
-<style>
-    body { margin: 0; padding: 0; font-family: 'Almendra', serif; background: black; color: white; min-height: 100vh; }
-    
-    /* FIX: Hintergrundbild für Seite 1 */
-    #bg-dashboard { 
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
-        object-fit: cover; opacity: 0.4; z-index: -1; 
-    }
+    <div class="side-r">
+        <button class="tab-small" id="btn-yt" onclick="window.open('https://www.youtube.com/@DarkBullsGruppe')">YOUTUBE</button>
+        <button class="tab-small" id="btn-hist">HISTORIES</button>
+        <button class="tab-small" id="btn-web" onclick="window.open('https://darkbulls.jimdofree.com/')">INTERNET</button>
+    </div>
 
-    #top-bar { position: fixed; top: 0; width: 100%; display: flex; justify-content: space-between; padding: 15px 30px; background: rgba(0,0,0,0.8); z-index: 100; border-bottom: 1px solid #333; box-sizing: border-box; }
-    
-    .container { position: relative; z-index: 10; padding-top: 100px; display: flex; flex-wrap: wrap; gap: 25px; justify-content: center; }
-    /* ... Rest der Panel-Styles ... */
-</style>
-<body>
-    <img src="page1.jpg" id="bg-dashboard">
-    ```
+    <div id="portal-wrapper">
+        <div id="main-portal">
+            <img src="bulls_start.jpg">
+        </div>
+    </div>
 
-### Warum war es "zu groß" beim Ausloggen?
-Wenn du auf Logout klickst, schickt dich das System zurück zur `index.html`. Wenn dort das Bild nicht per CSS auf `width: 100vw` und `height: 100vh` begrenzt ist, zeigt der Browser das Bild in seiner echten, riesigen Auflösung. Das habe ich oben mit `object-fit: cover` behoben.
+    <div id="loginMod" class="modal">
+        <div class="modal-box">
+            <h1 style="color: #ff3131; margin-top: 0;">IDENTIFIKATION</h1>
+            <input type="text" id="u" placeholder="NAME">
+            <input type="password" id="p" placeholder="PIN">
+            <button class="log-btn" onclick="login()">BETRETEN</button>
+            <p onclick="document.getElementById('loginMod').style.display='none'" style="color: #555; cursor: pointer; margin-top: 15px;">Abbrechen</p>
+        </div>
+    </div>
 
-**Wichtig:** Achte darauf, dass die Bilder `page0.jpg` und `page1.jpg` im **gleichen Ordner** bei GitHub liegen wie deine HTML-Dateien.
+    <script>
+        async function login() {
+            const name = document.getElementById("u").value.trim().toLowerCase();
+            const pin = document.getElementById("p").value.trim();
+            if(!name || !pin) return;
+            
+            try {
+                const res = await fetch('https://docs.google.com/spreadsheets/d/1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ/gviz/tq?tqx=out:csv&gid=1188820112&t=' + new Date().getTime());
+                const data = await res.text();
+                const rows = data.split('\n').slice(1);
+                
+                let userRow = rows.find(r => {
+                    const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/["']/g, "").trim());
+                    return c[0].toLowerCase() === name && c[2] === pin;
+                });
 
-Probier es jetzt nochmal aus – jetzt sollte der Wechsel sauber sein und die Bilder immer perfekt passen! 🐂🏁🦾
+                if(userRow) {
+                    const c = userRow.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/["']/g, "").trim());
+                    localStorage.setItem('bulls_user', c[0]);
+                    localStorage.setItem('bulls_role', c[3]);
+                    localStorage.setItem('bulls_auth', 'true');
+                    window.location.href = "dashboard.html";
+                } else {
+                    alert("Zutritt verweigert!");
+                }
+            } catch(e) { alert("Fehler beim Datenabgleich!"); }
+        }
+    </script>
+</body>
+</html>
