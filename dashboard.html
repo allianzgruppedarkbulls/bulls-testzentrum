@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Bulls - Dashboard (Testzentrum)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Almendra', serif; background: #000; color: white; min-height: 100vh; overflow-x: hidden; }
+        #bg-bull { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 800px; opacity: 0.3; z-index: 1; pointer-events: none; }
+        
+        #top-bar { position: fixed; top: 0; width: 100%; display: flex; justify-content: space-between; padding: 15px 30px; background: rgba(0,0,0,0.8); z-index: 100; border-bottom: 1px solid #333; box-sizing: border-box; }
+        .logout-btn { background: #ff3131; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 5px; font-family: 'Almendra'; }
+
+        .container { position: relative; z-index: 10; padding-top: 100px; display: flex; flex-wrap: wrap; gap: 25px; justify-content: center; }
+        
+        .panel { background: rgba(20, 20, 20, 0.95); border: 2px solid #444; padding: 20px; border-radius: 10px; width: 280px; box-shadow: 0 0 20px rgba(255,0,0,0.2); transition: 0.4s; }
+        .panel h2 { color: #ff3131; margin-top: 0; text-decoration: underline; text-align: center; }
+        .panel button { width: 100%; padding: 12px; margin: 8px 0; background: #39d353; border: none; font-family: 'Almendra'; font-weight: bold; cursor: pointer; border-radius: 5px; font-size: 16px; }
+        .panel button:hover { background: #2eb846; }
+
+        #chat-btn { position: fixed; bottom: 30px; right: 30px; background: #ff8c00; color: black; border: none; padding: 20px 40px; font-size: 22px; font-weight: bold; border-radius: 10px; cursor: pointer; z-index: 100; font-family: 'Almendra'; }
+    </style>
+</head>
+<body>
+
+    <div id="top-bar">
+        <div style="font-size: 20px; color: #ff3131;">Willkommen, <span id="user-name">...</span> (<span id="user-role">...</span>)</div>
+        <button class="logout-btn" onclick="logout()">LOGOUT</button>
+    </div>
+
+    <img src="bulls_dashboard.jpg" id="bg-bull">
+
+    <div class="container" id="panel-container">
+        <div class="panel" id="panel-profil">
+            <h2>Persönlich</h2>
+            <button onclick="alert('PIN-Modul folgt')">PIN ändern</button>
+            <button onclick="alert('Support-Modul folgt')">Support Chat</button>
+        </div>
+
+        <div class="panel" id="panel-blacklist">
+            <h2>Black Liste</h2>
+            <button onclick="alert('Melde-Modul folgt')">Sp. Melden</button>
+            <button onclick="alert('Listen-Modul folgt')">Anschauen</button>
+        </div>
+
+        <div class="panel" id="panel-admin">
+            <h2>Admin Stab</h2>
+            <button onclick="alert('Admin-Modul folgt')">User Verwaltung</button>
+        </div>
+
+        <div class="panel" id="panel-elo">
+            <h2>Elo Bereich</h2>
+            <button onclick="alert('Rechner-Modul folgt')">Rohstoffrechner</button>
+        </div>
+    </div>
+
+    <button id="chat-btn" onclick="alert('Chat-Modul folgt')">ALLIANZ CHAT</button>
+
+    <script>
+        const auth = localStorage.getItem('bulls_auth');
+        const role = localStorage.getItem('bulls_role');
+        const name = localStorage.getItem('bulls_name');
+
+        if(auth !== 'true') {
+            window.location.href = "index.html"; 
+        }
+
+        document.getElementById('user-name').innerText = name;
+        document.getElementById('user-role').innerText = role;
+
+        // DER GAST-RIEGEL
+        if(role === "Gast") {
+            document.getElementById('panel-blacklist').remove(); 
+            document.getElementById('panel-admin').remove();     
+            document.getElementById('panel-elo').remove();       
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>
