@@ -73,16 +73,18 @@
         <div class="modal-card">
             <h2>Rekrutierung</h2>
             <div class="grid-2">
-                <input type="text" id="regCowTime" placeholder="Dabei seit">
+                <input type="text" id="regCowTime" placeholder="Wie lange spielst du CoW schon?">
                 <input type="text" id="regKD" placeholder="Deine KD">
             </div>
-            <input type="text" id="regInGame" placeholder="Name im Spiel">
-            <input type="text" id="regAge" placeholder="Dein Alter">
+            <input type="text" id="regAware" placeholder="Wie bist du auf uns aufmerksam geworden?">
+            <input type="text" id="regAge" placeholder="Wie alt bist du?">
+            <input type="text" id="regFreq" placeholder="Wie viel spielst du das Spiel?">
             <select id="regReason">
-                <option value="" disabled selected>Grund...</option>
-                <option value="Gast">Gast</option>
-                <option value="Mitglied">Mitgliedschaft</option>
+                <option value="" disabled selected>Warum willst du zu uns?</option>
+                <option value="Nur zu Besuch / Gast">bin in einer anderen allisnz und nur zu besuch / als Gast</option>
+                <option value="Bestrebung einer Mitgliedschaft">bestrebung einer mitgliedschaft</option>
             </select>
+            <input type="text" id="regInGame" placeholder="Anmeldenamen (wie im Game)">
             <input type="password" id="regPin1" placeholder="PIN wählen">
             <button class="submit-btn" style="background: #ff3131; color: white;" onclick="doRegister()">ABSCHICKEN</button>
             <p onclick="closeModals()" style="color:#555; cursor:pointer; margin-top:15px;">Abbrechen</p>
@@ -91,6 +93,7 @@
 
     <script>
         const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ/gviz/tq?tqx=out:csv&gid=1188820112';
+        const WEBHOOK_URL = 'https://discord.com/api/webhooks/1502735246335021267/fpxXtWr5QgSny6rfJzGHKnhYskehC9vDMEl3CvUzjgbBOuKBd8KGzUhCRfvd2KmWcnND';
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModals() { document.querySelectorAll('.overlay').forEach(m => m.style.display = 'none'); }
@@ -113,8 +116,29 @@
             } else { alert("Zutritt verweigert!"); }
         }
 
-        function doRegister() {
+        async function doRegister() {
             const name = document.getElementById('regInGame').value.trim();
+            const cowTime = document.getElementById('regCowTime').value.trim();
+            const kd = document.getElementById('regKD').value.trim();
+            const aware = document.getElementById('regAware').value.trim();
+            const age = document.getElementById('regAge').value.trim();
+            const freq = document.getElementById('regFreq').value.trim();
+            const reason = document.getElementById('regReason').value;
+
+            if(!name) return alert("Bitte Namen eingeben!");
+
+            const message = {
+                content: `🚨 **NEUE REKRUTIERUNG** 🚨\n\n**Name:** ${name}\n**Alter:** ${age}\n**CoW Spielzeit:** ${cowTime}\n**KD:** ${kd}\n**Aufmerksam durch:** ${aware}\n**Spielt:** ${freq}\n**Grund:** ${reason}`
+            };
+
+            try {
+                await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(message)
+                });
+            } catch (e) { console.error("Discord Error"); }
+
             localStorage.setItem('bulls_user', name);
             localStorage.setItem('bulls_role', 'Gast');
             window.location.href = "dashboard.html";
