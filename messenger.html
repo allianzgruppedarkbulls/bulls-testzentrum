@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Bulls - Messenger</title>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: #000; color: #fff; font-family: 'Almendra', serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        
+        /* Header & Tabs */
+        .messenger-header { background: #0a0a0a; border-bottom: 2px solid #ff3131; padding: 10px; }
+        .tabs { display: flex; justify-content: center; gap: 20px; }
+        .tab { padding: 10px 20px; cursor: pointer; color: #888; text-transform: uppercase; border-bottom: 3px solid transparent; transition: 0.3s; }
+        .tab.active { color: #ff3131; border-bottom: 3px solid #ff3131; font-weight: bold; }
+        .tab.support-tab { color: #ff3131; display: none; } /* Standardmäßig versteckt */
+
+        /* Hauptbereich */
+        .main-container { display: flex; flex: 1; overflow: hidden; }
+
+        /* Seitenleiste (Chat-Liste) */
+        .chat-sidebar { width: 300px; background: #0a0a0a; border-right: 1px solid #333; overflow-y: auto; }
+        .chat-item { padding: 15px; border-bottom: 1px solid #222; cursor: pointer; transition: 0.2s; position: relative; }
+        .chat-item:hover { background: #1a1a1a; }
+        .chat-item.active { background: #222; border-left: 4px solid #ff3131; }
+        .chat-item .name { font-weight: bold; display: block; }
+        .chat-item .last-msg { font-size: 12px; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Chat-Fenster */
+        .chat-window { flex: 1; display: flex; flex-direction: column; background: #050505; }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        
+        /* Nachrichten-Bubbles */
+        .bubble { max-width: 70%; padding: 10px 15px; border-radius: 10px; position: relative; line-height: 1.4; }
+        .bubble.me { align-self: flex-end; background: #222; border: 1px solid #444; }
+        .bubble.them { align-self: flex-start; background: #111; border: 1px solid #333; }
+        .bubble.reported { background: rgba(255, 0, 0, 0.2) !important; border: 1px solid #ff3131 !important; color: #ff9999; }
+        
+        .bubble .meta { font-size: 10px; color: #555; margin-top: 5px; display: block; }
+        .report-btn { cursor: pointer; font-size: 12px; margin-left: 10px; opacity: 0.5; }
+        .report-btn:hover { opacity: 1; color: red; }
+
+        /* Eingabe */
+        .input-area { padding: 20px; background: #0a0a0a; border-top: 1px solid #333; display: flex; gap: 10px; }
+        input { flex: 1; background: #000; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 5px; font-family: 'Almendra'; }
+        button { background: #ff3131; color: #fff; border: none; padding: 0 20px; cursor: pointer; font-family: 'Almendra'; font-weight: bold; border-radius: 5px; }
+
+        .new-chat-btn { width: 100%; padding: 10px; background: #39d353; color: #000; border: none; font-family: 'Almendra'; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="messenger-header">
+        <div class="tabs" id="tabContainer">
+            <div class="tab active" onclick="switchMainTab('PN')">PN</div>
+            <div class="tab" onclick="switchMainTab('GROUP')">Gruppen</div>
+            <div class="tab support-tab" id="supportTab" onclick="switchMainTab('SUPPORT')">Support 🚨</div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="chat-sidebar">
+            <button class="new-chat-btn" onclick="startNewChat()">+ Neuer Chat</button>
+            <div id="chatList">
+                </div>
+        </div>
+
+        <div class="chat-window">
+            <div class="chat-messages" id="msgContainer">
+                </div>
+            <div class="input-area">
+                <input type="text" id="msgInput" placeholder="Nachricht schreiben..." onkeypress="if(event.key==='Enter') sendMsg()">
+                <button onclick="sendMsg()">Senden</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'DEINE_AKTUELLE_URL_HIER'; // <-- DEINE NEUE URL EINTRAGEN
+        const MY_NAME = localStorage.getItem('bulls_user');
+        const MY_ROLE = localStorage.getItem('bulls_role');
+        
+        let currentTab = 'PN';
+        let currentChatPartner = '';
+        let allMessages = [];
+
+        // Berechtigungs-Check für Support-Tab
+        if(["Admin", "Offi", "Ausbilder"].includes(MY_ROLE)) {
+            document.getElementById('supportTab').style.display = 'block';
+        }
+
+        async function loadChat() {
+            try {
+                const res = await fetch(SCRIPT_URL + "?action=getMessages");
+                allMessages = await res.json();
+                renderChatList();
+                renderMessages();
+            } catch(e) { console.error("Ladefehler", e); }
+        }
+
+        function renderChatList() {
+            const list = document.getElementById('chatList');
+            list.innerHTML = "";
+            
+            // Logik für PN: Wer hat zuletzt geschrieben?
+            let partners = {};
+            allMessages.forEach(m => {
+                if(m.typ === 'PN') {
+                    let partner = (m.absender === MY_NAME) ? m.ziel : m.absender;
+                    partners[partner] = m;
+                }
+            });
+
+            Object.keys(partners).sort((a,b) => new Date(partners[b].zeit) - new Date(partners[a].zeit)).forEach(p => {
+                const div = document.createElement('div');
+                div.className = `chat-item ${currentChatPartner === p ? 'active' : ''}`;
+                div.onclick = () => { currentChatPartner = p; renderMessages(); renderChatList(); };
+                div.innerHTML = `<span class="name">${p}</span><span class="last-msg">${partners[p].nachricht}</span>`;
+                list.appendChild(div);
+            });
+        }
+
+        function renderMessages() {
+            const container = document.getElementById('msgContainer');
+            container.innerHTML = "";
+            
+            let filtered = allMessages.filter(m => {
+                if(currentTab === 'PN') return (m.absender === MY_NAME && m.ziel === currentChatPartner) || (m.absender === currentChatPartner && m.ziel === MY_NAME);
+                if(currentTab === 'GROUP') return m.typ === 'GROUP';
+                if(currentTab === 'SUPPORT') return m.status === 'reported' || m.ziel === 'Support';
+                return false;
+            });
+
+            filtered.forEach(m => {
+                const div = document.createElement('div');
+                let isMe = m.absender === MY_NAME;
+                let isReported = m.status === 'reported' || m.ziel === 'Support';
+                
+                div.className = `bubble ${isMe ? 'me' : 'them'} ${isReported ? 'reported' : ''}`;
+                div.innerHTML = `
+                    <b>${m.absender}:</b><br>${m.nachricht}
+                    <span class="meta">${new Date(m.zeit).toLocaleTimeString()} 
+                    ${(!isMe && !isReported) ? `<span class="report-btn" onclick="reportMsg('${m.zeit}')">🚨 Melden</span>` : ''}</span>
+                `;
+                container.appendChild(div);
+            });
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendMsg() {
+            const inp = document.getElementById('msgInput');
+            if(!inp.value || !currentChatPartner) return;
+
+            const data = {
+                action: "sendChat",
+                absender: MY_NAME,
+                ziel: currentChatPartner,
+                nachricht: inp.value,
+                typ: currentTab,
+                status: "normal"
+            };
+
+            // Sofort lokal anzeigen (Optimismus)
+            allMessages.push({zeit: new Date(), ...data});
+            renderMessages();
+            inp.value = "";
+
+            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+        }
+
+        function switchMainTab(t) {
+            currentTab = t;
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            if(t === 'GROUP') currentChatPartner = 'Allianz';
+            if(t === 'SUPPORT') currentChatPartner = 'Support';
+            renderMessages();
+            renderChatList();
+        }
+
+        function startNewChat() {
+            let p = prompt("Name des Spielers:");
+            if(p) { currentChatPartner = p; renderMessages(); renderChatList(); }
+        }
+
+        setInterval(loadChat, 5000); // Alle 5 Sek neu laden
+        loadChat();
+    </script>
+</body>
+</html>
