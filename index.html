@@ -13,7 +13,7 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* DAS BILD: Jetzt auf 600px (ein bisschen größer) und mit starkem roten Glühen */
+        /* DEIN EINGESTELLTES BILD */
         #main-bull-logo { 
             width: 750px; 
             max-width: 100vw; 
@@ -34,7 +34,7 @@
         #tab-hist { background: #5b5bff; color: white; }
         #tab-web { background: #00cfd1; }
 
-        /* MODALS (Wieder mit der richtigen Rekrutierung) */
+        /* MODALS */
         .overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
         .modal-card { background: #111; padding: 25px; border: 2px solid #ff3131; border-radius: 15px; width: 450px; max-width: 90%; text-align: center; box-shadow: 0 0 50px red; }
         
@@ -73,19 +73,20 @@
         <div class="modal-card">
             <h2>Rekrutierung</h2>
             <div class="grid-2">
-                <input type="text" id="regCowTime" placeholder="Wie lange spielst du CoW schon?">
+                <input type="text" id="regCowTime" placeholder="Dabei seit">
                 <input type="text" id="regKD" placeholder="Deine KD">
             </div>
-            <input type="text" id="regAware" placeholder="Wie bist du auf uns aufmerksam geworden?">
-            <input type="text" id="regAge" placeholder="Wie alt bist du?">
-            <input type="text" id="regFreq" placeholder="Wie viel spielst du das Spiel?">
+            <input type="text" id="regAware" placeholder="Wie auf uns aufmerksam geworden?">
+            <input type="text" id="regAge" placeholder="Dein Alter">
+            <input type="text" id="regFreq" placeholder="Wie viel spielst du am Tag?">
             <select id="regReason">
-                <option value="" disabled selected>Warum willst du zu uns?</option>
+                <option value="" disabled selected>Grund der Anmeldung...</option>
                 <option value="Nur zu Besuch / Gast">bin in einer anderen allisnz und nur zu besuch / als Gast</option>
                 <option value="Bestrebung einer Mitgliedschaft">bestrebung einer mitgliedschaft</option>
             </select>
             <input type="text" id="regInGame" placeholder="Anmeldenamen (wie im Game)">
             <input type="password" id="regPin1" placeholder="PIN wählen">
+            <input type="password" id="regPin2" placeholder="PIN wiederholen">
             <button class="submit-btn" style="background: #ff3131; color: white;" onclick="doRegister()">ABSCHICKEN</button>
             <p onclick="closeModals()" style="color:#555; cursor:pointer; margin-top:15px;">Abbrechen</p>
         </div>
@@ -94,6 +95,7 @@
     <script>
         const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ/gviz/tq?tqx=out:csv&gid=1188820112';
         const WEBHOOK_URL = 'https://discord.com/api/webhooks/1502735246335021267/fpxXtWr5QgSny6rfJzGHKnhYskehC9vDMEl3CvUzjgbBOuKBd8KGzUhCRfvd2KmWcnND';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw0hFHFAj4COvIECS0MmZDs-KfIl2qnIksFWI1I_xn8gQr01PiVgYfQAXKPnr9UmU5Dyw/exec';
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModals() { document.querySelectorAll('.overlay').forEach(m => m.style.display = 'none'); }
@@ -118,6 +120,8 @@
 
         async function doRegister() {
             const name = document.getElementById('regInGame').value.trim();
+            const pin = document.getElementById('regPin1').value.trim();
+            const pin2 = document.getElementById('regPin2').value.trim();
             const cowTime = document.getElementById('regCowTime').value.trim();
             const kd = document.getElementById('regKD').value.trim();
             const aware = document.getElementById('regAware').value.trim();
@@ -125,23 +129,38 @@
             const freq = document.getElementById('regFreq').value.trim();
             const reason = document.getElementById('regReason').value;
 
-            if(!name) return alert("Bitte Namen eingeben!");
+            if(!name || !pin) return alert("Bitte Namen und PIN eingeben!");
+            if(pin !== pin2) return alert("Die PINs sind nicht gleich!");
 
-            const message = {
-                content: `🚨 **NEUE REKRUTIERUNG** 🚨\n\n**Name:** ${name}\n**Alter:** ${age}\n**CoW Spielzeit:** ${cowTime}\n**KD:** ${kd}\n**Aufmerksam durch:** ${aware}\n**Spielt:** ${freq}\n**Grund:** ${reason}`
-            };
-
+            // 1. AN GOOGLE TABELLE SENDEN (Aktion: registerUser)
             try {
-                await fetch(WEBHOOK_URL, {
+                fetch(SCRIPT_URL, {
                     method: 'POST',
+                    mode: 'no-cors',
+                    cache: 'no-cache',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(message)
+                    body: JSON.stringify({ 
+                        action: "registerUser", 
+                        name: name, 
+                        pin: pin 
+                    })
                 });
-            } catch (e) { console.error("Discord Error"); }
 
-            localStorage.setItem('bulls_user', name);
-            localStorage.setItem('bulls_role', 'Gast');
-            window.location.href = "dashboard.html";
+                // 2. AN DISCORD SENDEN
+                const discordMsg = {
+                    content: `🚨 **NEUE REKRUTIERUNG** 🚨\n\n**Name:** ${name}\n**Alter:** ${age}\n**KD:** ${kd}\n**CoW Zeit:** ${cowTime}\n**Spielt:** ${freq}\n**Grund:** ${reason}\n\n_System: Automatisch als Gast eingetragen._`
+                };
+                fetch(WEBHOOK_URL, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(discordMsg) });
+
+                // 3. LOGIN & WEITERLEITUNG
+                localStorage.setItem('bulls_user', name);
+                localStorage.setItem('bulls_role', 'Gast');
+                alert("Erfolgreich registriert! Willkommen bei den Bulls.");
+                window.location.href = "dashboard.html";
+
+            } catch (e) {
+                alert("Fehler bei der Datenbankverbindung.");
+            }
         }
     </script>
 </body>
