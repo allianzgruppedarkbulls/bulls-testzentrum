@@ -3,14 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dark Bulls - Allianz 1Zentrale</title>
+    <title>Dark Bulls - Allianz Zentrale</title>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* HINTERGRUND-FIX */
+        /* HINTERGRUND-FIX: Von 'cover' auf 'contain' geändert, damit das Bild kleiner ist */
         body { 
-            margin: 0; padding: 0; width: 100%; height: 100vh; 
+            margin: 0; 
+            padding: 0; 
+            width: 100%; 
+            height: 100vh; 
             background: black url('bulls_start.jpg') no-repeat center center fixed; 
-            background-size: cover; font-family: 'Almendra', serif; color: white; overflow: hidden; 
+            background-size: contain; /* Bild wird an den Bildschirm angepasst und nicht mehr vergrößert */
+            font-family: 'Almendra', serif; 
+            color: white; 
+            overflow: hidden; 
         }
 
         /* BUTTONS LINKS */
@@ -26,14 +32,14 @@
         #tab-hist { background: #5b5bff; color: white; }
         #tab-web { background: #00cfd1; }
 
-        /* MODALS (ROT) */
-        .overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; overflow-y: auto; padding: 20px 0; }
-        .modal-card { background: #111; padding: 25px; border: 2px solid #ff3131; border-radius: 15px; width: 480px; max-width: 90%; text-align: center; box-shadow: 0 0 50px red; }
+        /* MODALS (Login & Rekrutierung - Unverändert) */
+        .overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
+        .modal-card { background: #111; padding: 25px; border: 2px solid #ff3131; border-radius: 15px; width: 450px; max-width: 90%; text-align: center; box-shadow: 0 0 50px red; }
         
-        h2 { color: #ff3131; margin-top: 0; text-transform: uppercase; }
+        h2 { color: #ff3131; margin-top: 0; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        input, select { width: 100%; padding: 10px; margin: 8px 0; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 16px; text-align: center; box-sizing: border-box; outline: none; }
-        .submit-btn { width: 100%; padding: 15px; background: #ff3131; border: none; color: white; font-weight: bold; cursor: pointer; font-size: 20px; font-family: 'Almendra'; margin-top: 15px; border-radius: 5px; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 16px; text-align: center; box-sizing: border-box; }
+        .submit-btn { width: 100%; padding: 15px; background: #39d353; border: none; color: black; font-weight: bold; cursor: pointer; font-size: 20px; font-family: 'Almendra'; margin-top: 15px; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -45,7 +51,7 @@
 
     <div class="side-r">
         <button class="tab-r" id="tab-yt" onclick="window.open('https://www.youtube.com/@DarkBullsGruppe')">YOUTUBE</button>
-        <button class="tab-r" id="tab-hist">HISTORIES</button>
+        <button class="tab-r" id="tab-hist" onclick="alert('Historie folgt...')">HISTORIES</button>
         <button class="tab-r" id="tab-web" onclick="window.open('https://darkbulls.jimdofree.com/')">INTERNET</button>
     </div>
 
@@ -54,7 +60,7 @@
             <h2>Allianz Login</h2>
             <input type="text" id="logName" placeholder="BENUTZERNAME">
             <input type="password" id="logPin" placeholder="PIN">
-            <button class="submit-btn" style="background:#39d353; color:black;" onclick="doLogin()">BETRETEN</button>
+            <button class="submit-btn" onclick="doLogin()">BETRETEN</button>
             <p onclick="closeModals()" style="color:#555; cursor:pointer; margin-top:15px;">Abbrechen</p>
         </div>
     </div>
@@ -62,35 +68,19 @@
     <div id="regMod" class="overlay">
         <div class="modal-card">
             <h2>Rekrutierung</h2>
-            
             <div class="grid-2">
-                <input type="text" id="q1" placeholder="Spielzeit CoW schon?">
-                <input type="text" id="q2" placeholder="InGame Name?">
+                <input type="text" id="regCowTime" placeholder="Dabei seit">
+                <input type="text" id="regKD" placeholder="Deine KD">
             </div>
-            
-            <div class="grid-2">
-                <input type="text" id="q3" placeholder="Deine KD?">
-                <input type="text" id="q4" placeholder="Dein Alter?">
-            </div>
-
-            <input type="text" id="q5" placeholder="Wie auf uns aufmerksam geworden?">
-            <input type="text" id="q6" placeholder="Wie viel spielst du täglich?">
-
-            <select id="q7">
-                <option value="" disabled selected>Warum willst du zu uns?</option>
-                <option value="Nur zu Besuch / Gast">Nur zu Besuch / Gast</option>
-                <option value="Bestrebung einer Mitgliedschaft">Bestrebung einer Mitgliedschaft</option>
+            <input type="text" id="regInGame" placeholder="Name im Spiel">
+            <input type="text" id="regAge" placeholder="Dein Alter">
+            <select id="regReason">
+                <option value="" disabled selected>Grund...</option>
+                <option value="Gast">Gast</option>
+                <option value="Mitglied">Mitgliedschaft</option>
             </select>
-
-            <div style="border-top: 1px solid #333; margin-top: 10px; padding-top: 10px;">
-                <input type="text" id="regLogin" placeholder="Anmeldename (Für diese Seite)">
-                <div class="grid-2">
-                    <input type="password" id="p1" placeholder="Wähle PIN">
-                    <input type="password" id="p2" placeholder="PIN wiederholen">
-                </div>
-            </div>
-
-            <button class="submit-btn" onclick="doRegister()">ABSCHICKEN & STARTEN</button>
+            <input type="password" id="regPin1" placeholder="PIN wählen">
+            <button class="submit-btn" style="background: #ff3131; color: white;" onclick="doRegister()">ABSCHICKEN</button>
             <p onclick="closeModals()" style="color:#555; cursor:pointer; margin-top:15px;">Abbrechen</p>
         </div>
     </div>
@@ -116,12 +106,11 @@
                 localStorage.setItem('bulls_user', c[0]);
                 localStorage.setItem('bulls_role', c[3]);
                 window.location.href = "dashboard.html";
-            } else { alert("Falsch!"); }
+            } else { alert("Zutritt verweigert!"); }
         }
 
         function doRegister() {
-            const name = document.getElementById('regLogin').value.trim();
-            if(!name) return alert("Name fehlt!");
+            const name = document.getElementById('regInGame').value.trim();
             localStorage.setItem('bulls_user', name);
             localStorage.setItem('bulls_role', 'Gast');
             window.location.href = "dashboard.html";
