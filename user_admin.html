@@ -58,37 +58,35 @@
     </div>
 
     <script>
-        // HIER DEINE NEUE URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwypY5YbvzRzZliGm50RIv0cWbKIX37BUdRf_XiBb9wuBOIkHFvAPtDj0j-PuG3HLaKVw/exec';
+        // ACHTUNG: HIER DEINE AKTUELLE URL EINTRAGEN
+        const SCRIPT_URL = 'DEINE_URL_AUS_GOOGLE_HIER_EINSETZEN';
         
         let allUsers = [];
         let selectedUser = null;
 
         async function loadUsers() {
-            console.log("Starte Abfrage an:", SCRIPT_URL);
             try {
-                // Cache-Killer anhängen
+                // Wir erzwingen eine frische Abfrage ohne Cache
                 const response = await fetch(SCRIPT_URL + '?t=' + Date.now());
-                if (!response.ok) throw new Error('Netzwerk-Antwort war nicht ok');
-                
                 const data = await response.json();
-                console.log("Daten empfangen:", data);
                 
-                allUsers = data.slice(1);
+                // Wir filtern die Kopfzeile raus, falls vorhanden
+                allUsers = data.filter(row => row[0] !== "Name" && row[0] !== "");
+                
                 renderTable(allUsers);
                 
                 document.getElementById('loading-text').style.display = 'none';
                 document.getElementById('userTable').style.display = 'table';
             } catch (error) {
-                console.error("Fehler im Detail:", error);
-                document.getElementById('loading-text').innerText = "FEHLER: Script antwortet nicht. Prüfe die URL!";
+                console.error("Fehler:", error);
+                document.getElementById('loading-text').innerText = "FEHLER: Verbindung zum Google Script fehlgeschlagen.";
             }
         }
 
         function renderTable(data) {
             const body = document.getElementById('userBody');
             body.innerHTML = "";
-            data.forEach((row, index) => {
+            data.forEach((row) => {
                 const tr = document.createElement('tr');
                 tr.onclick = () => {
                     document.querySelectorAll('tr').forEach(r => r.classList.remove('selected-row'));
@@ -112,6 +110,7 @@
         }
 
         async function saveChanges() {
+            if(!selectedUser) return;
             const newName = document.getElementById('editName').value;
             const newRole = document.getElementById('editRole').value;
             const newExtra = document.getElementById('editExtraRole').value;
@@ -122,19 +121,19 @@
                 mode: 'no-cors',
                 body: JSON.stringify({ action: "fullUpdate", oldName: selectedUser[0], newName, newRole, newExtra })
             });
-            alert("Gesendet!");
+            alert("Änderungen gesendet!");
             location.reload();
         }
 
         async function resetPin() {
             const p = Math.floor(1000 + Math.random() * 9000);
-            if(!confirm("PIN Reset?")) return;
+            if(!confirm("PIN wirklich auf " + p + " zurücksetzen?")) return;
             await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "resetPin", userName: selectedUser[0], newPin: p })});
-            alert("Neu: " + p);
+            alert("PIN wurde auf " + p + " gesetzt!");
         }
 
         async function deleteUser() {
-            if(!confirm("Löschen?")) return;
+            if(!confirm("Spieler wirklich löschen?")) return;
             await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "deleteUser", userName: selectedUser[0] })});
             location.reload();
         }
