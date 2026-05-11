@@ -106,22 +106,28 @@
     const GID_USERS = '1188820112';
     let users = [];
 
-    // Setzt Bilder beim Laden mit Cache-Buster, damit sie frisch kommen
     window.onload = function() {
         const time = new Date().getTime();
+        // Hier laden wir beide Bilder direkt beim Start
         document.getElementById('bg0').src = 'bulls_start.jpg?t=' + time;
         document.getElementById('bg1').src = 'bulls_dashboard.jpg?t=' + time;
         loadData();
     };
 
     async function loadData() {
-        const res = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID_USERS}&t=${new Date().getTime()}`);
-        const text = await res.text();
-        const rows = text.split('\n').slice(1);
-        users = rows.map(r => {
-            const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            return { name: c[0].replace(/"/g,"").trim(), pin: c[2].replace(/"/g,"").trim(), role: c[3].replace(/"/g,"").trim() };
-        });
+        try {
+            const res = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID_USERS}&t=${new Date().getTime()}`);
+            const text = await res.text();
+            const rows = text.split('\n').slice(1);
+            users = rows.map(r => {
+                const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                return { 
+                    name: c[0].replace(/"/g,"").trim(), 
+                    pin: c[2].replace(/"/g,"").trim(), 
+                    role: c[3].replace(/"/g,"").trim() 
+                };
+            });
+        } catch(e) { console.log("Fehler beim Laden der User-Daten"); }
     }
 
     function doLogin() {
@@ -130,23 +136,33 @@
         const u = users.find(x => x.name.toLowerCase() === nInput && x.pin === pInput);
         
         if (u) {
-            // Hintergrund wechseln auf Dashboard-Bild
-            document.getElementById("bg0").style.display = "none";
-            document.getElementById("bg1").style.display = "block";
+            // FIX: Erst das Bild für Seite 2 SICHTBAR machen, dann Seite 1 ausblenden
+            const bgDashboard = document.getElementById("bg1");
+            const bgStart = document.getElementById("bg0");
+            
+            bgDashboard.style.display = "block"; 
+            bgDashboard.style.opacity = "0.4"; // Deine gewünschte Helligkeit
+            bgStart.style.display = "none";
 
             document.getElementById("pinModal").style.display = "none";
             document.getElementById("start").style.display = "none";
             document.getElementById("dashboard").style.display = "block";
+            
             document.getElementById("userNameDisplay").innerText = u.name;
             document.getElementById("userRoleDisplay").innerText = u.role;
 
+            // Panels einblenden
             document.querySelectorAll('.panel').forEach(p => {
                 if(u.role === "Admin" || p.id === "personal" || (p.id === "blacklistPanel" && u.role !== "Gast")) {
                     p.style.display = "block";
                     setTimeout(() => p.classList.add('visible'), 200);
                 }
             });
-        } else { alert("Login falsch!"); }
+        } else { 
+            alert("Zutritt verweigert! Name oder PIN falsch."); 
+        }
+    }
+</script>
     }
 </script>
 </body>
