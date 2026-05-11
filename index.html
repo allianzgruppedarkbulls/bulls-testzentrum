@@ -3,105 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dark Bulls - Allianz System V12.1 (Test)</title>
+    <title>Dark Bulls - Allianz System</title>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; padding: 0; font-family: 'Almendra', serif; background: black; color: white; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         
-        /* Das zentrierte Logo mit rotem Glow */
-        #logo-container { position: relative; z-index: 5; width: 600px; max-width: 80vw; padding: 20px; box-shadow: 0 0 80px rgba(255, 0, 0, 0.6); border: 1px solid rgba(255, 0, 0, 0.2); }
-        #logo-container img { width: 100%; display: block; }
+        /* Hintergrundbild Seite 0 */
+        #bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.7; z-index: 1; }
 
-        /* Seitliche Buttons links */
-        .side-bar-left { position: absolute; left: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 40px; z-index: 10; }
-        .side-btn-left { padding: 30px 10px; font-size: 18px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 0 10px 10px 0; width: 45px; color: black; font-family: 'Almendra'; }
+        #main-portal { 
+            position: relative; z-index: 5; 
+            width: 550px; max-width: 75vw; 
+            padding: 20px; 
+            box-shadow: 0 0 100px rgba(255, 0, 0, 0.8); 
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            background: rgba(0,0,0,0.6);
+        }
+        #main-portal img { width: 100%; display: block; filter: drop-shadow(0 0 15px red); }
+
+        /* Seitliche Tabs */
+        .side-l { position: absolute; left: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 30px; z-index: 10; }
+        .side-r { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 10; }
+        
+        .tab { padding: 35px 12px; font-size: 18px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 0 12px 12px 0; width: 50px; color: black; font-family: 'Almendra'; }
+        .tab-small { padding: 25px 8px; font-size: 14px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 12px 0 0 12px; width: 45px; color: black; font-family: 'Almendra'; }
+
         #btn-login { background: #39d353; }
         #btn-reg { background: #ffd600; }
-
-        /* Seitliche Buttons rechts */
-        .side-bar-right { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 10; }
-        .side-btn-right { padding: 25px 8px; font-size: 14px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 10px 0 0 10px; width: 40px; color: black; font-family: 'Almendra'; }
         #btn-yt { background: #ff8c00; }
         #btn-hist { background: #5b5bff; color: white; }
         #btn-web { background: #00cfd1; }
 
-        /* Login Modal (Das Fenster das aufploppt) */
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
-        .modal-content { background: #1a1a1a; padding: 30px; border: 2px solid #ff3131; border-radius: 15px; width: 350px; text-align: center; box-shadow: 0 0 40px red; }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 18px; box-sizing: border-box; text-align: center; border-radius: 5px; }
-        .go-btn { width: 100%; padding: 15px; background: #39d353; border: none; color: black; font-weight: bold; cursor: pointer; font-size: 20px; border-radius: 5px; font-family: 'Almendra'; }
-
-        /* Ladescreen */
-        #loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
-        .spinner { border: 5px solid #333; border-top: 5px solid #ff3131; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* Login Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
+        .modal-box { background: #111; padding: 40px; border: 2px solid #ff3131; border-radius: 15px; width: 320px; text-align: center; box-shadow: 0 0 50px red; }
+        input { width: 100%; padding: 15px; margin: 10px 0; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 20px; text-align: center; outline: none; }
+        .log-btn { width: 100%; padding: 15px; background: #39d353; border: none; color: black; font-weight: bold; cursor: pointer; font-size: 22px; font-family: 'Almendra'; }
     </style>
 </head>
 <body>
 
-    <div class="side-bar-left">
-        <button class="side-btn-left" id="btn-login" onclick="document.getElementById('loginModal').style.display='flex'">LOGIN</button>
-        <button class="side-btn-left" id="btn-reg" onclick="window.open('https://darkbulls.jimdofree.com/registrierung/')">REGISTRIEREN</button>
+    <img src="page0.jpg" id="bg">
+
+    <div class="side-l">
+        <button class="tab" id="btn-login" onclick="document.getElementById('loginMod').style.display='flex'">LOGIN</button>
+        <button class="tab" id="btn-reg" onclick="window.open('https://darkbulls.jimdofree.com/registrierung/')">REGISTRIEREN</button>
     </div>
 
-    <div class="side-bar-right">
-        <button class="side-btn-right" id="btn-yt" onclick="window.open('https://www.youtube.com/@DarkBullsGruppe')">YOUTUBE</button>
-        <button class="side-btn-right" id="btn-hist" onclick="alert('Historie folgt')">HISTORIES</button>
-        <button class="side-btn-right" id="btn-web" onclick="window.open('https://darkbulls.jimdofree.com/')">INTERNET</button>
+    <div class="side-r">
+        <button class="tab-small" id="btn-yt" onclick="window.open('https://www.youtube.com/@DarkBullsGruppe')">YOUTUBE</button>
+        <button class="tab-small" id="btn-hist">HISTORIES</button>
+        <button class="tab-small" id="btn-web" onclick="window.open('https://darkbulls.jimdofree.com/')">INTERNET</button>
     </div>
 
-    <div id="logo-container">
-        <img src="bulls_start.jpg" alt="Dark Bulls">
+    <div id="main-portal">
+        <img src="bulls_start.jpg">
     </div>
 
-    <div id="loginModal" class="modal">
-        <div class="modal-content">
-            <h2 style="color: #ff3131; margin-top: 0;">ANMELDUNG</h2>
-            <input type="text" id="nameInput" placeholder="NAME">
-            <input type="password" id="pinInput" placeholder="PIN">
-            <button class="go-btn" onclick="startAuth()">BETRETEN</button>
-            <p onclick="document.getElementById('loginModal').style.display='none'" style="color: #666; cursor: pointer; margin-top: 15px;">Abbrechen</p>
+    <div id="loginMod" class="modal">
+        <div class="modal-box">
+            <h1 style="color: #ff3131; margin-top: 0;">IDENTIFIKATION</h1>
+            <input type="text" id="u" placeholder="NAME">
+            <input type="password" id="p" placeholder="PIN">
+            <button class="log-btn" onclick="login()">BETRETEN</button>
+            <p onclick="document.getElementById('loginMod').style.display='none'" style="color: #555; cursor: pointer; margin-top: 15px;">Abbrechen</p>
         </div>
     </div>
 
-    <div id="loader">
-        <div class="spinner"></div>
-        <h2 style="color: #ff3131; margin-top: 20px;">Prüfe Allianz-Schlüssel...</h2>
-    </div>
-
     <script>
-        const SHEET_ID = '1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ';
-        const GID_USERS = '1188820112';
+        async function login() {
+            const name = document.getElementById("u").value.trim().toLowerCase();
+            const pin = document.getElementById("p").value.trim();
+            const res = await fetch('https://docs.google.com/spreadsheets/d/1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ/gviz/tq?tqx=out:csv&gid=1188820112');
+            const data = await res.text();
+            const rows = data.split('\n').slice(1);
+            
+            let user = rows.find(r => {
+                const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/["']/g, "").trim());
+                return c[0].toLowerCase() === name && c[2] === pin;
+            });
 
-        async function startAuth() {
-            const n = document.getElementById("nameInput").value.trim().toLowerCase();
-            const p = document.getElementById("pinInput").value.trim();
-            if(!n || !p) return;
-
-            document.getElementById("loader").style.display = "flex";
-
-            try {
-                const res = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID_USERS}&t=${new Date().getTime()}`);
-                const text = await res.text();
-                const users = text.split('\n').slice(1).map(r => {
-                    const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/["']/g, "").trim());
-                    return { name: c[0], pin: c[2], role: c[3] };
-                });
-
-                const user = users.find(u => u.name.toLowerCase() === n && u.pin === p);
-
-                if(user) {
-                    localStorage.setItem('bulls_name', user.name);
-                    localStorage.setItem('bulls_role', user.role);
-                    localStorage.setItem('bulls_auth', 'true');
-                    window.location.href = "dashboard.html";
-                } else {
-                    alert("Zutritt verweigert!");
-                    document.getElementById("loader").style.display = "none";
-                }
-            } catch (e) {
-                alert("Cloud Fehler!");
-                document.getElementById("loader").style.display = "none";
+            if(user) {
+                const c = user.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/["']/g, "").trim());
+                localStorage.setItem('bulls_user', c[0]);
+                localStorage.setItem('bulls_role', c[3]);
+                window.location.href = "dashboard.html";
+            } else {
+                alert("Zutritt verweigert!");
             }
         }
     </script>
