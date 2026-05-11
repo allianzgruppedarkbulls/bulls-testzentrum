@@ -13,7 +13,6 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* DEIN EINGESTELLTES BILD */
         #main-bull-logo { 
             width: 750px; 
             max-width: 100vw; 
@@ -21,20 +20,17 @@
             z-index: 1;
         }
 
-        /* BUTTONS LINKS */
         .side-l { position: absolute; left: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 40px; z-index: 100; }
         .tab-l { padding: 35px 15px; font-size: 20px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 0 12px 12px 0; width: 55px; color: black; font-family: 'Almendra'; text-align: center; }
         #btn-login { background: #39d353; box-shadow: 0 0 20px #39d353; }
         #btn-rekrut { background: #ffd600; box-shadow: 0 0 20px #ffd600; }
 
-        /* BUTTONS RECHTS */
         .side-r { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 100; }
         .tab-r { padding: 25px 10px; font-size: 15px; font-weight: bold; border: none; cursor: pointer; writing-mode: vertical-rl; text-orientation: upright; border-radius: 12px 0 0 12px; width: 45px; color: black; font-family: 'Almendra'; text-align: center; }
         #tab-yt { background: #ff8c00; }
         #tab-hist { background: #5b5bff; color: white; }
         #tab-web { background: #00cfd1; }
 
-        /* MODALS */
         .overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
         .modal-card { background: #111; padding: 25px; border: 2px solid #ff3131; border-radius: 15px; width: 450px; max-width: 90%; text-align: center; box-shadow: 0 0 50px red; }
         
@@ -42,6 +38,10 @@
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         input, select { width: 100%; padding: 10px; margin: 8px 0; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 16px; text-align: center; box-sizing: border-box; outline: none; }
         .submit-btn { width: 100%; padding: 15px; background: #39d353; border: none; color: black; font-weight: bold; cursor: pointer; font-size: 20px; font-family: 'Almendra'; margin-top: 15px; border-radius: 5px; }
+
+        /* SPEZIAL-STYLE FÜR DIE HISTORIE */
+        .hist-box { border: 2px solid white; padding: 25px; text-align: left; background: black; min-height: 250px; border-radius: 5px; margin-bottom: 20px; }
+        .hist-nav-container { display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -55,7 +55,7 @@
 
     <div class="side-r">
         <button class="tab-r" id="tab-yt" onclick="window.open('https://www.youtube.com/@DarkBullsGruppe')">YOUTUBE</button>
-        <button class="tab-r" id="tab-hist" onclick="alert('Historie folgt')">HISTORIES</button>
+        <button class="tab-r" id="tab-hist" onclick="openHistory()">HISTORIES</button>
         <button class="tab-r" id="tab-web" onclick="window.open('https://darkbulls.jimdofree.com/')">INTERNET</button>
     </div>
 
@@ -92,10 +92,29 @@
         </div>
     </div>
 
+    <div id="histMod" class="overlay">
+        <div class="modal-card" style="width: 850px; max-width: 95vw;">
+            <h1 style="color: #ff3131; font-size: 35px; margin-bottom: 15px;">Die Entstehung der Dark Bulls</h1>
+            <div class="hist-box">
+                <h3 id="hist-title" style="color: #ffd600; margin-top: 0; text-transform: uppercase;">Lade...</h3>
+                <p id="hist-text" style="font-size: 18px; color: white; line-height: 1.5; white-space: pre-wrap;"></p>
+            </div>
+            <div class="hist-nav-container">
+                <button class="submit-btn" style="background: #ffd600; margin: 0; flex: 1;" onclick="prevHist()">Zurück</button>
+                <button class="submit-btn" style="background: #39d353; margin: 0; flex: 1.2;" onclick="closeModals()">Zurück zum Start</button>
+                <button class="submit-btn" style="background: #ffd600; margin: 0; flex: 1;" onclick="nextHist()">Vor</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ/gviz/tq?tqx=out:csv&gid=1188820112';
         const WEBHOOK_URL = 'https://discord.com/api/webhooks/1502735246335021267/fpxXtWr5QgSny6rfJzGHKnhYskehC9vDMEl3CvUzjgbBOuKBd8KGzUhCRfvd2KmWcnND';
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw0hFHFAj4COvIECS0MmZDs-KfIl2qnIksFWI1I_xn8gQr01PiVgYfQAXKPnr9UmU5Dyw/exec';
+        const HIST_GID = '1142818833';
+
+        let historyData = [];
+        let currentHistIndex = 0;
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModals() { document.querySelectorAll('.overlay').forEach(m => m.style.display = 'none'); }
@@ -122,46 +141,44 @@
             const name = document.getElementById('regInGame').value.trim();
             const pin = document.getElementById('regPin1').value.trim();
             const pin2 = document.getElementById('regPin2').value.trim();
-            const cowTime = document.getElementById('regCowTime').value.trim();
-            const kd = document.getElementById('regKD').value.trim();
-            const aware = document.getElementById('regAware').value.trim();
-            const age = document.getElementById('regAge').value.trim();
-            const freq = document.getElementById('regFreq').value.trim();
-            const reason = document.getElementById('regReason').value;
-
             if(!name || !pin) return alert("Bitte Namen und PIN eingeben!");
             if(pin !== pin2) return alert("Die PINs sind nicht gleich!");
-
-            // 1. AN GOOGLE TABELLE SENDEN (Aktion: registerUser)
             try {
-                fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    cache: 'no-cache',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        action: "registerUser", 
-                        name: name, 
-                        pin: pin 
-                    })
+                fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "registerUser", name: name, pin: pin })
                 });
-
-                // 2. AN DISCORD SENDEN
-                const discordMsg = {
-                    content: `🚨 **NEUE REKRUTIERUNG** 🚨\n\n**Name:** ${name}\n**Alter:** ${age}\n**KD:** ${kd}\n**CoW Zeit:** ${cowTime}\n**Spielt:** ${freq}\n**Grund:** ${reason}\n\n_System: Automatisch als Gast eingetragen._`
-                };
+                const discordMsg = { content: `🚨 **NEUE REKRUTIERUNG** 🚨\n**Name:** ${name}\n_Automatisch eingetragen._` };
                 fetch(WEBHOOK_URL, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(discordMsg) });
-
-                // 3. LOGIN & WEITERLEITUNG
                 localStorage.setItem('bulls_user', name);
                 localStorage.setItem('bulls_role', 'Gast');
-                alert("Erfolgreich registriert! Willkommen bei den Bulls.");
+                alert("Registrierung erfolgreich!");
                 window.location.href = "dashboard.html";
+            } catch (e) { alert("Fehler!"); }
+        }
 
-            } catch (e) {
-                alert("Fehler bei der Datenbankverbindung.");
+        // HISTORIE FUNKTIONEN
+        async function openHistory() {
+            openModal('histMod');
+            if (historyData.length === 0) {
+                const url = `https://docs.google.com/spreadsheets/d/1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ/gviz/tq?tqx=out:csv&gid=${HIST_GID}`;
+                const res = await fetch(url + '&t=' + new Date().getTime());
+                const text = await res.text();
+                historyData = text.split('\n').slice(1).map(row => {
+                    return row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
+                });
+                renderHist();
             }
         }
+
+        function renderHist() {
+            if (historyData[currentHistIndex]) {
+                document.getElementById('hist-title').innerText = historyData[currentHistIndex][0] || "Kein Titel";
+                document.getElementById('hist-text').innerText = historyData[currentHistIndex][1] || "Kein Inhalt";
+            }
+        }
+
+        function nextHist() { if (currentHistIndex < historyData.length - 1) { currentHistIndex++; renderHist(); } }
+        function prevHist() { if (currentHistIndex > 0) { currentHistIndex--; renderHist(); } }
     </script>
 </body>
 </html>
