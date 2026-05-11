@@ -7,63 +7,70 @@
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { background: black; color: white; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .admin-container { width: 1000px; max-width: 95vw; background: #0a0a0a; padding: 30px; border: 2px solid #ff3131; border-radius: 15px; box-shadow: 0 0 40px red; }
-        h1 { color: #ff3131; text-transform: uppercase; text-align: center; margin-bottom: 25px; }
-        .search-box { width: 100%; padding: 15px; background: #111; border: 1px solid #444; color: #39d353; font-family: 'Almendra'; font-size: 20px; border-radius: 8px; margin-bottom: 25px; outline: none; box-sizing: border-box; }
-        .search-box:focus { border-color: #ff3131; box-shadow: 0 0 15px rgba(255, 49, 49, 0.3); }
+        .admin-container { width: 1000px; max-width: 95vw; background: #0a0a0a; padding: 25px; border: 2px solid #ff3131; border-radius: 15px; box-shadow: 0 0 40px red; }
+        
+        h1 { color: #ff3131; text-transform: uppercase; text-align: center; margin-top: 0; }
+
+        /* Suche */
+        .search-box { width: 100%; padding: 12px; background: #111; border: 1px solid #444; color: #39d353; font-family: 'Almendra'; font-size: 18px; border-radius: 8px; margin-bottom: 15px; outline: none; box-sizing: border-box; }
+
+        /* Scrollbare Tabelle */
+        .table-wrapper { max-height: 400px; overflow-y: auto; border: 1px solid #333; border-radius: 8px; margin-bottom: 20px; background: #000; }
         table { width: 100%; border-collapse: collapse; }
-        th { color: #ff3131; text-align: left; padding: 15px; border-bottom: 2px solid #333; text-transform: uppercase; font-size: 14px; }
-        td { padding: 15px; border-bottom: 1px solid #222; cursor: pointer; transition: 0.2s; }
-        tr:hover { background: rgba(255, 0, 0, 0.15); }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; }
-        .detail-card { background: #111; border: 2px solid #ff3131; padding: 35px; border-radius: 15px; width: 500px; box-shadow: 0 0 60px red; position: relative; }
-        .field-group { margin-bottom: 20px; }
-        label { display: block; color: #ff3131; font-size: 14px; margin-bottom: 8px; text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; background: black; border: 1px solid #444; color: white; font-family: 'Almendra'; font-size: 18px; box-sizing: border-box; outline: none; }
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
-        .btn { padding: 15px; border: none; cursor: pointer; font-family: 'Almendra'; font-weight: bold; border-radius: 5px; font-size: 16px; text-transform: uppercase; transition: 0.3s; }
-        .btn-save { background: #39d353; color: black; grid-column: span 2; font-size: 20px; }
+        th { position: sticky; top: 0; background: #111; color: #ff3131; text-align: left; padding: 12px; border-bottom: 2px solid #333; z-index: 10; }
+        td { padding: 12px; border-bottom: 1px solid #222; cursor: pointer; transition: 0.2s; }
+        
+        /* Markierung des Spielers */
+        .selected-row { background: rgba(255, 0, 0, 0.3) !important; color: #fff; box-shadow: inset 0 0 10px red; }
+        tr:hover:not(.selected-row) { background: rgba(255, 255, 255, 0.05); }
+
+        /* Unterer Bereich (Bearbeiten) */
+        .edit-area { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; padding: 20px; background: #111; border-radius: 10px; border: 1px solid #333; }
+        .field-group { display: flex; flex-direction: column; }
+        label { color: #ff3131; font-size: 14px; margin-bottom: 5px; }
+        input, select { padding: 10px; background: black; border: 1px solid #444; color: white; font-family: 'Almendra'; font-size: 16px; border-radius: 4px; }
+
+        /* Buttons */
+        .button-row { grid-column: span 3; display: flex; gap: 10px; margin-top: 10px; }
+        .btn { flex: 1; padding: 12px; border: none; cursor: pointer; font-family: 'Almendra'; font-weight: bold; border-radius: 5px; text-transform: uppercase; }
+        .btn-save { background: #39d353; color: black; }
         .btn-pin { background: #ffd600; color: black; }
-        .btn-stats { background: #5b5bff; color: white; }
-        .btn-del { background: #ff3131; color: white; margin-top: 10px; width: 100%; }
-        .btn-close { background: #333; color: white; width: 100%; margin-top: 20px; }
-        .back-btn { color: #5b5bff; cursor: pointer; text-decoration: underline; margin-bottom: 20px; align-self: flex-start; font-size: 18px; }
-        #loading { font-size: 24px; color: #ffd600; margin-top: 50px; text-align: center; width: 100%; }
+        .btn-del { background: #ff3131; color: white; }
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .back-btn { color: #5b5bff; cursor: pointer; text-decoration: underline; margin-bottom: 15px; align-self: flex-start; }
     </style>
 </head>
 <body>
 
-    <div class="back-btn" onclick="window.location.href='dashboard.html'"><< Zurück zum Dashboard</div>
+    <div class="back-btn" onclick="window.location.href='dashboard.html'"><< Zurück</div>
 
     <div class="admin-container">
         <h1>Mitglieder Kontrollzentrum</h1>
-        <input type="text" class="search-box" id="searchInput" placeholder="Spielername filtern..." onkeyup="filterTable()">
-        <div id="loading">Datenbank wird abgefragt...</div>
+        
+        <input type="text" class="search-box" id="searchInput" placeholder="Spieler suchen..." onkeyup="filterTable()">
+        
+        <div class="table-wrapper">
+            <table id="userTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Rolle</th>
+                        <th>Zusatz</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="userBody"></tbody>
+            </table>
+        </div>
 
-        <table id="userTable" style="display:none;">
-            <thead>
-                <tr>
-                    <th>Spielername</th>
-                    <th>Hauptrolle</th>
-                    <th>Zusatzaufgabe</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="userBody"></tbody>
-        </table>
-    </div>
-
-    <div id="detailModal" class="overlay">
-        <div class="detail-card">
-            <h2 id="editTitle" style="color: #ff3131; margin-top: 0; text-align: center;">Spieler-Akte</h2>
-            
+        <div class="edit-area" id="editArea">
             <div class="field-group">
-                <label>Spielername im Game</label>
-                <input type="text" id="editName">
+                <label>Name</label>
+                <input type="text" id="editName" placeholder="Spieler wählen...">
             </div>
-
             <div class="field-group">
-                <label>Allianz Rolle</label>
+                <label>Hauptrolle</label>
                 <select id="editRole">
                     <option value="Gast">Gast</option>
                     <option value="Allianz Gast">Allianz Gast</option>
@@ -74,48 +81,34 @@
                     <option value="Admin">Admin</option>
                 </select>
             </div>
-
             <div class="field-group">
-                <label>Zusätzliche Aufgabe</label>
+                <label>Zusatzaufgabe</label>
                 <select id="editExtraRole">
                     <option value="">Keine</option>
                     <option value="Buchhalter">Buchhalter</option>
                     <option value="ELO">ELO</option>
                 </select>
             </div>
-
-            <div class="action-grid">
-                <button class="btn btn-save" onclick="saveChanges(event)">Änderungen Speichern</button>
-                <button class="btn btn-pin" onclick="resetPin()">PIN Reset</button>
-                <button class="btn btn-stats" onclick="alert('Statistik Center folgt...')">Statistik</button>
+            <div class="button-row">
+                <button class="btn btn-save" id="saveBtn" onclick="saveChanges(event)" disabled>Speichern</button>
+                <button class="btn btn-pin" id="pinBtn" onclick="resetPin()" disabled>PIN Reset</button>
+                <button class="btn btn-del" id="delBtn" onclick="deleteUser()" disabled>Löschen</button>
             </div>
-            
-            <button class="btn btn-del" onclick="deleteUser()">Spieler unwiderruflich löschen</button>
-            <button class="btn btn-close" onclick="closeModal()">Fenster schließen</button>
         </div>
     </div>
 
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxVrCLO0pOP-pVcoYYfpSJZI_ou27LIr6jZPOzPPcgtYzu57qkqBynnPrC0-gIWbmJUSg/exec';
-        
         let allUsers = [];
-        let currentEditingName = "";
-
-        if (localStorage.getItem('bulls_role') !== "Admin") {
-            window.location.href = "dashboard.html";
-        }
+        let selectedUser = null;
 
         async function loadUsers() {
             try {
                 const res = await fetch(SCRIPT_URL);
                 const data = await res.json();
-                allUsers = data.slice(1); 
+                allUsers = data.slice(1);
                 renderTable(allUsers);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('userTable').style.display = 'table';
-            } catch (e) {
-                document.getElementById('loading').innerText = "Verbindung fehlgeschlagen!";
-            }
+            } catch (e) { alert("Fehler beim Laden!"); }
         }
 
         function renderTable(data) {
@@ -123,15 +116,35 @@
             body.innerHTML = "";
             data.forEach(row => {
                 const tr = document.createElement('tr');
-                tr.onclick = () => openModal(row);
+                tr.id = "row-" + row[0];
+                tr.onclick = () => selectPlayer(row);
                 tr.innerHTML = `
-                    <td style="font-weight: bold; font-size: 18px;">${row[0]}</td>
+                    <td style="font-weight: bold;">${row[0]}</td>
                     <td>${row[3]}</td>
                     <td style="color: #ffd600;">${row[4] || '-'}</td>
-                    <td style="font-size: 12px; color: #555;">${row[4] ? "Aktiv" : "Neu"}</td>
+                    <td style="font-size: 12px; color: #555;">${row[5] ? "Aktiv" : "Neu"}</td>
                 `;
                 body.appendChild(tr);
             });
+        }
+
+        function selectPlayer(row) {
+            // Alle anderen Zeilen Markierung entfernen
+            document.querySelectorAll('tr').forEach(r => r.classList.remove('selected-row'));
+            // Neue Zeile markieren
+            document.getElementById("row-" + row[0]).classList.add('selected-row');
+            
+            selectedUser = row;
+            
+            // Felder füllen
+            document.getElementById('editName').value = row[0];
+            document.getElementById('editRole').value = row[3];
+            document.getElementById('editExtraRole').value = row[4] || "";
+            
+            // Buttons aktivieren
+            document.getElementById('saveBtn').disabled = false;
+            document.getElementById('pinBtn').disabled = false;
+            document.getElementById('delBtn').disabled = false;
         }
 
         function filterTable() {
@@ -140,49 +153,44 @@
             renderTable(filtered);
         }
 
-        function openModal(row) {
-            currentEditingName = row[0];
-            document.getElementById('editTitle').innerText = "Akte: " + row[0];
-            document.getElementById('editName').value = row[0];
-            document.getElementById('editRole').value = row[3];
-            document.getElementById('editExtraRole').value = row[4] || ""; // Zusatzaufgabe aus Spalte E (Index 4)
-            document.getElementById('detailModal').style.display = 'flex';
-        }
-
-        function closeModal() { document.getElementById('detailModal').style.display = 'none'; }
-
         async function saveChanges(evt) {
             const btn = evt.target;
             const newName = document.getElementById('editName').value;
             const newRole = document.getElementById('editRole').value;
             const newExtra = document.getElementById('editExtraRole').value;
 
-            btn.innerText = "Speichere...";
-            btn.disabled = true;
-
+            btn.innerText = "Lade...";
             await fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
-                body: JSON.stringify({ 
-                    action: "fullUpdate", 
-                    oldName: currentEditingName, 
-                    newName: newName, 
-                    newRole: newRole, 
-                    newExtra: newExtra 
-                })
+                body: JSON.stringify({ action: "fullUpdate", oldName: selectedUser[0], newName, newRole, newExtra })
             });
-
-            alert("Daten für " + newName + " wurden aktualisiert!");
-            closeModal();
-            loadUsers();
+            alert("Erfolg!");
+            location.reload();
         }
 
         async function resetPin() {
             const tempPin = Math.floor(1000 + Math.random() * 9000);
-            if(confirm("PIN zurücksetzen auf: " + tempPin + "?")) {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({ action: "resetPin", userName: currentEditingName, newPin: tempPin })
-                });
-                alert("PIN ist jetzt " + temp
+            if(!confirm("PIN für " + selectedUser[0] + " auf " + tempPin + " setzen?")) return;
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ action: "resetPin", userName: selectedUser[0], newPin: tempPin })
+            });
+            alert("Erledigt!");
+        }
+
+        async function deleteUser() {
+            if(!confirm(selectedUser[0] + " wirklich löschen?")) return;
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ action: "deleteUser", userName: selectedUser[0] })
+            });
+            location.reload();
+        }
+
+        loadUsers();
+    </script>
+</body>
+</html>
