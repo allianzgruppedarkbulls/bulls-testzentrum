@@ -3,93 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dark Bulls - Admin Center V5.1</title>
+    <title>Dark Bulls - Admin Center V6</title>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { background: black; color: white; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .admin-container { width: 1000px; max-width: 95vw; background: #0a0a0a; padding: 25px; border: 2px solid #ff3131; border-radius: 15px; box-shadow: 0 0 40px red; }
         h1 { color: #ff3131; text-transform: uppercase; text-align: center; margin: 0 0 15px 0; }
-
         .search-box { width: 100%; padding: 12px; background: #111; border: 1px solid #444; color: #39d353; font-family: 'Almendra'; font-size: 18px; border-radius: 8px; margin-bottom: 15px; outline: none; box-sizing: border-box; }
-
-        /* Scroll-Bereich */
         .table-wrapper { max-height: 380px; overflow-y: auto; border: 1px solid #333; border-radius: 8px; margin-bottom: 20px; background: #000; }
         table { width: 100%; border-collapse: collapse; }
-        th { position: sticky; top: 0; background: #111; color: #ff3131; text-align: left; padding: 12px; border-bottom: 2px solid #333; z-index: 10; text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid #222; cursor: pointer; transition: 0.2s; }
-        
-        /* Das Markieren/Leuchten */
+        th { position: sticky; top: 0; background: #111; color: #ff3131; text-align: left; padding: 12px; border-bottom: 2px solid #333; z-index: 10; }
+        td { padding: 12px; border-bottom: 1px solid #222; cursor: pointer; }
         .selected-row { background: rgba(255, 0, 0, 0.4) !important; color: #fff !important; font-weight: bold; box-shadow: inset 0 0 15px red; }
-        tr:hover:not(.selected-row) { background: rgba(255, 255, 255, 0.05); }
-
-        /* Steuerung unten */
         .edit-area { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; padding: 20px; background: #111; border-radius: 10px; border: 1px solid #333; }
         .field-group { display: flex; flex-direction: column; }
         label { color: #ff3131; font-size: 14px; margin-bottom: 5px; text-transform: uppercase; }
         input, select { padding: 10px; background: black; border: 1px solid #444; color: white; font-family: 'Almendra'; font-size: 16px; border-radius: 4px; outline: none; }
-        input[readonly] { color: #888; border-color: #222; }
-
         .button-row { grid-column: span 3; display: flex; gap: 10px; margin-top: 15px; }
-        .btn { flex: 1; padding: 12px; border: none; cursor: pointer; font-family: 'Almendra'; font-weight: bold; border-radius: 5px; text-transform: uppercase; font-size: 16px; transition: 0.3s; }
+        .btn { flex: 1; padding: 12px; border: none; cursor: pointer; font-family: 'Almendra'; font-weight: bold; border-radius: 5px; text-transform: uppercase; }
         .btn-save { background: #39d353; color: black; }
         .btn-pin { background: #ffd600; color: black; }
         .btn-del { background: #ff3131; color: white; }
         .btn:disabled { opacity: 0.15; cursor: not-allowed; }
-
-        .back-btn { color: #5b5bff; cursor: pointer; text-decoration: underline; margin-bottom: 15px; align-self: flex-start; font-size: 18px; }
         #loading-text { color: #ffd600; text-align: center; padding: 20px; font-size: 20px; }
     </style>
 </head>
 <body>
-
-    <div class="back-btn" onclick="window.location.href='dashboard.html'"><< ZURÜCK</div>
-
     <div class="admin-container">
         <h1>Mitglieder Kontrollzentrum</h1>
         <input type="text" class="search-box" id="searchInput" placeholder="Nach Spieler suchen..." onkeyup="filterTable()">
-        
         <div class="table-wrapper">
-            <div id="loading-text">Lade Allianz-Datenbank...</div>
+            <div id="loading-text">Verbinde mit Google-Server...</div>
             <table id="userTable" style="display:none;">
                 <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Hauptrolle</th>
-                        <th>Zusatz</th>
-                        <th>Status</th>
-                    </tr>
+                    <tr><th>Name</th><th>Hauptrolle</th><th>Zusatz</th><th>Status</th></tr>
                 </thead>
                 <tbody id="userBody"></tbody>
             </table>
         </div>
-
         <div class="edit-area">
-            <div class="field-group">
-                <label>Spieler</label>
-                <input type="text" id="editName" readonly placeholder="Oben wählen...">
-            </div>
-            <div class="field-group">
-                <label>Allianz Rolle</label>
-                <select id="editRole">
-                    <option value="Gast">Gast</option>
-                    <option value="Allianz Gast">Allianz Gast</option>
-                    <option value="Mitglied">Mitglied</option>
-                    <option value="Kampfdivision">Kampfdivision</option>
-                    <option value="Ausbilder">Ausbilder</option>
-                    <option value="Offi">Offi</option>
-                    <option value="Admin">Admin</option>
-                </select>
-            </div>
-            <div class="field-group">
-                <label>Zusatzaufgabe</label>
-                <select id="editExtraRole">
-                    <option value="">Keine</option>
-                    <option value="Buchhalter">Buchhalter</option>
-                    <option value="ELO">ELO</option>
-                </select>
-            </div>
+            <div class="field-group"><label>Spieler</label><input type="text" id="editName" readonly></div>
+            <div class="field-group"><label>Rolle</label><select id="editRole">
+                <option value="Gast">Gast</option><option value="Mitglied">Mitglied</option><option value="Offi">Offi</option><option value="Admin">Admin</option>
+            </select></div>
+            <div class="field-group"><label>Zusatz</label><select id="editExtraRole">
+                <option value="">Keine</option><option value="ELO">ELO</option><option value="Buchhalter">Buchhalter</option>
+            </select></div>
             <div class="button-row">
-                <button class="btn btn-save" id="saveBtn" onclick="saveChanges(event)" disabled>Speichern</button>
+                <button class="btn btn-save" id="saveBtn" onclick="saveChanges()" disabled>Speichern</button>
                 <button class="btn btn-pin" id="pinBtn" onclick="resetPin()" disabled>PIN Reset</button>
                 <button class="btn btn-del" id="delBtn" onclick="deleteUser()" disabled>Löschen</button>
             </div>
@@ -97,32 +58,38 @@
     </div>
 
     <script>
-        // HIER DEINE NEUE URL EINTRAGEN!
+        // HIER DEINE NEUE URL
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw5JnKbPc1_hMo9QGFsdVdYCoR_NEAMISbP4U6PG7a_9uli3f_GSpxVplWuczLXBeT_Ow/exec';
         
         let allUsers = [];
         let selectedUser = null;
 
         async function loadUsers() {
+            console.log("Starte Abfrage an:", SCRIPT_URL);
             try {
-                const res = await fetch(SCRIPT_URL + '?t=' + new Date().getTime());
-                const data = await res.json();
+                // Cache-Killer anhängen
+                const response = await fetch(SCRIPT_URL + '?t=' + Date.now());
+                if (!response.ok) throw new Error('Netzwerk-Antwort war nicht ok');
+                
+                const data = await response.json();
+                console.log("Daten empfangen:", data);
+                
                 allUsers = data.slice(1);
                 renderTable(allUsers);
+                
                 document.getElementById('loading-text').style.display = 'none';
                 document.getElementById('userTable').style.display = 'table';
-            } catch (e) {
-                document.getElementById('loading-text').innerText = "FEHLER: Verbindung fehlgeschlagen!";
+            } catch (error) {
+                console.error("Fehler im Detail:", error);
+                document.getElementById('loading-text').innerText = "FEHLER: Script antwortet nicht. Prüfe die URL!";
             }
         }
 
         function renderTable(data) {
             const body = document.getElementById('userBody');
             body.innerHTML = "";
-            data.forEach(row => {
+            data.forEach((row, index) => {
                 const tr = document.createElement('tr');
-                const safeId = "row-" + (row[0] ? row[0].toString().replace(/\s/g, '_') : "x");
-                tr.id = safeId;
                 tr.onclick = () => {
                     document.querySelectorAll('tr').forEach(r => r.classList.remove('selected-row'));
                     tr.classList.add('selected-row');
@@ -134,53 +101,41 @@
                     document.getElementById('pinBtn').disabled = false;
                     document.getElementById('delBtn').disabled = false;
                 };
-                tr.innerHTML = `
-                    <td style="font-weight: bold;">${row[0] || ''}</td>
-                    <td>${row[3] || ''}</td>
-                    <td style="color: #ffd600;">${row[4] || '-'}</td>
-                    <td style="font-size: 12px; color: #555;">Aktiv</td>
-                `;
+                tr.innerHTML = `<td>${row[0]}</td><td>${row[3]}</td><td style="color:#ffd600">${row[4]||'-'}</td><td>Aktiv</td>`;
                 body.appendChild(tr);
             });
         }
 
         function filterTable() {
             const val = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allUsers.filter(u => u[0].toLowerCase().includes(val));
-            renderTable(filtered);
+            renderTable(allUsers.filter(u => u[0].toLowerCase().includes(val)));
         }
 
-        async function saveChanges(evt) {
-            const btn = evt.target;
+        async function saveChanges() {
             const newName = document.getElementById('editName').value;
             const newRole = document.getElementById('editRole').value;
             const newExtra = document.getElementById('editExtraRole').value;
-            if(!confirm("Daten für " + newName + " speichern?")) return;
-            btn.innerText = "...";
+            
+            document.getElementById('saveBtn').innerText = "...";
             await fetch(SCRIPT_URL, {
-                method: 'POST', mode: 'no-cors',
+                method: 'POST',
+                mode: 'no-cors',
                 body: JSON.stringify({ action: "fullUpdate", oldName: selectedUser[0], newName, newRole, newExtra })
             });
-            alert("Erfolg!");
+            alert("Gesendet!");
             location.reload();
         }
 
         async function resetPin() {
-            const tempPin = Math.floor(1000 + Math.random() * 9000);
-            if(!confirm("PIN für " + selectedUser[0] + " auf " + tempPin + " setzen?")) return;
-            await fetch(SCRIPT_URL, {
-                method: 'POST', mode: 'no-cors',
-                body: JSON.stringify({ action: "resetPin", userName: selectedUser[0], newPin: tempPin })
-            });
-            alert("Neuer PIN: " + tempPin);
+            const p = Math.floor(1000 + Math.random() * 9000);
+            if(!confirm("PIN Reset?")) return;
+            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "resetPin", userName: selectedUser[0], newPin: p })});
+            alert("Neu: " + p);
         }
 
         async function deleteUser() {
-            if(!confirm(selectedUser[0] + " wirklich LÖSCHEN?")) return;
-            await fetch(SCRIPT_URL, {
-                method: 'POST', mode: 'no-cors',
-                body: JSON.stringify({ action: "deleteUser", userName: selectedUser[0] })
-            });
+            if(!confirm("Löschen?")) return;
+            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "deleteUser", userName: selectedUser[0] })});
             location.reload();
         }
 
