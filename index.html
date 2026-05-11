@@ -6,77 +6,116 @@
     <title>Dark Bulls - Allianz Zentrale</title>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; background: black; color: white; font-family: 'Almendra'; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        #bg { position: fixed; width: 100vw; height: 100vh; object-fit: cover; z-index: -1; opacity: 0.7; }
+        /* HINTERGRUND-RIEGEL: Zwingt das Bild in den Fullscreen-Hintergrund */
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: black; font-family: 'Almendra', serif; color: white; }
         
-        .portal-box { background: rgba(0,0,0,0.85); padding: 30px; border: 2px solid #ff3131; border-radius: 15px; text-align: center; width: 380px; box-shadow: 0 0 50px rgba(255,0,0,0.6); position: relative; }
-        input, textarea, select { width: 100%; padding: 10px; margin: 8px 0; background: #000; color: #39d353; border: 1px solid #444; text-align: center; font-size: 16px; font-family: 'Almendra'; box-sizing: border-box; outline: none; }
+        #bg-image {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            object-fit: cover; /* Bild wird passend zugeschnitten, nicht verzerrt */
+            z-index: -1; 
+            opacity: 0.7; /* Leicht abgedunkelt für bessere Lesbarkeit */
+            display: block;
+        }
+
+        /* DESIGN LOGIN-BOX (Wie im Panzer-Design) */
+        #main-container { height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; z-index: 10; }
         
-        .btn-main { width: 100%; padding: 15px; background: #39d353; border: none; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 20px; margin-top: 10px; }
+        .portal-box { 
+            background: rgba(0,0,0,0.85); 
+            padding: 30px; 
+            border: 2px solid #ff3131; 
+            border-radius: 15px; 
+            text-align: center; 
+            width: 380px; 
+            box-shadow: 0 0 50px rgba(255,0,0,0.6); 
+            position: relative; 
+        }
+        
+        #logo-start { 
+            width: 100%; 
+            filter: drop-shadow(0 0 15px red); 
+            margin-bottom: 10px; 
+        }
+
+        h2 { color:#ff3131; margin: 0 0 15px 0; font-size: 28px; }
+
+        input, textarea, select { 
+            width: 100%; padding: 10px; margin: 8px 0; 
+            background: #000; color: #39d353; border: 1px solid #444; 
+            text-align: center; font-size: 16px; font-family: 'Almendra'; 
+            box-sizing: border-box; outline: none; 
+        }
+        
+        .btn-main { width: 100%; padding: 15px; background: #39d353; border: none; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 20px; margin-top: 10px; border-radius: 5px; color: black; }
+        .btn-main:hover { background: #2eb846; }
+        
         .btn-reg { background: #ffd600; margin-top: 20px; font-size: 16px; padding: 10px; color: black; }
+        .btn-reg:hover { background: #e6c200; }
 
-        /* Seiten-Tabs */
-        .side-menu { position: absolute; right: -45px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; }
-        .tab { padding: 20px 8px; background: #444; writing-mode: vertical-rl; text-orientation: upright; cursor: pointer; border-radius: 0 8px 8px 0; font-size: 14px; font-weight: bold; }
+        /* SEITEN-TABS (Rechte Seite) */
+        .side-tabs { position: absolute; right: -45px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+        .tab { padding: 20px 8px; background: #444; writing-mode: vertical-rl; text-orientation: upright; cursor: pointer; border-radius: 0 8px 8px 0; font-size: 14px; font-weight: bold; color: black; text-align: center; }
+        .tab:hover { opacity: 0.8; }
 
-        /* Rekrutierung Overlay */
+        /* REKRUTIERUNGS-MODAL (Das Fenster) */
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto; padding: 20px 0; }
-        .reg-card { background: #111; border: 2px solid #ffd600; padding: 25px; border-radius: 15px; width: 450px; max-width: 90%; text-align: center; box-shadow: 0 0 40px #ffd60055; }
+        .reg-card { background: #111; border: 2px solid #ffd600; padding: 25px; border-radius: 15px; width: 450px; max-width: 90%; text-align: center; box-shadow: 0 0 40px rgba(255, 214, 0, 0.4); }
         .reg-card h2 { color:#ffd600; margin: 0 0 10px 0; }
         .reg-card p { font-size: 14px; color: #ccc; margin-bottom: 15px; }
-        
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     </style>
 </head>
 <body>
 
-    <img src="bulls_start.jpg" id="bg">
+    <img src="bulls_start.jpg" id="bg-image">
 
-    <div class="portal-box">
-        <img src="bulls_start.jpg" style="width:100%; margin-bottom:10px; filter: drop-shadow(0 0 10px red);">
-        <h2 style="color:#ff3131; margin:0;">ALLIANZ LOGIN</h2>
-        
-        <input type="text" id="u" placeholder="BENUTZERNAME">
-        <input type="password" id="p" placeholder="PIN">
-        <button class="btn-main" onclick="login()">BETRETEN</button>
-        
-        <button class="btn-main btn-reg" onclick="openReg()">REKRUTIERUNG ÖFFNEN</button>
+    <div id="main-container">
+        <div class="portal-box">
+            <img src="bulls_start.jpg" id="logo-start">
+            
+            <h2>ALLIANZ LOGIN</h2>
+            
+            <input type="text" id="u" placeholder="BENUTZERNAME">
+            <input type="password" id="p" placeholder="PIN">
+            <button class="btn-main" onclick="login()">BETRETEN</button>
+            
+            <button class="btn-main btn-reg" onclick="openReg()">REKRUTIERUNG ÖFFNEN</button>
 
-        <div class="side-menu">
-            <div class="tab" id="btn-yt" onclick="window.open('https://www.youtube.com/@DarkBullsGruppe')">YOUTUBE</div>
-            <div class="tab" style="background:#5b5bff" onclick="alert('Historie folgt')">HISTORIES</div>
-            <div class="tab" style="background:#00cfd1" onclick="window.open('https://darkbulls.jimdofree.com/')">INTERNET</div>
+            <div class="side-tabs">
+                <div class="tab" id="btn-yt" onclick="window.open('https://www.youtube.com/@DarkBullsGruppe')">YOUTUBE</div>
+                <div class="tab" style="background:#5b5bff" onclick="alert('Historie folgt')">HISTORIES</div>
+                <div class="tab" style="background:#00cfd1" onclick="window.open('https://darkbulls.jimdofree.com/')">INTERNET</div>
+            </div>
         </div>
     </div>
 
     <div id="regModal" class="overlay">
         <div class="reg-card">
             <h2>REKRUTIERUNG</h2>
-            <p>Willkommen Rekrut! Fülle die Akte aus, um sofortigen Gast-Zugriff zu erhalten.</p>
+            <p>Willkommen Rekrut! Fülle die Akte vollständig aus, um sofortigen Gast-Zugriff zu erhalten.</p>
             
             <div class="grid-2">
                 <input type="text" id="regCoWName" placeholder="Name im Spiel">
-                <input type="text" id="regKD" placeholder="Deine KD">
+                <input type="text" id="regKD" placeholder="KD">
             </div>
             
             <div class="grid-2">
                 <input type="text" id="regAge" placeholder="Dein Alter">
-                <input type="text" id="regTime" placeholder="Spielzeit Call of War">
+                <input type="text" id="regTime" placeholder="Dabei seit (Call of War)">
             </div>
 
-            <input type="text" id="regAware" placeholder="Wie auf uns aufmerksam geworden?">
-            <input type="text" id="regFrequency" placeholder="Wie viel spielst du am Tag?">
+            <input type="text" id="regAware" placeholder="Wie bist du auf uns aufmerksam geworden?">
+            <input type="text" id="regFrequency" placeholder="Wie oft spielst du in der Woche/Tage?">
 
             <select id="regReason">
                 <option value="" disabled selected>Grund der Anmeldung...</option>
-                <option value="Nur zu Besuch / Gast">Nur zu Besuch / Gast</option>
+                <option value="Nur zu Besuch / Gast">bin in einer anderen allisnz und nur zu besuch / als Gast</option>
                 <option value="Bestrebung einer Mitgliedschaft">Bestrebung einer Mitgliedschaft</option>
-                <option value="Andere Allianz / Kooperation">Andere Allianz / Kooperation</option>
             </select>
 
             <div style="border-top: 1px solid #444; margin: 15px 0; padding-top: 10px;">
-                <p style="color:#39d353">Zugangsdaten für diese Seite festlegen:</p>
-                <input type="password" id="regPin1" placeholder="PIN wählen">
+                <p style="color:#39d353">Deine Zugangsdaten für diese Seite festlegen:</p>
+                <input type="password" id="regPin1" placeholder="PIN">
                 <input type="password" id="regPin2" placeholder="PIN wiederholen">
             </div>
 
@@ -92,25 +131,39 @@
         async function login() {
             const n = document.getElementById("u").value.trim().toLowerCase();
             const p = document.getElementById("p").value.trim();
-            if(!n || !p) return alert("Daten eingeben!");
+            if(!n || !p) return alert("Rekrut! Daten eingeben!");
 
             try {
+                // Fetch mit Cache-Killer (Timestamp), damit Daten immer frisch sind
                 const res = await fetch(SHEET_URL + '&t=' + new Date().getTime());
                 const text = await res.text();
                 const rows = text.split('\n').slice(1);
+                
                 const user = rows.find(r => {
                     const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
+                    // Spalte 0: Name, Spalte 2: PIN
                     return c[0].toLowerCase() === n && c[2] === p;
                 });
 
                 if(user) {
                     const c = user.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
+                    // Daten für Dashboard speichern (localStorage)
                     localStorage.setItem('bulls_user', c[0]);
-                    localStorage.setItem('bulls_role', c[3]);
+                    localStorage.setItem('bulls_role', c[3]); // Spalte 3: Rolle
+                    // Zum Hauptdeck springen
                     window.location.href = "dashboard.html";
-                } else { alert("Login falsch!"); }
-            } catch(e) { alert("Fehler!"); }
+                } else {
+                    alert("Zutritt verweigert! Name oder PIN falsch.");
+                }
+            } catch(e) { alert("Cloud Fehler!"); }
         }
+
+        // Enter-Taste im PIN-Feld aktiviert Login
+        document.getElementById("p").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                login();
+            }
+        });
 
         function openReg() { document.getElementById('regModal').style.display = 'flex'; }
         function closeReg() { document.getElementById('regModal').style.display = 'none'; }
@@ -126,31 +179,35 @@
             const pin1 = document.getElementById('regPin1').value;
             const pin2 = document.getElementById('regPin2').value;
 
-            if(!name || !pin1 || !reason) return alert("Name, PIN und Grund sind Pflicht!");
-            if(pin1 !== pin2) return alert("PINs stimmen nicht überein!");
+            // Einfacher Validierungs-Check
+            if(!name || !pin1 || !reason || !kd || !age) return alert("Akte unvollständig! Pflichtfelder füllen.");
+            if(pin1 !== pin2) return alert("Die PINs stimmen nicht überein!");
 
-            // Nachricht für Discord
-            const message = `🚨 **NEUE REKRUTIERUNG** 🚨\n\n` +
-                `**Name:** ${name}\n` +
-                `**Alter:** ${age}\n` +
+            // Nachricht für Discord zusammenbauen
+            const discordMessage = `🚨 **NEUE REKRUTIERUNG** 🚨\n\n` +
+                `**Name im Game:** ${name}\n` +
                 `**KD:** ${kd}\n` +
-                `**Dabei seit:** ${cowTime}\n` +
-                `**Spielt:** ${freq}\n` +
-                `**Quelle:** ${aware}\n` +
+                `**Alter:** ${age}\n` +
+                `**CoW Erfahrung:** ${cowTime}\n` +
+                `**Spielhäufigkeit:** ${freq}\n` +
+                `**Aufmerksam durch:** ${aware}\n` +
                 `**Grund:** ${reason}\n\n` +
-                `_User ist jetzt als Gast im Dashboard._`;
+                `_Der User ist jetzt automatisch als Gast im Dashboard._`;
 
-            await fetch(WEBHOOK_REG, {
+            // 1. Daten an Discord Webhook senden
+            fetch(WEBHOOK_REG, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ content: message })
+                body: JSON.stringify({ content: discordMessage })
             });
 
-            // Automatischer Gast-Login
+            // 2. Automatischer Gast-Login (Rechte setzen)
             localStorage.setItem('bulls_user', name);
-            localStorage.setItem('bulls_role', 'Gast');
+            localStorage.setItem('bulls_role', 'Gast'); // WICHTIG: Er bekommt die Rolle GAST
             
-            alert("Rekrutierung gesendet! Du bist nun als Gast freigeschaltet.");
+            alert("Rekrutierung gesendet! Du bist nun automatisch als Gast im System freigeschaltet.");
+            
+            // Zum Dashboard weiterleiten
             window.location.href = "dashboard.html";
         }
     </script>
