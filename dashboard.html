@@ -22,8 +22,6 @@
         .card-btn { background: #39d353; color: black; border: none; padding: 12px; cursor: pointer; font-family: 'Almendra'; font-weight: bold; border-radius: 5px; font-size: 15px; width: 100%; }
         .chat-btn-container { width: 100%; display: flex; justify-content: flex-end; }
         .chat-btn { background: #ff8c00; color: black; border: none; padding: 15px 45px; font-size: 24px; font-weight: bold; border-radius: 8px; cursor: pointer; font-family: 'Almendra'; box-shadow: 0 0 25px rgba(255, 140, 0, 0.5); }
-        
-        /* Hilfsklassen für Sichtbarkeit */
         .hidden { display: none !important; }
     </style>
 </head>
@@ -41,9 +39,9 @@
             <div class="card" id="box-perso">
                 <h2>Persönlich</h2>
                 <div class="btn-stack">
-                    <button class="card-btn" id="btn-stats">Eigene Statistik</button>
-                    <button class="card-btn">Pin ändern</button>
-                    <button class="card-btn">Support Chat</button>
+                    <button class="card-btn" id="btn-stats" onclick="alert('Statistik folgt')">Eigene Statistik</button>
+                    <button class="card-btn" onclick="alert('PIN ändern folgt')">Pin ändern</button>
+                    <button class="card-btn" onclick="alert('Support folgt')">Support Chat</button>
                 </div>
             </div>
 
@@ -70,8 +68,8 @@
             <div class="card" id="box-admin">
                 <h2>Admin</h2>
                 <div class="btn-stack">
-                    <button class="card-btn">User-Verwaltung</button>
-                    <button class="card-btn">Chat Verwaltung</button>
+                    <button class="card-btn" onclick="window.location.href='user_admin.html'">User-Verwaltung</button>
+                    <button class="card-btn" onclick="alert('Chat Verwaltung folgt')">Chat Verwaltung</button>
                 </div>
             </div>
 
@@ -100,7 +98,6 @@
         }
 
         function applyPermissions(r) {
-            // Erstmal alles Relevante suchen
             const boxStats = document.getElementById('btn-stats');
             const boxBlacklist = document.getElementById('box-blacklist');
             const boxPflege = document.getElementById('box-pflege');
@@ -108,7 +105,7 @@
             const boxElo = document.getElementById('box-elo');
             const boxAlliChat = document.getElementById('box-allichat');
 
-            // Logik basierend auf deiner Liste:
+            // Reset (Alles erst mal verstecken was wichtig ist)
             if (r === "Gast") {
                 boxStats.classList.add('hidden');
                 boxBlacklist.classList.add('hidden');
@@ -123,19 +120,16 @@
                 boxPflege.classList.add('hidden');
                 boxAdmin.classList.add('hidden');
                 boxElo.classList.add('hidden');
-                // Allianz Chat bleibt sichtbar!
             }
             else if (r === "Mitglied") {
                 boxPflege.classList.add('hidden');
                 boxAdmin.classList.add('hidden');
-                // Statistik und Blackliste sichtbar
             }
             else if (r === "Kampfdivision") {
-                boxStats.classList.add('hidden'); // Ohne Statistik
+                boxStats.classList.add('hidden');
                 boxPflege.classList.add('hidden');
                 boxAdmin.classList.add('hidden');
             }
-            // Ausbilder, Offi, Admin sehen automatisch alles (keine hidden-Klassen)
         }
 
         function logout() {
