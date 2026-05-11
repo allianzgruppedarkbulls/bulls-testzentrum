@@ -3,41 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dark Bulls - Login</title>
+    <title>Dark Bulls - Allianz Zentrale</title>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; background: black; color: white; font-family: 'Almendra'; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
         #bg { position: fixed; width: 100vw; height: 100vh; object-fit: cover; z-index: -1; opacity: 0.7; }
-        .login-box { background: rgba(0,0,0,0.8); padding: 30px; border: 2px solid #ff3131; border-radius: 15px; text-align: center; width: 320px; box-shadow: 0 0 50px red; }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #000; color: #39d353; border: 1px solid #444; text-align: center; font-size: 20px; font-family: 'Almendra'; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; background: #39d353; border: none; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 20px; }
+        
+        /* Design der Login-Zentrale */
+        .portal-box { background: rgba(0,0,0,0.85); padding: 30px; border: 2px solid #ff3131; border-radius: 15px; text-align: center; width: 350px; box-shadow: 0 0 50px rgba(255,0,0,0.6); position: relative; }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; background: #000; color: #39d353; border: 1px solid #444; text-align: center; font-size: 18px; font-family: 'Almendra'; box-sizing: border-box; }
+        
+        .btn-main { width: 100%; padding: 15px; background: #39d353; border: none; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 20px; margin-top: 10px; }
+        .btn-reg { background: #ffd600; margin-top: 20px; font-size: 16px; padding: 10px; color: black; }
+
+        /* Seiten-Tabs */
+        .side-tabs { position: absolute; right: -50px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; }
+        .tab { padding: 20px 5px; background: #444; writing-mode: vertical-rl; text-orientation: upright; cursor: pointer; border-radius: 0 5px 5px 0; font-size: 12px; }
+
+        /* Registrierung Overlay */
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; }
+        .reg-card { background: #111; border: 2px solid #ffd600; padding: 30px; border-radius: 15px; width: 320px; text-align: center; }
     </style>
 </head>
 <body>
+
     <img src="bulls_start.jpg" id="bg">
-    <div class="login-box">
-        <img src="bulls_start.jpg" style="width:100%; margin-bottom:10px;">
+
+    <div class="portal-box">
+        <img src="bulls_start.jpg" style="width:100%; margin-bottom:10px; filter: drop-shadow(0 0 10px red);">
+        <h2 style="color:#ff3131; margin:0;">ALLIANZ LOGIN</h2>
+        
         <input type="text" id="u" placeholder="NAME">
         <input type="password" id="p" placeholder="PIN">
-        <button onclick="login()">BETRETEN</button>
+        <button class="btn-main" onclick="login()">BETRETEN</button>
+        
+        <button class="btn-main btn-reg" onclick="openReg()">NEU HIER? REGISTRIEREN</button>
+
+        <div class="side-tabs">
+            <div class="tab" onclick="window.open('https://www.youtube.com/@DarkBullsGruppe')">YOUTUBE</div>
+            <div class="tab" style="background:#5b5bff">HISTORIES</div>
+        </div>
     </div>
+
+    <div id="regModal" class="overlay">
+        <div class="reg-card">
+            <h2 style="color:#ffd600">REKRUTIERUNG</h2>
+            <p style="font-size:14px;">Gib deinen Namen an, um sofortigen Gast-Zugriff zu erhalten.</p>
+            <input type="text" id="regName" placeholder="DEIN NAME">
+            <textarea id="regText" placeholder="WARUM WILLST DU ZU UNS?" style="height:80px;"></textarea>
+            <button class="btn-main" style="background:#ffd600; color:black;" onclick="autoGastLogin()">ABSENDEN & STARTEN</button>
+            <p onclick="closeReg()" style="color:#555; cursor:pointer; margin-top:15px;">Abbrechen</p>
+        </div>
+    </div>
+
     <script>
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ/gviz/tq?tqx=out:csv&gid=1188820112';
+        const WEBHOOK_REG = "https://discord.com/api/webhooks/1502735246335021267/fpxXtWr5QgSny6rfJzGHKnhYskehC9vDMEl3CvUzjgbBOuKBd8KGzUhCRfvd2KmWcnND";
+
         async function login() {
             const n = document.getElementById("u").value.trim().toLowerCase();
             const p = document.getElementById("p").value.trim();
-            const res = await fetch('https://docs.google.com/spreadsheets/d/1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ/gviz/tq?tqx=out:csv&gid=1188820112');
-            const text = await res.text();
-            const rows = text.split('\n').slice(1);
-            const user = rows.find(r => {
-                const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
-                return c[0].toLowerCase() === n && c[2] === p;
+            
+            if(!n || !p) return alert("Daten eingeben!");
+
+            try {
+                const res = await fetch(SHEET_URL + '&t=' + new Date().getTime());
+                const text = await res.text();
+                const rows = text.split('\n').slice(1);
+                
+                const user = rows.find(r => {
+                    const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
+                    return c[0].toLowerCase() === n && c[2] === p;
+                });
+
+                if(user) {
+                    const c = user.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
+                    localStorage.setItem('bulls_user', c[0]);
+                    localStorage.setItem('bulls_role', c[3]);
+                    window.location.href = "dashboard.html";
+                } else {
+                    alert("Zutritt verweigert! Name oder PIN falsch.");
+                }
+            } catch(e) { alert("Fehler beim Datenabgleich."); }
+        }
+
+        function openReg() { document.getElementById('regModal').style.display = 'flex'; }
+        function closeReg() { document.getElementById('regModal').style.display = 'none'; }
+
+        async function autoGastLogin() {
+            const name = document.getElementById('regName').value.trim();
+            const text = document.getElementById('regText').value.trim();
+
+            if(!name) return alert("Bitte Namen angeben!");
+
+            // 1. Info an Discord senden
+            await fetch(WEBHOOK_REG, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ content: `🆕 **NEUE REGISTRIERUNG**\n**Name:** ${name}\n**Info:** ${text}\n_User hat Gast-Zugriff erhalten._` })
             });
-            if(user) {
-                const c = user.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
-                localStorage.setItem('bulls_user', c[0]);
-                localStorage.setItem('bulls_role', c[3]);
-                window.location.href = "dashboard.html";
-            } else { alert("Falsch!"); }
+
+            // 2. Automatischer Gast-Login
+            localStorage.setItem('bulls_user', name);
+            localStorage.setItem('bulls_role', 'Gast'); // Er bekommt sofort Gast-Rechte
+            
+            alert("Willkommen bei den Bulls! Du hast nun eingeschränkten Gast-Zugriff.");
+            window.location.href = "dashboard.html";
         }
     </script>
 </body>
