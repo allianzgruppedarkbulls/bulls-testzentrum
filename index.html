@@ -9,31 +9,12 @@
         /* GRUND-LAYOUT */
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: black; font-family: 'Almendra', serif; color: white; overflow: hidden; }
         
-        /* HINTERGRUND-RIEGEL (Verhindert das Chaos, zwingt das Bild in den Hintergrund) */
+        /* HINTERGRUND-BILD */
         #main-bg { 
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
-            object-fit: cover; z-index: -1; opacity: 0.6; /* Leicht abgedunkelt */
-            display: block; 
+            object-fit: cover; z-index: -1; opacity: 0.8; 
+            display: block;
         }
-
-        /* ZENTRALE (Hier liegt das Emblem drin) */
-        #start-portal { display: flex; align-items: center; justify-content: center; height: 100vh; position: relative; z-index: 10; }
-        
-        /* DAS GLÜHENDE EMBLEM (Mitte) - HIER IST DER FIX */
-        #emblem-box { 
-            position: relative; 
-            z-index: 5; 
-            width: 550px; /* Perfekte Größe */
-            max-width: 80vw; 
-            padding: 20px; 
-            background: rgba(0,0,0,0.5); /* Leicht transparenter Hintergrund für das Logo */
-            
-            /* Der rote glühende Rahmen */
-            border: 2px solid #ff3131; 
-            border-radius: 20px; /* Abgerundete Ecken */
-            box-shadow: 0 0 80px rgba(255, 49, 49, 0.8), inset 0 0 20px rgba(255, 49, 49, 0.4); 
-        }
-        #emblem-box img { width: 100%; display: block; filter: drop-shadow(0 0 10px red); }
 
         /* BUTTONS LINKS (Login & Rekrutierung) */
         .side-l { position: absolute; left: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 40px; z-index: 100; }
@@ -48,40 +29,46 @@
         #tab-hist { background: #5b5bff; color: white; }
         #tab-web { background: #00cfd1; }
 
-        /* OVERLAYS (Login & Rekrutierung) */
-        .overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; overflow-y: auto; padding: 20px 0; }
-        .modal-card { background: #111; padding: 25px; border: 2px solid #ff3131; border-radius: 15px; width: 400px; max-width: 90%; text-align: center; box-shadow: 0 0 50px red; }
-        .modal-card.gold { border-color: #ffd600; box-shadow: 0 0 50px #ffd600; }
+        /* MODALS (Login & Rekrutierung - DEIN GEWÜNSCHTER STYLE) */
+        .overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; overflow-y: auto; }
+        .modal-card { background: #111; padding: 25px; border: 2px solid #ff3131; border-radius: 15px; width: 450px; max-width: 90%; text-align: center; box-shadow: 0 0 50px red; }
         
-        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 16px; text-align: center; box-sizing: border-box; outline: none; }
-        .submit-btn { width: 100%; padding: 15px; background: #39d353; border: none; color: black; font-weight: bold; cursor: pointer; font-size: 20px; font-family: 'Almendra'; margin-top: 10px; }
+        h2 { color: #ff3131; margin-top: 0; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        /* Die Eingabefelder genau wie im guten Code */
+        input, select, textarea { 
+            width: 100%; padding: 10px; margin: 8px 0; 
+            background: #000; color: #39d353; border: 1px solid #444; 
+            font-family: 'Almendra'; font-size: 16px; text-align: center; box-sizing: border-box; 
+            outline: none;
+        }
+
+        .submit-btn { 
+            width: 100%; padding: 15px; background: #39d353; border: none; 
+            color: black; font-weight: bold; cursor: pointer; font-size: 20px; 
+            font-family: 'Almendra'; margin-top: 15px; border-radius: 5px; 
+        }
     </style>
 </head>
 <body>
 
     <img src="bulls_start.jpg" id="main-bg">
 
-    <div id="start-portal">
-        
-        <div class="side-l">
-            <button class="tab-l" id="btn-login" onclick="openModal('loginMod')">LOGIN</button>
-            <button class="tab-l" id="btn-rekrut" onclick="openModal('regMod')">REKRUTIERUNG</button>
-        </div>
+    <div class="side-l">
+        <button class="tab-l" id="btn-login" onclick="openModal('loginMod')">LOGIN</button>
+        <button class="tab-l" id="btn-rekrut" onclick="openModal('regMod')">REKRUTIERUNG</button>
+    </div>
 
-        <div id="emblem-box">
-            <img src="bulls_start.jpg" alt="Logo">
-        </div>
-
-        <div class="side-r">
-            <button class="tab-r" id="tab-yt" onclick="window.open('https://www.youtube.com/@DarkBullsGruppe')">YOUTUBE</button>
-            <button class="tab-r" id="tab-hist" onclick="alert('Historie folgt')">HISTORIES</button>
-            <button class="tab-r" id="tab-web" onclick="window.open('https://darkbulls.jimdofree.com/')">INTERNET</button>
-        </div>
+    <div class="side-r">
+        <button class="tab-r" id="tab-yt" onclick="window.open('https://www.youtube.com/@DarkBullsGruppe')">YOUTUBE</button>
+        <button class="tab-r" id="tab-hist" onclick="alert('Historie folgt')">HISTORIES</button>
+        <button class="tab-r" id="tab-web" onclick="window.open('https://darkbulls.jimdofree.com/')">INTERNET</button>
     </div>
 
     <div id="loginMod" class="overlay">
         <div class="modal-card">
-            <h2 style="color: #ff3131;">ANMELDUNG</h2>
+            <h2>Allianz Login</h2>
             <input type="text" id="logName" placeholder="BENUTZERNAME">
             <input type="password" id="logPin" placeholder="PIN">
             <button class="submit-btn" onclick="doLogin()">BETRETEN</button>
@@ -90,61 +77,51 @@
     </div>
 
     <div id="regMod" class="overlay">
-        <div class="modal-card gold">
-            <h2 style="color: #ffd600;">REKRUTIERUNG</h2>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <input type="text" id="regName" placeholder="Name im Spiel">
-                <input type="text" id="regKD" placeholder="KD">
+        <div class="modal-card">
+            <h2>Rekrutierung</h2>
+            <div class="grid-2">
+                <input type="text" id="regCowTime" placeholder="Dabei seit">
+                <input type="text" id="regKD" placeholder="Deine KD">
             </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <input type="text" id="regAge" placeholder="Alter">
-                <input type="text" id="regTime" placeholder="Spielzeit CoW">
-            </div>
-            <input type="text" id="regFreq" placeholder="Wie viel spielst du am Tag?">
+            <input type="text" id="regInGame" placeholder="Name im Spiel">
+            <input type="text" id="regAge" placeholder="Dein Alter">
+            
+            <input type="text" id="regAware" placeholder="Wie auf uns aufmerksam geworden?">
+            <input type="text" id="regPlayTime" placeholder="Wie viel spielst du am Tag?">
+
             <select id="regReason">
-                <option value="" disabled selected>Grund der Anmeldung...</option>
-                <option value="Gast/Besuch">Nur zu Besuch / Gast</option>
-                <option value="Mitgliedschaft">Bestrebung einer Mitgliedschaft</option>
+                <option value="" disabled selected>Grund...</option>
+                <option value="Gast/Besuch">Bin in anderer Allianz / nur zu Besuch</option>
+                <option value="Mitglied">Bestrebung einer Mitgliedschaft</option>
             </select>
-            <input type="password" id="regPin1" placeholder="Wähle eine PIN">
-            <button class="submit-btn" style="background:#ffd600" onclick="doRegister()">ABSCHICKEN & STARTEN</button>
+            
+            <div style="border-top: 1px solid #333; margin-top: 10px; padding-top: 10px;">
+                <input type="text" id="regLoginName" placeholder="Anmeldename (Wie im Game)">
+                <input type="password" id="regPin1" placeholder="PIN wählen">
+            </div>
+
+            <button class="submit-btn" style="background: #ff3131; color: white;" onclick="doRegister()">ABSCHICKEN</button>
             <p onclick="closeModals()" style="color:#555; cursor:pointer; margin-top:15px;">Abbrechen</p>
         </div>
     </div>
 
     <script>
-        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ/gviz/tq?tqx:out:csv&gid=1188820112';
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ/gviz/tq?tqx=out:csv&gid=1188820112';
         const WEBHOOK = 'https://discord.com/api/webhooks/1502735246335021267/fpxXtWr5QgSny6rfJzGHKnhYskehC9vDMEl3CvUzjgbBOuKBd8KGzUhCRfvd2KmWcnND';
-
-        // Cache-Buster für Bilder beim Laden
-        window.onload = function() {
-            const time = new Date().getTime();
-            document.getElementById('main-bg').src = 'bulls_start.jpg?t=' + time;
-            loadData();
-        };
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModals() { document.querySelectorAll('.overlay').forEach(m => m.style.display = 'none'); }
 
-        async function loadData() {
-            try {
-                const res = await fetch(SHEET_URL + '&t=' + new Date().getTime());
-                const text = await res.text();
-                const rows = text.split('\n').slice(1);
-                window.userDataRows = rows;
-            } catch(e) { console.error("Cloud Fehler"); }
-        }
-
         async function doLogin() {
             const n = document.getElementById("logName").value.trim().toLowerCase();
             const p = document.getElementById("logPin").value.trim();
-            if(!n || !p) return alert("Daten eingeben!");
-
-            const user = window.userDataRows.find(r => {
+            const res = await fetch(SHEET_URL + '&t=' + new Date().getTime());
+            const text = await res.text();
+            const rows = text.split('\n').slice(1);
+            const user = rows.find(r => {
                 const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
                 return c[0].toLowerCase() === n && c[2] === p;
             });
-            
             if(user) {
                 const c = user.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
                 localStorage.setItem('bulls_user', c[0]);
@@ -154,16 +131,16 @@
         }
 
         async function doRegister() {
-            const name = document.getElementById('regName').value.trim();
+            const name = document.getElementById('regInGame').value.trim();
             const reason = document.getElementById('regReason').value;
-            if(!name || !reason) return alert("Name und Grund angeben!");
+            
+            if(!name || !reason) return alert("Bitte Name und Grund angeben!");
 
-            // Discord Info
-            fetch(WEBHOOK, {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ content: `🚨 **NEUE REKRUTIERUNG**\n**Name:** ${name}\n**Grund:** ${reason}\n_User startet als Gast._` })
-            });
+            // Discord Benachrichtigung
+            const msg = {
+                content: `🚨 **NEUE REKRUTIERUNG** 🚨\n**Name:** ${name}\n**Grund:** ${reason}\n_User startet als Gast._`
+            };
+            fetch(WEBHOOK, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(msg) });
 
             localStorage.setItem('bulls_user', name);
             localStorage.setItem('bulls_role', 'Gast');
