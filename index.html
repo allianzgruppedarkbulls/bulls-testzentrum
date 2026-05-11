@@ -9,20 +9,23 @@
         body { margin: 0; background: black; color: white; font-family: 'Almendra'; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
         #bg { position: fixed; width: 100vw; height: 100vh; object-fit: cover; z-index: -1; opacity: 0.7; }
         
-        /* Design der Login-Zentrale */
-        .portal-box { background: rgba(0,0,0,0.85); padding: 30px; border: 2px solid #ff3131; border-radius: 15px; text-align: center; width: 350px; box-shadow: 0 0 50px rgba(255,0,0,0.6); position: relative; }
-        input, textarea { width: 100%; padding: 12px; margin: 10px 0; background: #000; color: #39d353; border: 1px solid #444; text-align: center; font-size: 18px; font-family: 'Almendra'; box-sizing: border-box; }
+        .portal-box { background: rgba(0,0,0,0.85); padding: 30px; border: 2px solid #ff3131; border-radius: 15px; text-align: center; width: 380px; box-shadow: 0 0 50px rgba(255,0,0,0.6); position: relative; }
+        input, textarea, select { width: 100%; padding: 10px; margin: 8px 0; background: #000; color: #39d353; border: 1px solid #444; text-align: center; font-size: 16px; font-family: 'Almendra'; box-sizing: border-box; outline: none; }
         
         .btn-main { width: 100%; padding: 15px; background: #39d353; border: none; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 20px; margin-top: 10px; }
         .btn-reg { background: #ffd600; margin-top: 20px; font-size: 16px; padding: 10px; color: black; }
 
         /* Seiten-Tabs */
-        .side-tabs { position: absolute; right: -50px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; }
-        .tab { padding: 20px 5px; background: #444; writing-mode: vertical-rl; text-orientation: upright; cursor: pointer; border-radius: 0 5px 5px 0; font-size: 12px; }
+        .side-menu { position: absolute; right: -45px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; }
+        .tab { padding: 20px 8px; background: #444; writing-mode: vertical-rl; text-orientation: upright; cursor: pointer; border-radius: 0 8px 8px 0; font-size: 14px; font-weight: bold; }
 
-        /* Registrierung Overlay */
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; }
-        .reg-card { background: #111; border: 2px solid #ffd600; padding: 30px; border-radius: 15px; width: 320px; text-align: center; }
+        /* Rekrutierung Overlay */
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto; padding: 20px 0; }
+        .reg-card { background: #111; border: 2px solid #ffd600; padding: 25px; border-radius: 15px; width: 450px; max-width: 90%; text-align: center; box-shadow: 0 0 40px #ffd60055; }
+        .reg-card h2 { color:#ffd600; margin: 0 0 10px 0; }
+        .reg-card p { font-size: 14px; color: #ccc; margin-bottom: 15px; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     </style>
 </head>
 <body>
@@ -33,25 +36,51 @@
         <img src="bulls_start.jpg" style="width:100%; margin-bottom:10px; filter: drop-shadow(0 0 10px red);">
         <h2 style="color:#ff3131; margin:0;">ALLIANZ LOGIN</h2>
         
-        <input type="text" id="u" placeholder="NAME">
+        <input type="text" id="u" placeholder="BENUTZERNAME">
         <input type="password" id="p" placeholder="PIN">
         <button class="btn-main" onclick="login()">BETRETEN</button>
         
-        <button class="btn-main btn-reg" onclick="openReg()">NEU HIER? REGISTRIEREN</button>
+        <button class="btn-main btn-reg" onclick="openReg()">REKRUTIERUNG ÖFFNEN</button>
 
-        <div class="side-tabs">
-            <div class="tab" onclick="window.open('https://www.youtube.com/@DarkBullsGruppe')">YOUTUBE</div>
-            <div class="tab" style="background:#5b5bff">HISTORIES</div>
+        <div class="side-menu">
+            <div class="tab" id="btn-yt" onclick="window.open('https://www.youtube.com/@DarkBullsGruppe')">YOUTUBE</div>
+            <div class="tab" style="background:#5b5bff" onclick="alert('Historie folgt')">HISTORIES</div>
+            <div class="tab" style="background:#00cfd1" onclick="window.open('https://darkbulls.jimdofree.com/')">INTERNET</div>
         </div>
     </div>
 
     <div id="regModal" class="overlay">
         <div class="reg-card">
-            <h2 style="color:#ffd600">REKRUTIERUNG</h2>
-            <p style="font-size:14px;">Gib deinen Namen an, um sofortigen Gast-Zugriff zu erhalten.</p>
-            <input type="text" id="regName" placeholder="DEIN NAME">
-            <textarea id="regText" placeholder="WARUM WILLST DU ZU UNS?" style="height:80px;"></textarea>
-            <button class="btn-main" style="background:#ffd600; color:black;" onclick="autoGastLogin()">ABSENDEN & STARTEN</button>
+            <h2>REKRUTIERUNG</h2>
+            <p>Willkommen Rekrut! Fülle die Akte aus, um sofortigen Gast-Zugriff zu erhalten.</p>
+            
+            <div class="grid-2">
+                <input type="text" id="regCoWName" placeholder="Name im Spiel">
+                <input type="text" id="regKD" placeholder="Deine KD">
+            </div>
+            
+            <div class="grid-2">
+                <input type="text" id="regAge" placeholder="Dein Alter">
+                <input type="text" id="regTime" placeholder="Spielzeit Call of War">
+            </div>
+
+            <input type="text" id="regAware" placeholder="Wie auf uns aufmerksam geworden?">
+            <input type="text" id="regFrequency" placeholder="Wie viel spielst du am Tag?">
+
+            <select id="regReason">
+                <option value="" disabled selected>Grund der Anmeldung...</option>
+                <option value="Nur zu Besuch / Gast">Nur zu Besuch / Gast</option>
+                <option value="Bestrebung einer Mitgliedschaft">Bestrebung einer Mitgliedschaft</option>
+                <option value="Andere Allianz / Kooperation">Andere Allianz / Kooperation</option>
+            </select>
+
+            <div style="border-top: 1px solid #444; margin: 15px 0; padding-top: 10px;">
+                <p style="color:#39d353">Zugangsdaten für diese Seite festlegen:</p>
+                <input type="password" id="regPin1" placeholder="PIN wählen">
+                <input type="password" id="regPin2" placeholder="PIN wiederholen">
+            </div>
+
+            <button class="btn-main" style="background:#ffd600; color:black;" onclick="submitRekrutierung()">REKRUTIERUNG ABSCHICKEN</button>
             <p onclick="closeReg()" style="color:#555; cursor:pointer; margin-top:15px;">Abbrechen</p>
         </div>
     </div>
@@ -63,14 +92,12 @@
         async function login() {
             const n = document.getElementById("u").value.trim().toLowerCase();
             const p = document.getElementById("p").value.trim();
-            
             if(!n || !p) return alert("Daten eingeben!");
 
             try {
                 const res = await fetch(SHEET_URL + '&t=' + new Date().getTime());
                 const text = await res.text();
                 const rows = text.split('\n').slice(1);
-                
                 const user = rows.find(r => {
                     const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
                     return c[0].toLowerCase() === n && c[2] === p;
@@ -81,33 +108,49 @@
                     localStorage.setItem('bulls_user', c[0]);
                     localStorage.setItem('bulls_role', c[3]);
                     window.location.href = "dashboard.html";
-                } else {
-                    alert("Zutritt verweigert! Name oder PIN falsch.");
-                }
-            } catch(e) { alert("Fehler beim Datenabgleich."); }
+                } else { alert("Login falsch!"); }
+            } catch(e) { alert("Fehler!"); }
         }
 
         function openReg() { document.getElementById('regModal').style.display = 'flex'; }
         function closeReg() { document.getElementById('regModal').style.display = 'none'; }
 
-        async function autoGastLogin() {
-            const name = document.getElementById('regName').value.trim();
-            const text = document.getElementById('regText').value.trim();
+        async function submitRekrutierung() {
+            const name = document.getElementById('regCoWName').value.trim();
+            const kd = document.getElementById('regKD').value.trim();
+            const age = document.getElementById('regAge').value.trim();
+            const cowTime = document.getElementById('regTime').value.trim();
+            const aware = document.getElementById('regAware').value.trim();
+            const freq = document.getElementById('regFrequency').value.trim();
+            const reason = document.getElementById('regReason').value;
+            const pin1 = document.getElementById('regPin1').value;
+            const pin2 = document.getElementById('regPin2').value;
 
-            if(!name) return alert("Bitte Namen angeben!");
+            if(!name || !pin1 || !reason) return alert("Name, PIN und Grund sind Pflicht!");
+            if(pin1 !== pin2) return alert("PINs stimmen nicht überein!");
 
-            // 1. Info an Discord senden
+            // Nachricht für Discord
+            const message = `🚨 **NEUE REKRUTIERUNG** 🚨\n\n` +
+                `**Name:** ${name}\n` +
+                `**Alter:** ${age}\n` +
+                `**KD:** ${kd}\n` +
+                `**Dabei seit:** ${cowTime}\n` +
+                `**Spielt:** ${freq}\n` +
+                `**Quelle:** ${aware}\n` +
+                `**Grund:** ${reason}\n\n` +
+                `_User ist jetzt als Gast im Dashboard._`;
+
             await fetch(WEBHOOK_REG, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ content: `🆕 **NEUE REGISTRIERUNG**\n**Name:** ${name}\n**Info:** ${text}\n_User hat Gast-Zugriff erhalten._` })
+                body: JSON.stringify({ content: message })
             });
 
-            // 2. Automatischer Gast-Login
+            // Automatischer Gast-Login
             localStorage.setItem('bulls_user', name);
-            localStorage.setItem('bulls_role', 'Gast'); // Er bekommt sofort Gast-Rechte
+            localStorage.setItem('bulls_role', 'Gast');
             
-            alert("Willkommen bei den Bulls! Du hast nun eingeschränkten Gast-Zugriff.");
+            alert("Rekrutierung gesendet! Du bist nun als Gast freigeschaltet.");
             window.location.href = "dashboard.html";
         }
     </script>
