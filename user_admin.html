@@ -58,8 +58,8 @@
     </div>
 
     <script>
-        // ACHTUNG: HIER DEINE AKTUELLE URL EINTRAGEN
-        const SCRIPT_URL = 'DEINE_URL_AUS_GOOGLE_HIER_EINSETZEN';
+        // DIE URL DIE DU MIR GESCHICKT HAST
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwypY5YbvzRzZliGm50RIv0cWbKIX37BUdRf_XiBb9wuBOIkHFvAPtDj0j-PuG3HLaKVw/exec';
         
         let allUsers = [];
         let selectedUser = null;
@@ -70,8 +70,8 @@
                 const response = await fetch(SCRIPT_URL + '?t=' + Date.now());
                 const data = await response.json();
                 
-                // Wir filtern die Kopfzeile raus, falls vorhanden
-                allUsers = data.filter(row => row[0] !== "Name" && row[0] !== "");
+                // Wir filtern leere Zeilen und die Kopfzeile raus
+                allUsers = data.filter(row => row[0] && row[0] !== "Spielername" && row[0] !== "Name");
                 
                 renderTable(allUsers);
                 
@@ -79,7 +79,7 @@
                 document.getElementById('userTable').style.display = 'table';
             } catch (error) {
                 console.error("Fehler:", error);
-                document.getElementById('loading-text').innerText = "FEHLER: Verbindung zum Google Script fehlgeschlagen.";
+                document.getElementById('loading-text').innerText = "FEHLER: Script antwortet nicht korrekt (Doppelte Variablen im Script!)";
             }
         }
 
@@ -99,6 +99,7 @@
                     document.getElementById('pinBtn').disabled = false;
                     document.getElementById('delBtn').disabled = false;
                 };
+                // Zeigt Spalte A (Name), Spalte D (Rolle) und Spalte E (Zusatz)
                 tr.innerHTML = `<td>${row[0]}</td><td>${row[3]}</td><td style="color:#ffd600">${row[4]||'-'}</td><td>Aktiv</td>`;
                 body.appendChild(tr);
             });
