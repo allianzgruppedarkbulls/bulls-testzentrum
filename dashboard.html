@@ -33,7 +33,7 @@
         .user-info { color: #ff3131; font-size: 20px; }
         .logout-btn { background: #ff0000; color: white; border: none; padding: 8px 15px; cursor: pointer; font-weight: bold; font-family: 'Almendra'; border-radius: 4px; text-transform: uppercase; }
 
-        /* HAUPT-CONTAINER FÜR DIE ANORDNUNG */
+        /* HAUPT-CONTAINER */
         .side-container {
             position: absolute;
             width: 100%; height: 100%;
@@ -50,10 +50,10 @@
             height: 90vh;
         }
 
-        /* LINKS ANORDNUNG: Admin oben, Black Liste mitte, Pflege unten */
+        /* LINKS ANORDNUNG: Persönlich oben, Black Liste mitte, Pflege unten */
         .left-side { justify-content: space-between; }
 
-        /* RECHTS ANORDNUNG: Persönlich oben, Elo mitte, Chat unten */
+        /* RECHTS ANORDNUNG: Admin oben, Elo mitte, Chat unten */
         .right-side { justify-content: space-between; align-items: flex-end; }
 
         .card { 
@@ -76,7 +76,7 @@
             font-size: 15px; width: 100%;
         }
 
-        /* ALLIANZ CHAT BUTTON (Unten Rechts fixiert) */
+        /* ALLIANZ CHAT BUTTON */
         .chat-btn-container { width: 100%; display: flex; justify-content: flex-end; }
         .chat-btn {
             background: #ff8c00; color: black; border: none;
@@ -91,17 +91,18 @@
     <img src="bulls_dashboard.jpg" id="dashboard-bg">
 
     <div class="header">
-        <div class="user-info" id="userDisplay">Julian (Admin)</div>
+        <div class="user-info" id="userDisplay">Lädt...</div>
         <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
 
     <div class="side-container">
         <div class="left-side">
             <div class="card">
-                <h2>Admin</h2>
+                <h2>Persönlich</h2>
                 <div class="btn-stack">
-                    <button class="card-btn">User-Verwaltung</button>
-                    <button class="card-btn">Chat Verwaltung</button>
+                    <button class="card-btn">Eigene Statistik</button>
+                    <button class="card-btn">Pin ändern</button>
+                    <button class="card-btn">Support Chat</button>
                 </div>
             </div>
 
@@ -126,15 +127,15 @@
 
         <div class="right-side">
             <div class="card">
-                <h2>Persönlich</h2>
+                <h2>Admin</h2>
                 <div class="btn-stack">
-                    <button class="card-btn">Eigene Statistik</button>
-                    <button class="card-btn">Pin ändern</button>
-                    <button class="card-btn">Support Chat</button>
+                    <button class="card-btn">User-Verwaltung</button>
+                    <button class="card-btn">Chat Verwaltung</button>
                 </div>
             </div>
 
-            <div class="card" style="margin-top: -50px;"> <h2>Elo Bereich</h2>
+            <div class="card" style="margin-top: -50px;"> 
+                <h2>Elo Bereich</h2>
                 <div class="btn-stack">
                     <button class="card-btn">Rohstoffrechner</button>
                 </div>
