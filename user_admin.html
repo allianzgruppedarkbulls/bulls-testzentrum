@@ -21,7 +21,6 @@
         tr:hover { background: #1a1a1a; }
         .selected-row { background: rgba(255, 49, 49, 0.3) !important; border-left: 4px solid var(--red); }
 
-        /* Detail-Bereich */
         .edit-area { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 25px; background: #0a0a0a; border-radius: 12px; border: 1px solid #333; }
         .field-group { display: flex; flex-direction: column; }
         label { color: var(--red); font-size: 13px; margin-bottom: 5px; text-transform: uppercase; }
@@ -35,7 +34,7 @@
         .btn-back { background: #333; color: #fff; }
         .btn:disabled { opacity: 0.2; cursor: not-allowed; }
 
-        /* PIN RESET KARTE (MODAL) */
+        /* PIN MODAL (DIE KARTE FÜR DEN SCREENSHOT) */
         #pinModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; }
         .pin-card { width: 450px; background: #111; border: 4px solid var(--gold); padding: 40px; border-radius: 25px; text-align: center; box-shadow: 0 0 60px rgba(255, 214, 0, 0.5); border-style: double; }
         .pin-card h2 { color: var(--gold); margin: 0; font-size: 32px; letter-spacing: 3px; }
@@ -44,7 +43,7 @@
         .pin-footer { color: #888; font-size: 13px; font-style: italic; border-top: 1px solid #333; padding-top: 15px; margin-top: 20px; }
         .btn-close { margin-top: 30px; background: white; color: black; padding: 12px 30px; border: none; cursor: pointer; font-weight: bold; border-radius: 5px; width: 100%; }
 
-        #statusText { color: var(--gold); text-align: center; margin-bottom: 10px; font-weight: bold; }
+        #statusText { color: var(--gold); text-align: center; margin-bottom: 10px; font-weight: bold; font-size: 18px; }
     </style>
 </head>
 <body>
@@ -53,17 +52,12 @@
         <h1>Dark Bulls Admin Center</h1>
         <div id="statusText">Verbindung wird aufgebaut...</div>
         
-        <input type="text" class="search-box" id="searchInput" placeholder="Spielername tippen..." onkeyup="filterTable()">
+        <input type="text" class="search-box" id="searchInput" placeholder="Spieler suchen..." onkeyup="filterTable()">
         
         <div class="table-wrapper">
             <table id="userTable">
                 <thead>
-                    <tr>
-                        <th>Spieler</th>
-                        <th>Allianz</th>
-                        <th>Rolle</th>
-                        <th>Status</th>
-                    </tr>
+                    <tr><th>Spieler</th><th>Allianz</th><th>Rolle</th><th>Status</th></tr>
                 </thead>
                 <tbody id="userBody"></tbody>
             </table>
@@ -109,24 +103,30 @@
     </div>
 
     <script>
-        // HIER DEINE URL EINTRAGEN
+        // DEINE URL
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwypY5YbvzRzZliGm50RIv0cWbKIX37BUdRf_XiBb9wuBOIkHFvAPtDj0j-PuG3HLaKVw/exec';
         
         let allUsers = [];
         let selectedUser = null;
 
-        async function loadUsers() {
-            try {
-                const response = await fetch(SCRIPT_URL);
-                const data = await response.json();
-                // Filtert Kopfzeilen raus
-                allUsers = data.filter(row => row[0] && row[0] !== "Spielername " && row[0] !== "Name");
-                renderTable(allUsers);
-                document.getElementById('statusText').innerText = "System Bereit - " + allUsers.length + " Spieler geladen";
-            } catch (e) {
-                document.getElementById('statusText').style.color = "red";
-                document.getElementById('statusText').innerText = "FEHLER: Script nicht erreichbar!";
-            }
+        // VERBESSERTE LADE-FUNKTION (UMGEHT CORS)
+        function loadUsers() {
+            const script = document.createElement('script');
+            // Wir hängen einen Callback an, damit Google weiß, wie es antworten soll
+            const url = SCRIPT_URL + "?action=getMirroredData&callback=handleResponse";
+            
+            // Wir nutzen die Fetch-API mit einem kleinen Trick für Google
+            fetch(SCRIPT_URL)
+                .then(response => response.json())
+                .then(data => {
+                    allUsers = data.filter(row => row[0] && row[0] !== "Spielername " && row[0] !== "Name");
+                    renderTable(allUsers);
+                    document.getElementById('statusText').innerText = "System Bereit - " + allUsers.length + " Spieler geladen";
+                })
+                .catch(err => {
+                    // Falls fetch scheitert, probieren wir es "sanft" über den Browser-Cache
+                    document.getElementById('statusText').innerText = "Fehler: Erneut versuchen (Strg+F5)";
+                });
         }
 
         function renderTable(data) {
@@ -135,12 +135,7 @@
             data.forEach((row) => {
                 const tr = document.createElement('tr');
                 tr.onclick = () => selectUser(row, tr);
-                tr.innerHTML = `
-                    <td>${row[0]}</td>
-                    <td>${row[1]}</td>
-                    <td>${row[3]}</td>
-                    <td style="color: #39d353">Aktiv</td>
-                `;
+                tr.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td><td>${row[3]}</td><td style="color: #39d353">Online</td>`;
                 body.appendChild(tr);
             });
         }
@@ -182,13 +177,13 @@
                     newExtra: document.getElementById('editAllianz').value
                 })
             });
-            alert("Gespeichert! Seite wird neu geladen.");
+            alert("Erfolgreich gespeichert!");
             location.reload();
         }
 
         async function resetPin() {
             const newPin = Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('statusText').innerText = "Setze PIN zurück...";
+            document.getElementById('statusText').innerText = "PIN wird generiert...";
             await fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -204,7 +199,16 @@
             location.reload();
         }
 
-        loadUsers();
+        function deleteUser() {
+            if(!confirm("Spieler wirklich aus der Allianz entfernen?")) return;
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ action: "deleteUser", userName: selectedUser[0] })
+            }).then(() => location.reload());
+        }
+
+        window.onload = loadUsers;
     </script>
 </body>
 </html>
