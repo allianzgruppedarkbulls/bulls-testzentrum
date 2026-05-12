@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Dark Bulls - Offizielle Blackliste</title>
+  <script src="config.js"></script>
+  <script src="common.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --red: #ff3131; --bg: #000; --card: #0a0a0a; --green: #39d353; --gold: #ffd600; }
+    body { background: var(--bg); color: white; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+    .container { width: 850px; max-width: 95vw; background: var(--card); border: 2px solid var(--red); border-radius: 15px; padding: 30px; box-shadow: 0 0 40px rgba(255, 49, 49, 0.4); }
+    h1 { color: var(--red); text-align: center; text-transform: uppercase; letter-spacing: 5px; margin-bottom: 30px; text-shadow: 0 0 15px red; }
+    
+    /* Such-Bereich */
+    .search-section { display: flex; gap: 15px; margin-bottom: 30px; }
+    select, input { flex: 1; padding: 15px; background: #111; border: 1px solid #444; color: var(--gold); font-family: 'Almendra'; font-size: 18px; border-radius: 8px; outline: none; }
+    
+    /* Akten-Layout (Wie dein Bild) */
+    .file-card { display: none; border-top: 1px solid #333; padding-top: 20px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    label { color: var(--red); font-size: 12px; text-transform: uppercase; display: block; margin-bottom: 5px; }
+    .data-field { padding: 12px; background: rgba(255,255,255,0.05); border-radius: 5px; border-left: 3px solid var(--red); font-size: 18px; }
+    .description { grid-column: span 2; padding: 20px; background: #050505; border: 1px dashed #444; color: var(--green); white-space: pre-wrap; line-height: 1.6; }
+    
+    .fallnummer { color: var(--gold); font-size: 24px; text-align: center; margin-bottom: 20px; font-weight: bold; border: 1px solid var(--gold); padding: 5px; display: inline-block; }
+    .btn-back { margin-top: 30px; width: 100%; padding: 15px; background: #222; border: none; color: white; cursor: pointer; font-family: 'Almendra'; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Dark Bulls Black List</h1>
+
+    <div class="search-section">
+      <select id="blDropdown" onchange="loadSingleCase(this.value)">
+        <option value="">-- Spieler wählen --</option>
+      </select>
+    </div>
+
+    <div id="fileCard" class="file-card">
+      <div style="text-align: center;"><div class="fallnummer" id="outFallNr">DB-2026-XXX</div></div>
+      
+      <div class="grid">
+        <div><label>Spielername / ID</label><div class="data-field" id="outTarget"></div></div>
+        <div><label>Verstoß</label><div class="data-field" id="outVerstoss"></div></div>
+        <div><label>Punkte zum Zeitpunkt</label><div class="data-field" id="outPunkte"></div></div>
+        <div><label>Meistgespielte Map</label><div class="data-field" id="outMap"></div></div>
+        
+        <div class="description" id="outDesc"></div>
+        
+        <div class="full"><label>Beweise / Zeugen</label><div class="data-field" id="outZeugen"></div></div>
+        <div><label>Eingetragen von</label><div class="data-field" id="outMelder"></div></div>
+        <div><label>Datum des Eintrags</label><div class="data-field" id="outDatum"></div></div>
+      </div>
+    </div>
+
+    <button class="btn-back" onclick="window.location.href='dashboard.html'">Zurück zum Dashboard</button>
+  </div>
+
+  <script>
+    const API_URL = window.BULLS_CONFIG.SCRIPT_URL;
+    let blacklistData = [];
+
+    // 1. Gesamte Blackliste laden (für das Dropdown)
+    async function init() {
+      // Wir nutzen eine neue Aktion im Script "getBlacklistData"
+      const res = await fetch(API_URL + "?action=getBlacklistData&t=" + Date.now());
+      blacklistData = await res.json();
+      
+      const dropdown = document.getElementById("blDropdown");
+      blacklistData.forEach((item, index) => {
+        const opt = document.createElement("option");
+        opt.value = index;
+        opt.innerText = item.target + " (" + item.fallNr + ")";
+        dropdown.appendChild(opt);
+      });
+    }
+
+    // 2. Einzelnen Fall anzeigen
+    function loadSingleCase(index) {
+      if(index === "") {
+        document.getElementById("fileCard").style.display = "none";
+        return;
+      }
+      const data = blacklistData[index];
+      document.getElementById("fileCard").style.display = "block";
+      
+      document.getElementById("outFallNr").innerText = data.fallNr;
+      document.getElementById("outTarget").innerText = data.target;
+      document.getElementById("outVerstoss").innerText = data.verstoss;
+      document.getElementById("outPunkte").innerText = data.punkte;
+      document.getElementById("outMap").innerText = data.map;
+      document.getElementById("outDesc").innerText = data.beschreibung;
+      document.getElementById("outZeugen").innerText = data.zeugen;
+      document.getElementById("outMelder").innerText = data.melder;
+      document.getElementById("outDatum").innerText = new Date(data.datum).toLocaleDateString();
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
