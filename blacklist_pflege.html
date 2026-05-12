@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Dark Bulls - Blacklist Pflege</title>
+  <script src="config.js"></script>
+  <script src="common.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --red: #ff3131; --bg: #050505; --card: #0f0f0f; --green: #39d353; --gold: #ffd600; }
+    body { background: var(--bg); color: white; font-family: 'Almendra', serif; margin: 0; padding: 20px; }
+    .container { width: 1000px; max-width: 95vw; margin: auto; background: var(--card); border: 2px solid var(--red); border-radius: 15px; padding: 20px; }
+    h1 { color: var(--red); text-align: center; text-transform: uppercase; text-shadow: 0 0 10px red; }
+
+    /* Listen-Ansicht */
+    #listView { display: block; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th { background: #151515; color: var(--red); padding: 12px; border-bottom: 2px solid var(--red); text-align: left; }
+    td { padding: 12px; border-bottom: 1px solid #222; cursor: pointer; }
+    tr:hover { background: #1a1a1a; }
+
+    /* Detail-Maske (Pflege) */
+    #detailView { display: none; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+    .full { grid-column: span 2; }
+    label { color: var(--red); font-size: 13px; text-transform: uppercase; }
+    input, textarea { width: 100%; padding: 10px; background: #000; border: 1px solid #444; color: #fff; font-family: 'Almendra'; border-radius: 5px; box-sizing: border-box; }
+    textarea { height: 120px; color: var(--green); resize: none; }
+
+    /* Buttons */
+    .btn-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+    .btn { flex: 1; padding: 15px; border: none; border-radius: 5px; cursor: pointer; font-family: 'Almendra'; font-weight: bold; text-transform: uppercase; transition: 0.2s; }
+    .btn-approve { background: var(--green); color: #000; }
+    .btn-contact { background: var(--gold); color: #000; }
+    .btn-delete { background: var(--red); color: #fff; }
+    .btn-back { background: #444; color: #fff; }
+    .btn:hover { filter: brightness(1.2); transform: scale(1.02); }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Blacklist Pflege</h1>
+
+    <div id="listView">
+      <p style="text-align:center; color:#888;">Eingegangene Meldungen im Vorspeicher:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Gegner</th>
+            <th>Verstoß</th>
+            <th>Melder</th>
+            <th>Datum</th>
+          </tr>
+        </thead>
+        <tbody id="meldungBody"></tbody>
+      </table>
+    </div>
+
+    <div id="detailView">
+      <h2 id="editTitle" style="color:var(--gold); border-bottom:1px solid #333; padding-bottom:10px;">Prüfung: </h2>
+      <div class="grid">
+        <div class="field"><label>Spieler / ID</label><input type="text" id="mTarget"></div>
+        <div class="field"><label>Map</label><input type="text" id="mMap"></div>
+        <div class="field"><label>Punkte</label><input type="text" id="mPunkte"></div>
+        <div class="field"><label>Verstoß</label><input type="text" id="mVerstoss"></div>
+        <div class="full"><label>Beschreibung</label><textarea id="mDesc"></textarea></div>
+        <div class="full"><label>Zeugen</label><input type="text" id="mZeugen"></div>
+        <div class="field"><label>Eingereicht von</label><input type="text" id="mMelder" readonly></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-approve" onclick="approve()">Freigeben / Blacklist</button>
+        <button class="btn btn-contact" onclick="contactMelder()">Melder kontaktieren</button>
+        <button class="btn btn-delete" onclick="reject()">Löschen</button>
+        <button class="btn btn-back" onclick="showList()">Zurück</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = window.BULLS_CONFIG.SCRIPT_URL;
+    let currentData = null;
+
+    // 1. Meldungen laden
+    async function loadMeldungen() {
+      const res = await fetch(API_URL + "?action=listMeldungen&t=" + Date.now());
+      const data = await res.json();
+      renderTable(data);
+    }
+
+    function renderTable(data) {
+      const body = document.getElementById("meldungBody");
+      body.innerHTML = "";
+      if (data.length === 0) {
+        body.innerHTML = "<tr><td colspan='4' style='text-align:center; color:#555;'>Keine neuen Meldungen.</td></tr>";
+        return;
+      }
+      data.forEach(m => {
+        const tr = document.createElement("tr");
+        tr.onclick = () => showDetails(m);
+        tr.innerHTML = `<td>${m.target}</td><td>${m.verstoss}</td><td>${m.melder}</td><td>${new Date(m.datum).toLocaleDateString()}</td>`;
+        body.appendChild(tr);
+      });
+    }
+
+    // 2. Ansichten steuern
+    function showDetails(m) {
+      currentData = m;
+      document.getElementById("listView").style.display = "none";
+      document.getElementById("detailView").style.display = "block";
+      document.getElementById("editTitle").innerText = "Prüfung: " + m.target;
+      document.getElementById("mTarget").value = m.target;
+      document.getElementById("mMap").value = m.map;
+      document.getElementById("mPunkte").value = m.punkte;
+      document.getElementById("mVerstoss").value = m.verstoss;
+      document.getElementById("mDesc").value = m.beschreibung;
+      document.getElementById("mZeugen").value = m.zeugen;
+      document.getElementById("mMelder").value = m.melder;
+    }
+
+    function showList() {
+      document.getElementById("listView").style.display = "block";
+      document.getElementById("detailView").style.display = "none";
+      loadMeldungen();
+    }
+
+    // 3. Aktionen
+    async function approve() {
+      if(!confirm("Fall freigeben und in Blacklist übernehmen?")) return;
+      const res = await fetch(API_URL, {
+        method: "POST", mode: "no-cors",
+        body: JSON.stringify({
+          action: "approveMeldung",
+          target: document.getElementById("mTarget").value,
+          map: document.getElementById("mMap").value,
+          punkte: document.getElementById("mPunkte").value,
+          verstoss: document.getElementById("mVerstoss").value,
+          beschreibung: document.getElementById("mDesc").value,
+          zeugen: document.getElementById("mZeugen").value,
+          melder: document.getElementById("mMelder").value
+        })
+      });
+      alert("Fall genehmigt! Melder wurde informiert.");
+      showList();
+    }
+
+    async function reject() {
+      if(!confirm("Meldung wirklich unwiderruflich löschen?")) return;
+      await fetch(API_URL, {
+        method: "POST", mode: "no-cors",
+        body: JSON.stringify({ action: "rejectMeldung", target: currentData.target, melder: currentData.melder })
+      });
+      showList();
+    }
+
+    function contactMelder() {
+      // Wir speichern den Partner im LocalStorage und springen zum Messenger
+      localStorage.setItem("bulls_chat_partner", document.getElementById("mMelder").value);
+      window.location.href = "messenger.html";
+    }
+
+    window.onload = loadMeldungen;
+  </script>
+</body>
+</html>
