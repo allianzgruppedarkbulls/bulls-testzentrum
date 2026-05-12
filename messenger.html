@@ -5,19 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dark Bulls - Messenger</title>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+    <script src="config.js"></script>
+    <script src="common.js"></script>
     <style>
         body { background: #000; color: #fff; font-family: 'Almendra', serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
-        
         /* Header & Tabs */
         .messenger-header { background: #0a0a0a; border-bottom: 2px solid #ff3131; padding: 10px; }
         .tabs { display: flex; justify-content: center; gap: 20px; }
         .tab { padding: 10px 20px; cursor: pointer; color: #888; text-transform: uppercase; border-bottom: 3px solid transparent; transition: 0.3s; }
         .tab.active { color: #ff3131; border-bottom: 3px solid #ff3131; font-weight: bold; }
         .tab.support-tab { color: #ff3131; display: none; } /* Standardmäßig versteckt */
-
         /* Hauptbereich */
         .main-container { display: flex; flex: 1; overflow: hidden; }
-
         /* Seitenleiste (Chat-Liste) */
         .chat-sidebar { width: 300px; background: #0a0a0a; border-right: 1px solid #333; overflow-y: auto; }
         .chat-item { padding: 15px; border-bottom: 1px solid #222; cursor: pointer; transition: 0.2s; position: relative; }
@@ -25,97 +24,141 @@
         .chat-item.active { background: #222; border-left: 4px solid #ff3131; }
         .chat-item .name { font-weight: bold; display: block; }
         .chat-item .last-msg { font-size: 12px; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
         /* Chat-Fenster */
         .chat-window { flex: 1; display: flex; flex-direction: column; background: #050505; }
         .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        
         /* Nachrichten-Bubbles */
-        .bubble { max-width: 70%; padding: 10px 15px; border-radius: 10px; position: relative; line-height: 1.4; }
+        .bubble { max-width: 70%; padding: 10px 15px; border-radius: 10px; position: relative; line-height: 1.4; white-space: pre-wrap; }
         .bubble.me { align-self: flex-end; background: #222; border: 1px solid #444; }
         .bubble.them { align-self: flex-start; background: #111; border: 1px solid #333; }
         .bubble.reported { background: rgba(255, 0, 0, 0.2) !important; border: 1px solid #ff3131 !important; color: #ff9999; }
-        
         .bubble .meta { font-size: 10px; color: #555; margin-top: 5px; display: block; }
         .report-btn { cursor: pointer; font-size: 12px; margin-left: 10px; opacity: 0.5; }
         .report-btn:hover { opacity: 1; color: red; }
-
         /* Eingabe */
         .input-area { padding: 20px; background: #0a0a0a; border-top: 1px solid #333; display: flex; gap: 10px; }
         input { flex: 1; background: #000; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 5px; font-family: 'Almendra'; }
         button { background: #ff3131; color: #fff; border: none; padding: 0 20px; cursor: pointer; font-family: 'Almendra'; font-weight: bold; border-radius: 5px; }
-
         .new-chat-btn { width: 100%; padding: 10px; background: #39d353; color: #000; border: none; font-family: 'Almendra'; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
-
     <div class="messenger-header">
         <div class="tabs" id="tabContainer">
-            <div class="tab active" onclick="switchMainTab('PN')">PN</div>
-            <div class="tab" onclick="switchMainTab('GROUP')">Gruppen</div>
-            <div class="tab support-tab" id="supportTab" onclick="switchMainTab('SUPPORT')">Support 🚨</div>
+            <div class="tab active" id="tabPN" onclick="switchMainTab(event,'PN')">PN</div>
+            <div class="tab" id="tabGROUP" onclick="switchMainTab(event,'GROUP')">Gruppen</div>
+            <div class="tab support-tab" id="supportTab" onclick="switchMainTab(event,'SUPPORT')">Support 🚨</div>
         </div>
     </div>
-
     <div class="main-container">
         <div class="chat-sidebar">
             <button class="new-chat-btn" onclick="startNewChat()">+ Neuer Chat</button>
-            <div id="chatList">
-                </div>
+            <div id="chatList"></div>
         </div>
-
         <div class="chat-window">
-            <div class="chat-messages" id="msgContainer">
-                </div>
+            <div class="chat-messages" id="msgContainer"></div>
             <div class="input-area">
                 <input type="text" id="msgInput" placeholder="Nachricht schreiben..." onkeypress="if(event.key==='Enter') sendMsg()">
                 <button onclick="sendMsg()">Senden</button>
             </div>
         </div>
     </div>
-
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyivUyPpATTNv1muEF_U5HfT6_4Yj6QkseOvxaJX6wgIki9f-5XIzJUtDUxGAwCPeQLWw/exec'; 
+        if (!window.Bulls || !Bulls.requireLogin("index.html")) {
+            // redirect
+        }
+
+        const SCRIPT_URL = (window.BULLS_CONFIG && window.BULLS_CONFIG.SCRIPT_URL) || "";
         const MY_NAME = localStorage.getItem('bulls_user');
         const MY_ROLE = localStorage.getItem('bulls_role');
-        
+
         let currentTab = 'PN';
         let currentChatPartner = '';
         let allMessages = [];
 
         // Berechtigungs-Check für Support-Tab
-        if(["Admin", "Offi", "Ausbilder"].includes(MY_ROLE)) {
+        if (["Admin", "Offi", "Ausbilder"].includes(MY_ROLE)) {
             document.getElementById('supportTab').style.display = 'block';
+        }
+
+        // Ziel aus Dashboard übernehmen (z.B. Support/Allianz)
+        const preset = Bulls.consumeMessengerTarget();
+        if (preset.tab) currentTab = preset.tab;
+        if (preset.partner) currentChatPartner = preset.partner;
+
+        function setActiveTabUI() {
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            const id = (currentTab === "PN") ? "tabPN" : (currentTab === "GROUP" ? "tabGROUP" : "supportTab");
+            const el = document.getElementById(id);
+            if (el) el.classList.add('active');
         }
 
         async function loadChat() {
             try {
-                const res = await fetch(SCRIPT_URL + "?action=getMessages");
+                const res = await fetch(SCRIPT_URL + "?action=getMessages&t=" + Date.now());
                 allMessages = await res.json();
+                // Wenn noch kein Partner gewählt ist: ersten PN Partner auswählen
+                if (!currentChatPartner && currentTab === "PN") {
+                    const partners = getPartnersFromMessages(allMessages);
+                    if (partners.length) currentChatPartner = partners[0];
+                }
                 renderChatList();
                 renderMessages();
-            } catch(e) { console.error("Ladefehler", e); }
+            } catch (e) {
+                console.error("Ladefehler", e);
+            }
+        }
+
+        function getPartnersFromMessages(messages) {
+            const set = new Set();
+            messages.forEach(m => {
+                if (m.typ === 'PN') {
+                    const partner = (m.absender === MY_NAME) ? m.ziel : m.absender;
+                    if (partner && partner !== MY_NAME) set.add(partner);
+                }
+            });
+            // Sortierung nach letzter Nachricht
+            const last = {};
+            messages.forEach(m => {
+                if (m.typ === 'PN') {
+                    const partner = (m.absender === MY_NAME) ? m.ziel : m.absender;
+                    last[partner] = m;
+                }
+            });
+            return Array.from(set).sort((a, b) => new Date(last[b]?.zeit || 0) - new Date(last[a]?.zeit || 0));
         }
 
         function renderChatList() {
             const list = document.getElementById('chatList');
             list.innerHTML = "";
-            
-            // Logik für PN: Wer hat zuletzt geschrieben?
-            let partners = {};
-            allMessages.forEach(m => {
-                if(m.typ === 'PN') {
-                    let partner = (m.absender === MY_NAME) ? m.ziel : m.absender;
-                    partners[partner] = m;
-                }
-            });
 
-            Object.keys(partners).sort((a,b) => new Date(partners[b].zeit) - new Date(partners[a].zeit)).forEach(p => {
+            // Für GROUP/SUPPORT zeigen wir 1 Fix-Eintrag
+            if (currentTab === "GROUP") {
+                const div = document.createElement('div');
+                div.className = `chat-item ${currentChatPartner === "Allianz" ? 'active' : ''}`;
+                div.onclick = () => { currentChatPartner = "Allianz"; renderMessages(); renderChatList(); };
+                div.innerHTML = `<span class="name">Allianz</span><span class="last-msg">Gruppenchat</span>`;
+                list.appendChild(div);
+                return;
+            }
+            if (currentTab === "SUPPORT") {
+                const div = document.createElement('div');
+                div.className = `chat-item ${currentChatPartner === "Support" ? 'active' : ''}`;
+                div.onclick = () => { currentChatPartner = "Support"; renderMessages(); renderChatList(); };
+                div.innerHTML = `<span class="name">Support</span><span class="last-msg">Support-Anfragen</span>`;
+                list.appendChild(div);
+                return;
+            }
+
+            // PN: Partnerliste nach letzter Aktivität
+            const partners = getPartnersFromMessages(allMessages);
+            partners.forEach(p => {
+                const lastMsg = allMessages.filter(m => m.typ === "PN" && ((m.absender === MY_NAME && m.ziel === p) || (m.absender === p && m.ziel === MY_NAME)))
+                  .sort((a,b) => new Date(b.zeit) - new Date(a.zeit))[0];
                 const div = document.createElement('div');
                 div.className = `chat-item ${currentChatPartner === p ? 'active' : ''}`;
                 div.onclick = () => { currentChatPartner = p; renderMessages(); renderChatList(); };
-                div.innerHTML = `<span class="name">${p}</span><span class="last-msg">${partners[p].nachricht}</span>`;
+                div.innerHTML = `<span class="name">${p}</span><span class="last-msg">${(lastMsg && lastMsg.nachricht) ? lastMsg.nachricht : ""}</span>`;
                 list.appendChild(div);
             });
         }
@@ -123,11 +166,16 @@
         function renderMessages() {
             const container = document.getElementById('msgContainer');
             container.innerHTML = "";
-            
+
+            if (!currentChatPartner) {
+                container.innerHTML = `<div style="color:#777">Wähle links einen Chat aus.</div>`;
+                return;
+            }
+
             let filtered = allMessages.filter(m => {
-                if(currentTab === 'PN') return (m.absender === MY_NAME && m.ziel === currentChatPartner) || (m.absender === currentChatPartner && m.ziel === MY_NAME);
-                if(currentTab === 'GROUP') return m.typ === 'GROUP';
-                if(currentTab === 'SUPPORT') return m.status === 'reported' || m.ziel === 'Support';
+                if (currentTab === 'PN') return (m.absender === MY_NAME && m.ziel === currentChatPartner) || (m.absender === currentChatPartner && m.ziel === MY_NAME);
+                if (currentTab === 'GROUP') return m.typ === 'GROUP';
+                if (currentTab === 'SUPPORT') return m.status === 'reported' || m.ziel === 'Support';
                 return false;
             });
 
@@ -135,11 +183,13 @@
                 const div = document.createElement('div');
                 let isMe = m.absender === MY_NAME;
                 let isReported = m.status === 'reported' || m.ziel === 'Support';
-                
+
                 div.className = `bubble ${isMe ? 'me' : 'them'} ${isReported ? 'reported' : ''}`;
+                const timeStr = m.zeit ? new Date(m.zeit).toLocaleTimeString() : "";
                 div.innerHTML = `
-                    <b>${m.absender}:</b><br>${m.nachricht}
-                    <span class="meta">${new Date(m.zeit).toLocaleTimeString()} 
+                    <b>${m.absender}:</b>
+${m.nachricht || ""}
+                    <span class="meta">${timeStr}
                     ${(!isMe && !isReported) ? `<span class="report-btn" onclick="reportMsg('${m.zeit}')">🚨 Melden</span>` : ''}</span>
                 `;
                 container.appendChild(div);
@@ -149,39 +199,60 @@
 
         async function sendMsg() {
             const inp = document.getElementById('msgInput');
-            if(!inp.value || !currentChatPartner) return;
+            const text = (inp.value || "").trim();
+            if (!text) return;
 
-            const data = {
+            // Ziel abhängig vom Tab
+            let ziel = currentChatPartner;
+            if (currentTab === "GROUP") ziel = "Allianz";
+            if (currentTab === "SUPPORT") ziel = "Support";
+            if (!ziel) return;
+
+            const payload = {
                 action: "sendChat",
                 absender: MY_NAME,
-                ziel: currentChatPartner,
-                nachricht: inp.value,
+                ziel,
+                nachricht: text,
                 typ: currentTab,
                 status: "normal"
             };
 
             // Sofort lokal anzeigen (Optimismus)
-            allMessages.push({zeit: new Date(), ...data});
+            allMessages.push({ zeit: new Date().toISOString(), ...payload });
             renderMessages();
             inp.value = "";
 
-            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
         }
 
-        function switchMainTab(t) {
+        async function reportMsg(zeit) {
+            if (!zeit) return;
+            // Lokal markieren
+            allMessages = allMessages.map(m => (m.zeit === zeit ? { ...m, status: "reported", ziel: "Support" } : m));
+            renderMessages();
+            // Server markieren (Apps Script muss action=reportMsg unterstützen)
+            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "reportMsg", zeit }) });
+        }
+
+        function switchMainTab(ev, t) {
             currentTab = t;
-            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
-            if(t === 'GROUP') currentChatPartner = 'Allianz';
-            if(t === 'SUPPORT') currentChatPartner = 'Support';
+            if (t === 'GROUP') currentChatPartner = 'Allianz';
+            if (t === 'SUPPORT') currentChatPartner = 'Support';
+            setActiveTabUI();
             renderMessages();
             renderChatList();
         }
 
         function startNewChat() {
+            if (currentTab !== "PN") return;
             let p = prompt("Name des Spielers:");
-            if(p) { currentChatPartner = p; renderMessages(); renderChatList(); }
+            if (p) { currentChatPartner = p; renderMessages(); renderChatList(); }
         }
+
+        // Init
+        setActiveTabUI();
+        if (currentTab === "GROUP" && !currentChatPartner) currentChatPartner = "Allianz";
+        if (currentTab === "SUPPORT" && !currentChatPartner) currentChatPartner = "Support";
 
         setInterval(loadChat, 5000); // Alle 5 Sek neu laden
         loadChat();
