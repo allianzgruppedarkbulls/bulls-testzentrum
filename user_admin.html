@@ -1,124 +1,233 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dark Bulls - Admin Center V6</title>
-    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        :root { --red: #ff3131; --gold: #ffd600; --bg: #050505; --card: #0f0f0f; }
-        body { background: var(--bg); color: white; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .admin-container { width: 1100px; max-width: 95vw; background: var(--card); padding: 25px; border: 2px solid var(--red); border-radius: 15px; box-shadow: 0 0 30px rgba(255, 49, 49, 0.3); }
-        h1 { color: var(--red); text-transform: uppercase; text-align: center; margin: 0 0 20px 0; text-shadow: 0 0 10px red; }
-        .search-box { width: 100%; padding: 15px; background: #000; border: 1px solid #333; color: #39d353; font-family: 'Almendra'; font-size: 18px; border-radius: 8px; margin-bottom: 15px; outline: none; box-sizing: border-box; }
-        .table-wrapper { max-height: 400px; overflow-y: auto; border: 1px solid #222; border-radius: 8px; background: #000; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; }
-        th { position: sticky; top: 0; background: #151515; color: var(--red); text-align: left; padding: 15px; border-bottom: 2px solid var(--red); }
-        td { padding: 12px 15px; border-bottom: 1px solid #111; cursor: pointer; }
-        tr:hover { background: #1a1a1a; }
-        .selected-row { background: rgba(255, 49, 49, 0.3) !important; border-left: 4px solid var(--red); }
-        .edit-area { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 25px; background: #0a0a0a; border-radius: 12px; border: 1px solid #333; }
-        .field-group { display: flex; flex-direction: column; }
-        label { color: var(--red); font-size: 13px; margin-bottom: 5px; text-transform: uppercase; }
-        input, select { padding: 12px; background: #000; border: 1px solid #444; color: white; font-family: 'Almendra'; font-size: 16px; border-radius: 5px; }
-        .btn-row { grid-column: span 3; display: flex; gap: 15px; margin-top: 15px; }
-        .btn { flex: 1; padding: 15px; border: none; cursor: pointer; font-family: 'Almendra'; font-weight: bold; border-radius: 5px; text-transform: uppercase; }
-        .btn-save { background: #39d353; color: #000; }
-        .btn-pin { background: var(--gold); color: #000; }
-        .btn-del { background: var(--red); color: #fff; }
-        #pinModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; }
-        .pin-card { width: 450px; background: #111; border: 4px solid var(--gold); padding: 40px; border-radius: 25px; text-align: center; box-shadow: 0 0 60px rgba(255, 214, 0, 0.5); border-style: double; }
-        .pin-code { font-size: 60px; color: white; letter-spacing: 12px; margin: 25px 0; text-shadow: 0 0 20px white; font-weight: bold; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dark Bulls - Admin Center</title>
+  <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+  <script src="config.js"></script>
+  <script src="common.js"></script>
+  <style>
+    :root { --red:#ff3131; --gold:#ffd600; --bg:#050505; --card:#0f0f0f; --green:#39d353; }
+    body { background: var(--bg); color: white; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+    .admin-container { width: 1100px; max-width: 95vw; background: var(--card); padding: 25px; border: 2px solid var(--red); border-radius: 15px; box-shadow: 0 0 30px rgba(255, 49, 49, 0.3); }
+    h1 { color: var(--red); text-transform: uppercase; text-align: center; margin: 0 0 20px 0; text-shadow: 0 0 10px red; }
+    .search-box { width: 100%; padding: 15px; background: #000; border: 1px solid #333; color: var(--green); font-family: 'Almendra'; font-size: 18px; border-radius: 8px; margin-bottom: 15px; outline: none; box-sizing: border-box; }
+    .table-wrapper { max-height: 420px; overflow-y: auto; border: 1px solid #222; border-radius: 8px; background: #000; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { position: sticky; top: 0; background: #151515; color: var(--red); text-align: left; padding: 15px; border-bottom: 2px solid var(--red); }
+    td { padding: 12px 15px; border-bottom: 1px solid #111; cursor: pointer; }
+    tr:hover { background: #1a1a1a; }
+    .selected-row { background: rgba(255, 49, 49, 0.25) !important; border-left: 4px solid var(--red); }
+
+    .edit-area { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 25px; background: #0a0a0a; border-radius: 12px; border: 1px solid #333; }
+    .field-group { display: flex; flex-direction: column; }
+    label { color: var(--red); font-size: 13px; margin-bottom: 5px; text-transform: uppercase; }
+    input { padding: 12px; background: #000; border: 1px solid #444; color: white; font-family: 'Almendra'; font-size: 16px; border-radius: 5px; }
+    input[readonly] { opacity: 0.85; }
+
+    .hint { grid-column: span 3; color: #777; font-size: 13px; margin-top: -10px; }
+    .btn-row { grid-column: span 3; display: flex; gap: 15px; margin-top: 15px; }
+    .btn { flex: 1; padding: 15px; border: none; cursor: pointer; font-family: 'Almendra'; font-weight: bold; border-radius: 5px; text-transform: uppercase; }
+    .btn-save { background: var(--green); color: #000; }
+    .btn-edit { background: #444; color: #fff; }
+    .btn-pin { background: var(--gold); color: #000; }
+    .btn-del { background: var(--red); color: #fff; }
+    .btn-back { background:#222; color:white; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    #pinModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; }
+    .pin-card { width: 450px; background: #111; border: 4px solid var(--gold); padding: 40px; border-radius: 25px; text-align: center; box-shadow: 0 0 60px rgba(255, 214, 0, 0.5); border-style: double; }
+    .pin-code { font-size: 60px; color: white; letter-spacing: 12px; margin: 25px 0; text-shadow: 0 0 20px white; font-weight: bold; }
+  </style>
 </head>
 <body>
+  <div class="admin-container">
+    <h1>Dark Bulls Admin Center</h1>
+    <input type="text" class="search-box" id="searchInput" placeholder="Spieler suchen..." onkeyup="filterTable()">
 
-    <div class="admin-container">
-        <h1 id="title">Dark Bulls Admin Center</h1>
-        <input type="text" class="search-box" id="searchInput" placeholder="Spieler suchen..." onkeyup="filterTable()">
-        <div class="table-wrapper">
-            <table>
-                <thead><tr><th>Spieler</th><th>Allianz</th><th>Rolle</th><th>Status</th></tr></thead>
-                <tbody id="userBody"></tbody>
-            </table>
-        </div>
-        <div class="edit-area">
-            <div class="field-group"><label>Name</label><input type="text" id="editName" readonly></div>
-            <div class="field-group"><label>Allianz</label><input type="text" id="editAllianz"></div>
-            <div class="field-group"><label>Rolle</label><input type="text" id="editRole"></div>
-            <div class="btn-row">
-                <button class="btn btn-save" id="saveBtn" onclick="saveChanges()" disabled>Speichern</button>
-                <button class="btn btn-pin" id="pinBtn" onclick="resetPin()" disabled>PIN Reset</button>
-                <button class="btn btn-del" id="delBtn" onclick="deleteUser()" disabled>Löschen</button>
-                <button class="btn" style="background:#444; color:white" onclick="location.reload()">Zurück</button>
-            </div>
-        </div>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Spieler</th><th>Allianz</th><th>Rolle</th><th>Zusatz</th></tr></thead>
+        <tbody id="userBody"></tbody>
+      </table>
     </div>
 
-    <div id="pinModal">
-        <div class="pin-card">
-            <h2 style="color:var(--gold); margin:0">DARK BULLS</h2>
-            <p style="color:var(--gold)">EINMALPASSWORT ERSTELLT</p>
-            <p>Spieler: <span id="pinUser" style="color:white; font-size:20px"></span></p>
-            <div class="pin-code" id="newPinDisplay">####</div>
-            <p style="font-size:12px; color:#888; border-top:1px solid #333; padding-top:10px">DIES IST EIN EINMALPASSWORT.<br>NUR FÜR DEN EIGENTÜMER BESTIMMT!</p>
-            <button onclick="location.reload()" style="width:100%; padding:10px; margin-top:20px; cursor:pointer; font-weight:bold">FERTIG</button>
-        </div>
+    <div class="edit-area">
+      <div class="field-group"><label>Name</label><input type="text" id="editName" readonly></div>
+      <div class="field-group"><label>Allianz</label><input type="text" id="editAllianz" readonly></div>
+      <div class="field-group"><label>Rolle</label><input type="text" id="editRole" readonly></div>
+      <div class="field-group"><label>Zusätzliche Aufgabe</label><input type="text" id="editExtra" readonly></div>
+
+      <div class="hint" id="hint">Tipp: zuerst Spieler auswählen, dann „Bearbeiten“.</div>
+
+      <div class="btn-row">
+        <button class="btn btn-edit" id="editBtn" onclick="enableEdit()" disabled>Bearbeiten</button>
+        <button class="btn btn-save" id="saveBtn" onclick="saveChanges()" disabled>Speichern</button>
+        <button class="btn btn-pin" id="pinBtn" onclick="resetPin()" disabled>PIN Reset</button>
+        <button class="btn btn-del" id="delBtn" onclick="deleteUser()" disabled>Löschen</button>
+        <button class="btn btn-back" onclick="goBack()">Zurück</button>
+      </div>
     </div>
+  </div>
 
-    <script>
-        const SCRIPT_URL = 'DEINE_URL_HIER_EINSETZEN'; // <--- DEINE URL REIN!
+  <div id="pinModal">
+    <div class="pin-card">
+      <h2 style="color:var(--gold); margin:0">DARK BULLS</h2>
+      <p style="color:var(--gold)">EINMALPASSWORT ERSTELLT</p>
+      <p>Spieler: <span id="pinUser" style="color:white; font-size:20px"></span></p>
+      <div class="pin-code" id="newPinDisplay">####</div>
+      <p style="font-size:12px; color:#888; border-top:1px solid #333; padding-top:10px">DIES IST EIN EINMALPASSWORT.
+NUR FÜR DEN EIGENTÜMER BESTIMMT!</p>
+      <button onclick="closePinModal()" style="width:100%; padding:10px; margin-top:20px; cursor:pointer; font-weight:bold">FERTIG</button>
+    </div>
+  </div>
 
-        function handleResponse(data) {
-            const body = document.getElementById('userBody');
-            body.innerHTML = "";
-            data.filter(r => r[0] && r[0] !== "Spielername ").forEach(row => {
-                const tr = document.createElement('tr');
-                tr.onclick = () => {
-                    document.querySelectorAll('tr').forEach(el => el.classList.remove('selected-row'));
-                    tr.classList.add('selected-row');
-                    document.getElementById('editName').value = row[0];
-                    document.getElementById('editAllianz').value = row[1];
-                    document.getElementById('editRole').value = row[3];
-                    document.querySelectorAll('.btn').forEach(b => b.disabled = false);
-                };
-                tr.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td><td>${row[3]}</td><td style="color:#39d353">Online</td>`;
-                body.appendChild(tr);
-            });
-        }
+  <script>
+    if (!window.Bulls || !Bulls.requireLogin("index.html")) { /* redirect */ }
 
-        function loadData() {
-            const script = document.createElement('script');
-            script.src = SCRIPT_URL + "?callback=handleResponse&t=" + Date.now();
-            document.body.appendChild(script);
-        }
+    const SCRIPT_URL = (window.BULLS_CONFIG && window.BULLS_CONFIG.SCRIPT_URL) || "";
+    const ME = Bulls.getUser();
 
-        async function saveChanges() {
-            const name = document.getElementById('editName').value;
-            await fetch(SCRIPT_URL, {
-                method: 'POST', mode: 'no-cors',
-                body: JSON.stringify({ action: "fullUpdate", oldName: name, newName: name, newRole: document.getElementById('editRole').value, newExtra: document.getElementById('editAllianz').value })
-            });
-            alert("Gespeichert!"); location.reload();
-        }
+    // Zugriff: Admin/Offi/Ausbilder oder Zusatzrollen Moderator/Personalabteilung
+    const allowedRoles = ["Admin", "Offizier", "Offi", "Ausbilder"];
+    const allowedExtras = ["Moderator", "Personalabteilung"];
 
-        async function resetPin() {
-            const name = document.getElementById('editName').value;
-            const pin = Math.floor(1000 + Math.random() * 9000);
-            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "resetPin", userName: name, newPin: pin }) });
-            document.getElementById('pinUser').innerText = name;
-            document.getElementById('newPinDisplay').innerText = pin;
-            document.getElementById('pinModal').style.display = 'flex';
-        }
+    if (allowedRoles.indexOf(ME.role) === -1 && allowedExtras.indexOf(ME.extra) === -1) {
+      alert("Kein Zugriff.");
+      window.location.href = "dashboard.html";
+    }
 
-        function filterTable() {
-            const val = document.getElementById('searchInput').value.toLowerCase();
-            document.querySelectorAll('#userBody tr').forEach(tr => {
-                tr.style.display = tr.innerText.toLowerCase().includes(val) ? "" : "none";
-            });
-        }
+    let selectedName = "";
+    let editMode = false;
 
-        window.onload = loadData;
-    </script>
+    function setReadOnly(ro) {
+      document.getElementById("editAllianz").readOnly = ro;
+      document.getElementById("editRole").readOnly = ro;
+      document.getElementById("editExtra").readOnly = ro;
+    }
+
+    function setButtons(state) {
+      document.getElementById("editBtn").disabled = !state.canSelect;
+      document.getElementById("saveBtn").disabled = !state.canSave;
+      document.getElementById("pinBtn").disabled = !state.canAdmin;
+      document.getElementById("delBtn").disabled = !state.canAdmin;
+    }
+
+    function enableEdit() {
+      if (!selectedName) return;
+      editMode = true;
+      setReadOnly(false);
+      setButtons({ canSelect: true, canSave: true, canAdmin: true });
+      document.getElementById("hint").innerText = "Bearbeiten aktiv – danach „Speichern“.";
+    }
+
+    function handleResponse(data) {
+      // Erwartet: [name, allianz, "****", rolle, extra]
+      const body = document.getElementById('userBody');
+      body.innerHTML = "";
+
+      const rows = (data && data.length) ? data : [];
+      rows.forEach(function(row) {
+        if (!row || !row[0] || row[0] === "Spielername ") return;
+
+        const tr = document.createElement('tr');
+        tr.onclick = function() {
+          document.querySelectorAll('#userBody tr').forEach(function(el){ el.classList.remove('selected-row'); });
+          tr.classList.add('selected-row');
+
+          selectedName = row[0];
+          editMode = false;
+          setReadOnly(true);
+
+          document.getElementById('editName').value = row[0] || "";
+          document.getElementById('editAllianz').value = row[1] || "";
+          document.getElementById('editRole').value = row[3] || "";
+          document.getElementById('editExtra').value = row[4] || "";
+
+          setButtons({ canSelect: true, canSave: false, canAdmin: true });
+          document.getElementById("hint").innerText = "Spieler ausgewählt: „Bearbeiten“ klicken.";
+        };
+
+        tr.innerHTML =
+          "<td>" + (row[0] || "") + "</td>" +
+          "<td>" + (row[1] || "") + "</td>" +
+          "<td>" + (row[3] || "") + "</td>" +
+          "<td>" + (row[4] || "") + "</td>";
+        body.appendChild(tr);
+      });
+    }
+
+    function loadData() {
+      // JSONP (ohne CORS)
+      const script = document.createElement('script');
+      script.src = SCRIPT_URL + "?action=listUsers&callback=handleResponse&t=" + Date.now();
+      document.body.appendChild(script);
+    }
+
+    async function saveChanges() {
+      if (!selectedName) return;
+      if (!editMode) return alert("Erst auf „Bearbeiten“ klicken.");
+
+      const payload = {
+        action: "fullUpdate",
+        userName: selectedName,
+        newAllianz: document.getElementById('editAllianz').value || "",
+        newRole: document.getElementById('editRole').value || "",
+        newExtra: document.getElementById('editExtra').value || ""
+      };
+
+      await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+      alert("Gespeichert!");
+      location.reload();
+    }
+
+    async function resetPin() {
+      if (!selectedName) return;
+      const pin = Math.floor(1000 + Math.random() * 9000);
+
+      await fetch(SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        body: JSON.stringify({ action: "resetPin", userName: selectedName, newPin: String(pin) })
+      });
+
+      document.getElementById('pinUser').innerText = selectedName;
+      document.getElementById('newPinDisplay').innerText = pin;
+      document.getElementById('pinModal').style.display = 'flex';
+    }
+
+    async function deleteUser() {
+      if (!selectedName) return;
+      if (!confirm("User wirklich löschen: " + selectedName + " ?")) return;
+
+      await fetch(SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        body: JSON.stringify({ action: "deleteUser", userName: selectedName })
+      });
+
+      alert("Gelöscht!");
+      location.reload();
+    }
+
+    function filterTable() {
+      const val = (document.getElementById('searchInput').value || "").toLowerCase();
+      document.querySelectorAll('#userBody tr').forEach(function(tr) {
+        tr.style.display = tr.innerText.toLowerCase().indexOf(val) >= 0 ? "" : "none";
+      });
+    }
+
+    function closePinModal() {
+      document.getElementById('pinModal').style.display = 'none';
+      location.reload();
+    }
+
+    function goBack() {
+      window.location.href = "dashboard.html";
+    }
+
+    setReadOnly(true);
+    setButtons({ canSelect: false, canSave: false, canAdmin: false });
+    window.onload = loadData;
+  </script>
 </body>
 </html>
