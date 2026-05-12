@@ -33,7 +33,7 @@
     /* Modal */
     .overlay { display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 9999; align-items: center; justify-content: center; }
     .modal-card {
-      width: 700px; max-width: 95vw;
+      width: 760px; max-width: 95vw;
       background: #111; border: 2px solid var(--red); border-radius: 14px;
       box-shadow: 0 0 40px rgba(255,49,49,0.35);
       padding: 22px;
@@ -52,6 +52,10 @@
     .btn-save { background: var(--green); color:#000; }
     .btn-cancel { background: #700; color:#fff; }
     .hint { color:#888; font-size: 12px; margin-top: 8px; text-align:center; }
+
+    .checks { display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+    .check { display:flex; gap: 8px; align-items: center; font-size: 14px; color:#ddd; }
+    .check input { width: 18px; height: 18px; }
   </style>
 </head>
 <body>
@@ -84,10 +88,24 @@
         <div class="field">
           <label>Spielername</label>
           <input id="mName" readonly>
+          <label class="check" style="margin-top:6px;">
+            <input type="checkbox" id="mRenameToggle" onchange="toggleRename()"> Name ändern
+          </label>
+          <input id="mNameNew" placeholder="Neuer Spielername" style="display:none;">
         </div>
+
         <div class="field">
           <label>Allianz</label>
-          <input id="mAllianz" placeholder="z.B. Dark Bulls">
+          <select id="mAllianzSelect" onchange="toggleAllianzCustom()">
+            <option value="">(leer)</option>
+            <option value="Dark Bulls">Dark Bulls</option>
+            <option value="Dark bulls Unit">Dark bulls Unit</option>
+            <option value="Dark bulls Unit Leitung">Dark bulls Unit Leitung</option>
+            <option value="Dark Bulls Leitung">Dark Bulls Leitung</option>
+            <option value="Dark Bulls plus">Dark Bulls plus</option>
+            <option value="__custom__">Andere…</option>
+          </select>
+          <input id="mAllianzCustom" placeholder="Eigene Allianz" style="display:none; margin-top:8px;">
         </div>
 
         <div class="field">
@@ -107,19 +125,17 @@
         </div>
 
         <div class="field">
-          <label>Zusätzliche Aufgabe</label>
-          <select id="mExtra" onchange="toggleExtraCustom()">
-            <option value="">(keine)</option>
-            <option value="Moderator">Moderator</option>
-            <option value="Support">Support</option>
-            <option value="Buchhalter">Buchhalter</option>
-            <option value="Blackeinsicht">Blackeinsicht</option>
-            <option value="ELO">ELO</option>
-            <option value="Elo bearbeiter">Elo bearbeiter</option>
-            <option value="Personalabteilung">Personalabteilung</option>
-            <option value="__custom__">Andere…</option>
-          </select>
-          <input id="mExtraCustom" placeholder="Eigene Zusatzrolle" style="display:none; margin-top:8px;">
+          <label>Zusätzliche Aufgaben (mehrfach)</label>
+          <div class="checks" id="extraChecks">
+            <label class="check"><input type="checkbox" value="Moderator"> Moderator</label>
+            <label class="check"><input type="checkbox" value="Support"> Support</label>
+            <label class="check"><input type="checkbox" value="Buchhalter"> Buchhalter</label>
+            <label class="check"><input type="checkbox" value="Blackeinsicht"> Blackeinsicht</label>
+            <label class="check"><input type="checkbox" value="ELO"> ELO</label>
+            <label class="check"><input type="checkbox" value="Elo bearbeiter"> Elo bearbeiter</label>
+            <label class="check"><input type="checkbox" value="Personalabteilung"> Personalabteilung</label>
+          </div>
+          <input id="mExtraCustom" placeholder="Weitere (optional, komma-getrennt)" style="margin-top:8px;">
         </div>
       </div>
 
@@ -154,9 +170,15 @@
     const ME = Bulls.getUser();
 
     // Zugriff: Admin/Offi/Ausbilder oder Zusatzrollen Moderator/Personalabteilung
+    function extrasList(s) {
+      return String(s||"").split(",").map(x => x.trim()).filter(Boolean);
+    }
     const allowedRoles = ["Admin", "Offizier", "Offi", "Ausbilder"];
     const allowedExtras = ["Moderator", "Personalabteilung"];
-    if (allowedRoles.indexOf(ME.role) === -1 && allowedExtras.indexOf(ME.extra) === -1) {
+    const myExtras = extrasList(ME.extra);
+    const hasAllowedExtra = myExtras.some(x => allowedExtras.includes(x));
+
+    if (allowedRoles.indexOf(ME.role) === -1 && !hasAllowedExtra) {
       alert("Kein Zugriff.");
       window.location.href = "dashboard.html";
     }
@@ -177,7 +199,6 @@
       rows.forEach(function(row) {
         if (!row || !row[0] || row[0] === "Spielername ") return;
 
-        // Format aus Apps Script: [name, allianz, "****", rolle, extra]
         const item = {
           name: row[0] || "",
           allianz: row[1] || "",
@@ -207,7 +228,6 @@
     }
 
     function loadData() {
-      // JSONP
       const script = document.createElement("script");
       script.src = SCRIPT_URL + "?action=listUsers&callback=handleResponse&t=" + Date.now();
       document.body.appendChild(script);
@@ -220,37 +240,55 @@
       });
     }
 
+    function toggleRename() {
+      const on = document.getElementById("mRenameToggle").checked;
+      document.getElementById("mNameNew").style.display = on ? "block" : "none";
+      if (!on) document.getElementById("mNameNew").value = "";
+    }
+
+    function toggleAllianzCustom() {
+      const v = document.getElementById("mAllianzSelect").value;
+      const inp = document.getElementById("mAllianzCustom");
+      inp.style.display = (v === "__custom__") ? "block" : "none";
+      if (v !== "__custom__") inp.value = "";
+    }
+
     function openEditModal() {
       if (!selected) return;
 
+      // Reset UI
+      document.getElementById("mRenameToggle").checked = false;
+      toggleRename();
+
       document.getElementById("mName").value = selected.name;
-      document.getElementById("mAllianz").value = selected.allianz || "";
 
-      // Rolle setzen (wenn unbekannt -> bleibt wie es ist, sonst default)
-      const roleSelect = document.getElementById("mRole");
-      const roleVal = selected.role || "Gast";
-      let roleFound = false;
-      for (let i=0; i<roleSelect.options.length; i++) {
-        if (roleSelect.options[i].value === roleVal) roleFound = true;
-      }
-      roleSelect.value = roleFound ? roleVal : "Gast";
-
-      // Zusatzrolle setzen
-      const extraSelect = document.getElementById("mExtra");
-      const extraVal = selected.extra || "";
-      let extraFound = false;
-      for (let i=0; i<extraSelect.options.length; i++) {
-        if (extraSelect.options[i].value === extraVal) extraFound = true;
-      }
-      if (extraVal && !extraFound) {
-        extraSelect.value = "__custom__";
-        document.getElementById("mExtraCustom").style.display = "block";
-        document.getElementById("mExtraCustom").value = extraVal;
+      // Allianz: wenn nicht in Liste -> custom
+      const allSelect = document.getElementById("mAllianzSelect");
+      const allVal = selected.allianz || "";
+      let foundAll = false;
+      for (let i=0;i<allSelect.options.length;i++) if (allSelect.options[i].value === allVal) foundAll = true;
+      if (allVal && !foundAll) {
+        allSelect.value = "__custom__";
+        toggleAllianzCustom();
+        document.getElementById("mAllianzCustom").value = allVal;
       } else {
-        extraSelect.value = extraVal;
-        document.getElementById("mExtraCustom").style.display = "none";
-        document.getElementById("mExtraCustom").value = "";
+        allSelect.value = allVal;
+        toggleAllianzCustom();
       }
+
+      // Rolle
+      const roleSelect = document.getElementById("mRole");
+      roleSelect.value = selected.role || "Gast";
+
+      // Extras (mehrfach)
+      const extras = String(selected.extra||"").split(",").map(x => x.trim()).filter(Boolean);
+      document.querySelectorAll("#extraChecks input[type=checkbox]").forEach(cb => {
+        cb.checked = extras.includes(cb.value);
+      });
+      // Unbekannte Extras in Custom
+      const known = Array.from(document.querySelectorAll("#extraChecks input[type=checkbox]")).map(x=>x.value);
+      const unknown = extras.filter(x => !known.includes(x));
+      document.getElementById("mExtraCustom").value = unknown.join(", ");
 
       document.getElementById("editModal").style.display = "flex";
     }
@@ -259,32 +297,35 @@
       document.getElementById("editModal").style.display = "none";
     }
 
-    function toggleExtraCustom() {
-      const v = document.getElementById("mExtra").value;
-      const inp = document.getElementById("mExtraCustom");
-      if (v === "__custom__") {
-        inp.style.display = "block";
-        inp.focus();
-      } else {
-        inp.style.display = "none";
-        inp.value = "";
-      }
+    function getAllianzValue() {
+      const v = document.getElementById("mAllianzSelect").value;
+      if (v === "__custom__") return document.getElementById("mAllianzCustom").value || "";
+      return v || "";
+    }
+
+    function getExtrasValue() {
+      const chosen = [];
+      document.querySelectorAll("#extraChecks input[type=checkbox]").forEach(cb => {
+        if (cb.checked) chosen.push(cb.value);
+      });
+      const extraCustom = (document.getElementById("mExtraCustom").value || "")
+        .split(",").map(x => x.trim()).filter(Boolean);
+      return chosen.concat(extraCustom).join(", ");
     }
 
     async function saveChanges() {
       if (!selected) return;
 
-      const newAllianz = document.getElementById("mAllianz").value || "";
-      const newRole = document.getElementById("mRole").value || "Gast";
-      let newExtra = document.getElementById("mExtra").value || "";
-      if (newExtra === "__custom__") newExtra = document.getElementById("mExtraCustom").value || "";
+      const rename = document.getElementById("mRenameToggle").checked;
+      const newName = rename ? (document.getElementById("mNameNew").value || "").trim() : selected.name;
 
       const payload = {
         action: "fullUpdate",
-        userName: selected.name,
-        newAllianz: newAllianz,
-        newRole: newRole,
-        newExtra: newExtra
+        oldName: selected.name,
+        newName: newName,
+        newAllianz: getAllianzValue(),
+        newRole: document.getElementById("mRole").value || "Gast",
+        newExtra: getExtrasValue()
       };
 
       await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
@@ -326,9 +367,7 @@
       location.reload();
     }
 
-    function goBack() {
-      window.location.href = "dashboard.html";
-    }
+    function goBack() { window.location.href = "dashboard.html"; }
 
     window.onload = loadData;
   </script>
