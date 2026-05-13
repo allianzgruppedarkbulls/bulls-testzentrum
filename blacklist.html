@@ -11,10 +11,28 @@
         
         h1 { color: #ff3131; text-align: center; font-size: 42px; text-transform: uppercase; margin-bottom: 30px; letter-spacing: 2px; }
         
-        /* Suchzeile */
+        /* --- DUNKLES DROPDOWN DESIGN --- */
         .search-bar { display: flex; align-items: center; gap: 15px; background: #000; padding: 10px 20px; border-radius: 5px; margin-bottom: 30px; border: 1px solid #444; }
         .search-bar label { font-size: 20px; white-space: nowrap; }
-        .search-bar select { flex: 1; background: transparent; border: none; color: #39d353; font-family: 'Almendra'; font-size: 18px; outline: none; cursor: pointer; }
+        
+        #blDropdown { 
+            flex: 1; 
+            background-color: #000 !important; /* Hintergrund schwarz */
+            border: 1px solid #ff3131; /* Roter Rahmen wie auf dem Bild */
+            color: #39d353 !important; /* Grüne Schrift */
+            font-family: 'Almendra'; 
+            font-size: 18px; 
+            outline: none; 
+            cursor: pointer; 
+            padding: 5px;
+        }
+
+        /* Sorgt dafür, dass die Liste im Browser auch dunkel bleibt */
+        #blDropdown option {
+            background-color: #0a0a0a;
+            color: #ffffff;
+        }
+
         .btn-load { background: #39d353; color: #000; border: none; padding: 10px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 18px; }
 
         /* Sektionen */
@@ -60,10 +78,12 @@
         <div class="field"><label>Meistgespielte Map</label><span id="outMap"></span></div>
         
         <div class="field"><label>Verstoß</label><span id="outVerstoss" style="color: #ff3131;"></span></div>
-        <div class="field"></div> <div class="field"><label>Beweise vorhanden?</label><span id="outBeweise"></span></div>
+        <div class="field"></div> 
+        <div class="field"><label>Beweise vorhanden?</label><span id="outBeweise"></span></div>
         
         <div class="field"><label>Fallnummer</label><span id="outFallNr"></span></div>
-        <div class="field"></div> <div class="field"><label>Datum der Meldung</label><span id="outDatum"></span></div>
+        <div class="field"></div> 
+        <div class="field"><label>Datum der Meldung</label><span id="outDatum"></span></div>
     </div>
 
     <label class="desc-label">Was ist passiert / Beschreibung:</label>
@@ -94,10 +114,21 @@
             const res = await fetch(API + "?action=getBlacklistData");
             blacklistData = await res.json();
             const drop = document.getElementById("blDropdown");
+            
+            // Dropdown leeren und Standardtext
+            drop.innerHTML = '<option value="">-- Spieler suchen (Name | ID) --</option>';
+
             blacklistData.forEach((item, i) => {
                 const opt = document.createElement("option");
                 opt.value = i;
-                opt.innerText = item.target; // Hier kannst du auch ID | Name anzeigen
+                
+                // --- NAMEN UND ID IM DROPDOWN ANZEIGEN ---
+                // Zeigt z.B.: "DB-2024-101 - SpielerName | 12345"
+                let displayText = "";
+                if(item.fallNr) displayText += item.fallNr + " - ";
+                displayText += item.target; // target enthält bereits "ID | Name"
+                
+                opt.innerText = displayText;
                 drop.appendChild(opt);
             });
         } catch(e) { console.error("Ladefehler:", e); }
@@ -110,8 +141,11 @@
         const d = blacklistData[idx];
         
         // Zuordnung der Datenfelder
-        document.getElementById("outID").innerText = d.target.split('|')[0] || d.target;
-        document.getElementById("outName").innerText = d.target.split('|')[1] || "";
+        // Wir splitten "ID | Name" wieder auf
+        let parts = d.target.split('|');
+        document.getElementById("outID").innerText = parts[0] ? parts[0].trim() : d.target;
+        document.getElementById("outName").innerText = parts[1] ? parts[1].trim() : "";
+        
         document.getElementById("outJoin").innerText = d.joinDate || "Unbekannt";
         document.getElementById("outAlli").innerText = d.alli || "Unbekannt";
         document.getElementById("outPunkte").innerText = d.punkte || "0";
@@ -120,10 +154,9 @@
         document.getElementById("outBeweise").innerText = d.beweise || "Nein";
         document.getElementById("outFallNr").innerText = d.fallNr;
         document.getElementById("outDatum").innerText = new Date(d.datum).toLocaleDateString();
-        document.getElementById("outDesc").innerText = d.beschreibung;
+        document.getElementById("outDesc").innerText = d.beschreibung || d.desc || "";
         document.getElementById("outMelder").innerText = d.melder;
         
-        // Zeugen splitten (falls als Komma-Liste gespeichert)
         const z = d.zeugen ? d.zeugen.split(',') : [];
         document.getElementById("outZ1").innerText = z[0] || "";
         document.getElementById("outZ2").innerText = z[1] || "";
