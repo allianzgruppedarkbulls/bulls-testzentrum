@@ -11,15 +11,22 @@
         .header { position: absolute; top: 15px; right: 20px; display: flex; align-items: center; gap: 15px; z-index: 100; }
         .user-info { color: #ff3131; font-size: 20px; }
         .logout-btn { background: #ff0000; color: white; border: none; padding: 8px 15px; cursor: pointer; font-weight: bold; font-family: 'Almendra'; border-radius: 4px; text-transform: uppercase; }
+        
+        /* Die Haupt-Container Logik */
         .side-container { position: absolute; width: 100%; height: 100%; display: flex; justify-content: space-between; padding: 40px; box-sizing: border-box; z-index: 10; }
         .left-side, .right-side { display: flex; flex-direction: column; width: 320px; height: 90vh; }
-        .left-side { justify-content: space-between; }
+        
+        .left-side { justify-content: space-between; } /* Verteilt Boxen von oben bis unten */
         .right-side { justify-content: space-between; align-items: flex-end; }
-        .card { background: rgba(0, 0, 0, 0.9); padding: 18px; border: 2px solid #ff3131; border-radius: 12px; box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); width: 100%; box-sizing: border-box; margin-bottom: 10px; }
+
+        .card { background: rgba(0, 0, 0, 0.9); padding: 18px; border: 2px solid #ff3131; border-radius: 12px; box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); width: 100%; box-sizing: border-box; }
         .card h2 { color: #ff3131; margin: 0 0 12px 0; font-size: 20px; text-decoration: underline; text-align: left; }
         .btn-stack { display: flex; flex-direction: column; gap: 10px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .card-btn { background: #39d353; color: black; border: none; padding: 12px; cursor: pointer; font-family: 'Almendra'; font-weight: bold; border-radius: 5px; font-size: 15px; width: 100%; }
+        
+        .card-btn { background: #39d353; color: black; border: none; padding: 12px; cursor: pointer; font-family: 'Almendra'; font-weight: bold; border-radius: 5px; font-size: 15px; width: 100%; transition: 0.2s; }
+        .card-btn:hover { background: #2fb145; transform: scale(1.02); }
+        
         .chat-btn-container { width: 100%; display: flex; justify-content: flex-end; }
         .chat-btn { background: #ff8c00; color: black; border: none; padding: 15px 45px; font-size: 24px; font-weight: bold; border-radius: 8px; cursor: pointer; font-family: 'Almendra'; box-shadow: 0 0 25px rgba(255, 140, 0, 0.5); }
         .hidden { display: none !important; }
@@ -39,29 +46,30 @@
             <div class="card" id="box-perso">
                 <h2>Persönlich</h2>
                 <div class="btn-stack">
-                    <button class="card-btn" id="btn-stats" onclick="alert('Statistik folgt')">Eigene Statistik</button>
+                    <button class="card-btn" onclick="alert('Statistik folgt')">Eigene Statistik</button>
                     <button class="card-btn" onclick="alert('PIN ändern folgt')">Pin ändern</button>
                     <button class="card-btn" onclick="alert('Support folgt')">Support Chat</button>
                 </div>
             </div>
 
-           <div class="card" id="box-blacklist">
-    <h2>Freundschaft +</h2>
-    <div class="btn-stack">
-        <button class="card-btn" onclick="window.location.href='meldung_form.html'">Spieler Melden</button>
-        <button class="card-btn" onclick="window.location.href='blacklist.html'">Anschauen</button>
-    </div>
-</div>
+            <div class="card" id="box-blacklist">
+                <h2>Freundschaft +</h2>
+                <div class="btn-stack">
+                    <button class="card-btn" onclick="window.location.href='meldung_form.html'">Spieler Melden</button>
+                    <button class="card-btn" onclick="window.location.href='blacklist.html'">Anschauen</button>
+                </div>
+            </div>
 
-<div class="card" id="box-pflege">
-    <h2>Freundschaft + Pflege</h2>
-    <div class="grid-2">
-        <button class="card-btn" onclick="window.location.href='blacklist_pflege.html'">Gemeldete</button>
-        <button class="card-btn" onclick="window.location.href='blacklist_pflege.html'">Pflege</button>
-        <button class="card-btn" onclick="alert('In Arbeit...')">Eintragen</button>
-        <button class="card-btn" onclick="window.location.href='blacklist.html'">Vollansicht</button>
-    </div>
-</div>
+            <div class="card" id="box-pflege">
+                <h2>Freundschaft + Pflege</h2>
+                <div class="grid-2">
+                    <button class="card-btn" onclick="window.location.href='blacklist_pflege.html'">Gemeldete</button>
+                    <button class="card-btn" onclick="window.location.href='blacklist_pflege.html'">Pflege</button>
+                    <button class="card-btn" onclick="alert('Direkt-Eintrag folgt')">Eintragen</button>
+                    <button class="card-btn" onclick="window.location.href='blacklist.html'">Vollansicht</button>
+                </div>
+            </div>
+        </div>
 
         <div class="right-side">
             <div class="card" id="box-admin">
@@ -72,7 +80,7 @@
                 </div>
             </div>
 
-            <div class="card" id="box-elo" style="margin-top: -50px;"> 
+            <div class="card" id="box-elo"> 
                 <h2>Elo Bereich</h2>
                 <div class="btn-stack">
                     <button class="card-btn">Rohstoffrechner</button>
@@ -81,10 +89,7 @@
             </div>
 
             <div class="chat-btn-container" id="box-allichat">
-                <button class="chat-btn"
-  onclick="localStorage.setItem('bulls_messenger_tab','GROUP'); localStorage.setItem('bulls_messenger_partner','Allianz'); window.location.href='messenger.html';">
-  ALLIANZ CHAT
-</button>
+                <button class="chat-btn" onclick="openChat('GROUP', 'Allianz')">ALLIANZ CHAT</button>
             </div>
         </div>
     </div>
@@ -92,64 +97,58 @@
     <script>
         const user = localStorage.getItem('bulls_user');
         const role = localStorage.getItem('bulls_role');
-        const extra = localStorage.getItem('bulls_extra') || ""; // Spezial-Rolle laden
+        const extra = localStorage.getItem('bulls_extra') || "";
 
         if (!user) {
             window.location.href = "index.html";
         } else {
-            // Anzeige oben rechts: Name (Hauptrolle | Zusatzrolle)
             let displayRole = role;
             if(extra) displayRole += " | " + extra;
             document.getElementById('userDisplay').innerText = user + " (" + displayRole + ")";
-            
             applyPermissions(role, extra);
         }
 
-       function applyPermissions(r, ex) {
-    const boxStats = document.getElementById('btn-stats');
-    const boxBlacklist = document.getElementById('box-blacklist');
-    const boxPflege = document.getElementById('box-pflege');
-    const boxAdmin = document.getElementById('box-admin');
-    const boxElo = document.getElementById('box-elo');
-    const boxAlliChat = document.getElementById('box-allichat');
+        function applyPermissions(r, ex) {
+            const boxStats = document.getElementById('box-perso');
+            const boxBlacklist = document.getElementById('box-blacklist');
+            const boxPflege = document.getElementById('box-pflege');
+            const boxAdmin = document.getElementById('box-admin');
+            const boxElo = document.getElementById('box-elo');
+            const boxAlliChat = document.getElementById('box-allichat');
 
-    // --- BASIS-LOGIK ---
-    if (r === "Gast") {
-        [boxStats, boxBlacklist, boxPflege, boxAdmin, boxElo, boxAlliChat].forEach(el => el.classList.add('hidden'));
-    } 
-    else if (r === "Allianz Gast") {
-        [boxStats, boxBlacklist, boxPflege, boxAdmin, boxElo].forEach(el => el.classList.add('hidden'));
-    }
-    else if (r === "Mitglied" || r === "Kampfdivision") {
-        boxPflege.classList.add('hidden'); // Standardmäßig verstecken
-        boxAdmin.classList.add('hidden');
-        boxElo.classList.add('hidden');
-    }
+            // Grundzustand: Alles ausblenden was kritisch ist
+            if (r === "Gast") {
+                [boxBlacklist, boxPflege, boxAdmin, boxElo, boxAlliChat].forEach(el => el.classList.add('hidden'));
+            } 
+            else if (r === "Allianz Gast") {
+                [boxBlacklist, boxPflege, boxAdmin, boxElo].forEach(el => el.classList.add('hidden'));
+            }
+            else if (r === "Mitglied" || r === "Kampfdivision") {
+                boxPflege.classList.add('hidden');
+                boxAdmin.classList.add('hidden');
+                if (!ex.includes("ELO")) boxElo.classList.add('hidden');
+            }
 
-    // --- SPEZIAL-ÜBERSTEUERUNG (Zusatzrollen stechen Hauptrollen) ---
-    
-    // Buchhalter dürfen die Pflege-Box sehen (für Blacklist)
-    if (ex.includes("Buchhalter") || ex.includes("Moderator") || ex.includes("Personalabteilung")) {
-        boxPflege.classList.remove('hidden');
-    }
+            // Zusatzrollen-Check
+            if (ex.includes("Buchhalter") || ex.includes("Moderator")) {
+                boxPflege.classList.remove('hidden');
+            }
+            if (ex.includes("ELO")) {
+                boxElo.classList.remove('hidden');
+            }
+            if (["Admin", "Offizier", "Offi"].includes(r)) {
+                [boxPflege, boxAdmin, boxElo].forEach(el => el.classList.remove('hidden'));
+            }
+        }
 
-    // ELO-Beauftragte sehen die ELO-Box
-    if (ex.includes("ELO") || ex.includes("Elo bearbeiter")) {
-        boxElo.classList.remove('hidden');
-    }
-
-    // Admins/Offis sehen sowieso alles
-    if (["Admin", "Offizier", "Offi", "Ausbilder"].includes(r)) {
-        boxPflege.classList.remove('hidden');
-        boxAdmin.classList.remove('hidden');
-        boxElo.classList.remove('hidden');
-    }
-}
+        function openChat(typ, ziel) {
+            localStorage.setItem('bulls_messenger_tab', typ);
+            localStorage.setItem('bulls_messenger_partner', ziel);
+            window.location.href = 'messenger.html';
+        }
 
         function logout() {
-            localStorage.removeItem('bulls_user');
-            localStorage.removeItem('bulls_role');
-            localStorage.removeItem('bulls_extra');
+            localStorage.clear();
             window.location.href = "index.html";
         }
     </script>
