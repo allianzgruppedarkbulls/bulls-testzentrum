@@ -141,53 +141,50 @@ if(data.allianzen) {
         }
     }
 
-    async function sendMeldung() {
-        console.log("Sende-Vorgang gestartet...");
-        
-        // IDs checken
-        const id = document.getElementById('mID').value;
-        const name = document.getElementById('mName').value;
-        
-        if(!id || !name) { 
-            alert("Bitte ID und Name des Spielers angeben!"); 
-            return; 
-        }
-
-        // Daten zusammenstellen (mit Sicherheits-Checks)
-        const data = {
-            action: "addMeldung",
-            target: id + " | " + name,
-            alli: document.getElementById('mAlli') ? document.getElementById('mAlli').value : "Unbekannt",
-            joinDate: document.getElementById('mJoin') ? document.getElementById('mJoin').value : "",
-            punkte: document.getElementById('mPunkte') ? document.getElementById('mPunkte').value : 0,
-            map: document.getElementById('mMap') ? document.getElementById('mMap').value : "Unbekannt",
-            verstoss: document.getElementById('mVerstoss') ? document.getElementById('mVerstoss').value : "Unbekannt",
-            beweise: document.getElementById('mBeweise') ? document.getElementById('mBeweise').value : "Nein",
-            beschreibung: document.getElementById('mDesc').value,
-            melder: document.getElementById('mMelder').value,
-            zeugen: [
-                document.getElementById('mZ1').value,
-                document.getElementById('mZ2').value,
-                document.getElementById('mZ3').value,
-                document.getElementById('mZ4').value
-            ].filter(z => z && z !== "").join(",")
-        };
-
-        console.log("Payload bereit:", data);
-
-        try {
-            const response = await fetch(API, { 
-                method: "POST", 
-                body: JSON.stringify(data) 
-            });
-            console.log("Antwort vom Server:", response);
-            alert("Meldung erfolgreich gesendet!");
-            window.location.href = 'dashboard.html';
-        } catch (e) { 
-            console.error("Sende-Fehler:", e);
-            alert("Fehler beim Senden: " + e); 
-        }
+  async function sendMeldung() {
+    console.log("Sende-Vorgang gestartet...");
+    
+    const id = document.getElementById('mID').value;
+    const name = document.getElementById('mName').value;
+    
+    if(!id || !name) { 
+        alert("Bitte ID und Name des Spielers angeben!"); 
+        return; 
     }
+
+    const data = {
+        action: "addMeldung",
+        target: id + " | " + name,
+        alli: document.getElementById('mAlli').value, 
+        joinDate: document.getElementById('mJoin').value,
+        punkte: document.getElementById('mPunkte').value,
+        map: document.getElementById('mMap').value,
+        verstoss: document.getElementById('mVerstoss').value,
+        beweise: document.getElementById('mBeweise') ? document.getElementById('mBeweise').value : "Nein",
+        beschreibung: document.getElementById('mDesc').value,
+        melder: document.getElementById('mMelder').value,
+        zeugen: [
+            document.getElementById('mZ1').value,
+            document.getElementById('mZ2').value,
+            document.getElementById('mZ3').value,
+            document.getElementById('mZ4').value
+        ].filter(z => z && z !== "").join(",")
+    };
+
+    console.log("Payload bereit:", data);
+
+    try {
+        const response = await fetch(API, { 
+            method: "POST", 
+            body: JSON.stringify(data) 
+        });
+        alert("Meldung erfolgreich gesendet!");
+        window.location.href = 'dashboard.html';
+    } catch (e) { 
+        console.error("Sende-Fehler:", e);
+        alert("Fehler beim Senden: " + e); 
+    }
+}
 
     function openSupport() {
         localStorage.setItem('bulls_messenger_tab', 'PN');
