@@ -17,9 +17,9 @@
         
         #blDropdown { 
             flex: 1; 
-            background-color: #000 !important; /* Hintergrund schwarz */
-            border: 1px solid #ff3131; /* Roter Rahmen wie auf dem Bild */
-            color: #39d353 !important; /* Grüne Schrift */
+            background-color: #000 !important; 
+            border: 1px solid #ff3131; 
+            color: #39d353 !important; 
             font-family: 'Almendra'; 
             font-size: 18px; 
             outline: none; 
@@ -27,7 +27,6 @@
             padding: 5px;
         }
 
-        /* Sorgt dafür, dass die Liste im Browser auch dunkel bleibt */
         #blDropdown option {
             background-color: #0a0a0a;
             color: #ffffff;
@@ -115,18 +114,16 @@
             blacklistData = await res.json();
             const drop = document.getElementById("blDropdown");
             
-            // Dropdown leeren und Standardtext
             drop.innerHTML = '<option value="">-- Spieler suchen (Name | ID) --</option>';
 
             blacklistData.forEach((item, i) => {
                 const opt = document.createElement("option");
                 opt.value = i;
                 
-                // --- NAMEN UND ID IM DROPDOWN ANZEIGEN ---
-                // Zeigt z.B.: "DB-2024-101 - SpielerName | 12345"
+                // Nutzt den "target" String aus dem Script (enthält "Name | ID")
                 let displayText = "";
                 if(item.fallNr) displayText += item.fallNr + " - ";
-                displayText += item.target; // target enthält bereits "ID | Name"
+                displayText += item.target; 
                 
                 opt.innerText = displayText;
                 drop.appendChild(opt);
@@ -140,11 +137,9 @@
         
         const d = blacklistData[idx];
         
-        // Zuordnung der Datenfelder
-        // Wir splitten "ID | Name" wieder auf
-        let parts = d.target.split('|');
-        document.getElementById("outID").innerText = parts[0] ? parts[0].trim() : d.target;
-        document.getElementById("outName").innerText = parts[1] ? parts[1].trim() : "";
+        // Zuweisung basierend auf den neuen Script-Feldern playerID (Spalte B) und playerName (Spalte C)
+        document.getElementById("outID").innerText = d.playerID || "";
+        document.getElementById("outName").innerText = d.playerName || "";
         
         document.getElementById("outJoin").innerText = d.joinDate || "Unbekannt";
         document.getElementById("outAlli").innerText = d.alli || "Unbekannt";
@@ -153,7 +148,12 @@
         document.getElementById("outVerstoss").innerText = d.verstoss;
         document.getElementById("outBeweise").innerText = d.beweise || "Nein";
         document.getElementById("outFallNr").innerText = d.fallNr;
-        document.getElementById("outDatum").innerText = new Date(d.datum).toLocaleDateString();
+        
+        // Datum formatieren
+        if(d.datum) {
+            document.getElementById("outDatum").innerText = new Date(d.datum).toLocaleDateString('de-DE');
+        }
+
         document.getElementById("outDesc").innerText = d.beschreibung || d.desc || "";
         document.getElementById("outMelder").innerText = d.melder;
         
