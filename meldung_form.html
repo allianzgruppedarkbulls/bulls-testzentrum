@@ -99,60 +99,59 @@
     const API = window.BULLS_CONFIG.SCRIPT_URL;
 
     async function setupForm() {
+        console.log("Starte Formular-Setup...");
         document.getElementById('mMelder').value = localStorage.getItem('bulls_user') || "Unbekannt";
 
         try {
             const res = await fetch(API + "?action=getDropdownData");
             const data = await res.json();
+            console.log("Daten empfangen:", data);
 
-            // Vorwürfe
             const vDrop = document.getElementById("mVerstoss");
             vDrop.innerHTML = "";
             data.vorwuerfe.forEach(v => vDrop.innerHTML += `<option value="${v}">${v}</option>`);
 
-            // Maps
             const mDrop = document.getElementById("mMap");
             mDrop.innerHTML = "";
             data.maps.forEach(m => mDrop.innerHTML += `<option value="${m}">${m}</option>`);
 
-            // Zeugen
             const zDrops = document.querySelectorAll(".user-drop");
             zDrops.forEach(drop => {
                 drop.innerHTML = '<option value="">Kein Zeuge</option>';
-                data.user.forEach(u => drop.innerHTML += `<option value="${u}">${u}</option>`);
+                data.user.forEach(u => {
+                    let opt = document.createElement("option");
+                    opt.value = u;
+                    opt.innerText = u;
+                    drop.appendChild(opt);
+                });
             });
-
-            // Allianzen (Dynamisch an die zwei festen anhängen falls vorhanden)
-            const aDrop = document.getElementById("mAlli");
-            if(data.allianzen_liste) { // Falls du eine Liste in der Tabelle hast
-                data.allianzen_liste.forEach(a => aDrop.innerHTML += `<option value="${a}">${a}</option>`);
-            }
         } catch (e) {
-            console.error("Dropdown Fehler:", e);
+            console.error("Fehler beim Laden der Dropdowns:", e);
         }
     }
 
-    function openSupport() {
-        // Leitet zum Messenger mit dem Support-Konto weiter
-        localStorage.setItem('bulls_messenger_tab', 'PN');
-        localStorage.setItem('bulls_messenger_partner', 'Support'); 
-        window.location.href = 'messenger.html';
-    }
-
     async function sendMeldung() {
+        console.log("Sende-Vorgang gestartet...");
+        
+        // IDs checken
         const id = document.getElementById('mID').value;
         const name = document.getElementById('mName').value;
-        if(!id || !name) { alert("Bitte ID und Name angeben!"); return; }
+        
+        if(!id || !name) { 
+            alert("Bitte ID und Name des Spielers angeben!"); 
+            return; 
+        }
 
+        // Daten zusammenstellen (mit Sicherheits-Checks)
         const data = {
             action: "addMeldung",
             target: id + " | " + name,
-            alli: document.getElementById('mAlli').value,
-            joinDate: document.getElementById('mJoin').value,
-            punkte: document.getElementById('mPunkte').value,
-            map: document.getElementById('mMap').value,
-            verstoss: document.getElementById('mVerstoss').value,
-            beweise: document.getElementById('mBeweise').value,
+            alli: document.getElementById('mAlli') ? document.getElementById('mAlli').value : "Unbekannt",
+            joinDate: document.getElementById('mJoin') ? document.getElementById('mJoin').value : "",
+            punkte: document.getElementById('mPunkte') ? document.getElementById('mPunkte').value : 0,
+            map: document.getElementById('mMap') ? document.getElementById('mMap').value : "Unbekannt",
+            verstoss: document.getElementById('mVerstoss') ? document.getElementById('mVerstoss').value : "Unbekannt",
+            beweise: document.getElementById('mBeweise') ? document.getElementById('mBeweise').value : "Nein",
             beschreibung: document.getElementById('mDesc').value,
             melder: document.getElementById('mMelder').value,
             zeugen: [
@@ -160,14 +159,29 @@
                 document.getElementById('mZ2').value,
                 document.getElementById('mZ3').value,
                 document.getElementById('mZ4').value
-            ].filter(z => z !== "").join(",")
+            ].filter(z => z && z !== "").join(",")
         };
 
+        console.log("Payload bereit:", data);
+
         try {
-            await fetch(API, { method: "POST", body: JSON.stringify(data) });
+            const response = await fetch(API, { 
+                method: "POST", 
+                body: JSON.stringify(data) 
+            });
+            console.log("Antwort vom Server:", response);
             alert("Meldung erfolgreich gesendet!");
             window.location.href = 'dashboard.html';
-        } catch (e) { alert("Fehler: " + e); }
+        } catch (e) { 
+            console.error("Sende-Fehler:", e);
+            alert("Fehler beim Senden: " + e); 
+        }
+    }
+
+    function openSupport() {
+        localStorage.setItem('bulls_messenger_tab', 'PN');
+        localStorage.setItem('bulls_messenger_partner', 'Support'); 
+        window.location.href = 'messenger.html';
     }
 
     window.onload = setupForm;
