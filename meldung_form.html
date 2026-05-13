@@ -13,19 +13,26 @@
         .info-grid { display: grid; grid-template-columns: 1.2fr 1.2fr 1fr; gap: 15px; margin-bottom: 20px; }
         .field { display: flex; flex-direction: column; }
         .field label { font-weight: bold; font-size: 18px; margin-bottom: 5px; }
+        
         input, select, textarea { 
             background: #000; border: 1px solid #444; color: #39d353; 
             font-family: 'Almendra'; font-size: 18px; padding: 8px; border-radius: 5px; outline: none; 
         }
         input:focus, textarea:focus { border-color: #ff3131; }
+
+        /* Kasten für Beschreibung deutlich größer */
         .desc-label { color: #f1c40f; font-weight: bold; font-size: 20px; margin-bottom: 10px; display: block; }
-        textarea { width: 100%; height: 120px; box-sizing: border-box; resize: none; }
+        .desc-sub { color: #888; font-size: 14px; font-style: italic; margin-bottom: 5px; display: block; }
+        textarea { width: 100%; height: 250px; box-sizing: border-box; resize: vertical; }
+
         .witness-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 10px; }
         .witness-col { display: flex; flex-direction: column; gap: 10px; }
-        .btn-group { display: flex; justify: center; gap: 20px; margin-top: 30px; }
-        .btn { padding: 15px 30px; border-radius: 5px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 18px; text-transform: uppercase; border: none; }
+
+        .btn-group { display: flex; justify-content: center; gap: 15px; margin-top: 30px; flex-wrap: wrap; }
+        .btn { padding: 15px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 16px; text-transform: uppercase; border: none; min-width: 180px; }
         .btn-submit { background: #ff3131; color: white; }
         .btn-back { background: #444; color: white; }
+        .btn-support { background: #f1c40f; color: black; } /* Gelber Support Button */
         .btn:hover { filter: brightness(1.2); transform: scale(1.02); }
     </style>
 </head>
@@ -49,11 +56,11 @@
         <div class="field"><label>Spieler angemeldet am</label><input type="date" id="mJoin"></div>
         <div class="field">
             <label>Meistgespielte Map</label>
-            <select id="mMap"><option>Lädt...</option></select>
+            <select id="mMap"><option>Lädt Karten...</option></select>
         </div>
         <div class="field">
             <label>Verstoß</label>
-            <select id="mVerstoss"><option>Lädt...</option></select>
+            <select id="mVerstoss"><option>Lädt Vorwürfe...</option></select>
         </div>
         
         <div class="field"><label>Beweise vorhanden?</label>
@@ -65,23 +72,25 @@
     </div>
 
     <label class="desc-label">Was ist passiert / Beschreibung:</label>
+    <span class="desc-sub">(Wenn keine Eingabe im Dropdown zutrifft, hier eintragen)</span>
     <textarea id="mDesc" placeholder="Beschreibe den Vorfall so genau wie möglich..."></textarea>
 
     <div class="section-title">Melder & Zeugen</div>
     <div class="witness-grid">
         <div class="field"><label>Melder (Du)</label><input type="text" id="mMelder" readonly></div>
         <div class="witness-col">
-            <div class="field"><label>Zeuge 1</label><select id="mZ1" class="user-drop"><option value="">Wählen...</option></select></div>
-            <div class="field"><label>Zeuge 2</label><select id="mZ2" class="user-drop"><option value="">Wählen...</option></select></div>
+            <div class="field"><label>Zeuge 1</label><select id="mZ1" class="user-drop"></select></div>
+            <div class="field"><label>Zeuge 2</label><select id="mZ2" class="user-drop"></select></div>
         </div>
         <div class="witness-col">
-            <div class="field"><label>Zeuge 3</label><select id="mZ3" class="user-drop"><option value="">Wählen...</option></select></div>
-            <div class="field"><label>Zeuge 4</label><select id="mZ4" class="user-drop"><option value="">Wählen...</option></select></div>
+            <div class="field"><label>Zeuge 3</label><select id="mZ3" class="user-drop"></select></div>
+            <div class="field"><label>Zeuge 4</label><select id="mZ4" class="user-drop"></select></div>
         </div>
     </div>
 
     <div class="btn-group">
         <button class="btn btn-back" onclick="window.location.href='dashboard.html'">Abbrechen</button>
+        <button class="btn btn-support" onclick="openSupport()">Buchhaltungs Support</button>
         <button class="btn btn-submit" onclick="sendMeldung()">Meldung absenden</button>
     </div>
 </div>
@@ -90,32 +99,44 @@
     const API = window.BULLS_CONFIG.SCRIPT_URL;
 
     async function setupForm() {
-        // Melder setzen
         document.getElementById('mMelder').value = localStorage.getItem('bulls_user') || "Unbekannt";
 
         try {
             const res = await fetch(API + "?action=getDropdownData");
             const data = await res.json();
 
-            // Vorwürfe füllen
+            // Vorwürfe
             const vDrop = document.getElementById("mVerstoss");
             vDrop.innerHTML = "";
             data.vorwuerfe.forEach(v => vDrop.innerHTML += `<option value="${v}">${v}</option>`);
 
-            // Maps füllen
+            // Maps
             const mDrop = document.getElementById("mMap");
             mDrop.innerHTML = "";
             data.maps.forEach(m => mDrop.innerHTML += `<option value="${m}">${m}</option>`);
 
-            // Zeugen füllen
+            // Zeugen
             const zDrops = document.querySelectorAll(".user-drop");
             zDrops.forEach(drop => {
                 drop.innerHTML = '<option value="">Kein Zeuge</option>';
                 data.user.forEach(u => drop.innerHTML += `<option value="${u}">${u}</option>`);
             });
+
+            // Allianzen (Dynamisch an die zwei festen anhängen falls vorhanden)
+            const aDrop = document.getElementById("mAlli");
+            if(data.allianzen_liste) { // Falls du eine Liste in der Tabelle hast
+                data.allianzen_liste.forEach(a => aDrop.innerHTML += `<option value="${a}">${a}</option>`);
+            }
         } catch (e) {
-            console.error("Fehler beim Laden der Dropdowns:", e);
+            console.error("Dropdown Fehler:", e);
         }
+    }
+
+    function openSupport() {
+        // Leitet zum Messenger mit dem Support-Konto weiter
+        localStorage.setItem('bulls_messenger_tab', 'PN');
+        localStorage.setItem('bulls_messenger_partner', 'Support'); 
+        window.location.href = 'messenger.html';
     }
 
     async function sendMeldung() {
@@ -144,7 +165,7 @@
 
         try {
             await fetch(API, { method: "POST", body: JSON.stringify(data) });
-            alert("Erfolgreich gesendet!");
+            alert("Meldung erfolgreich gesendet!");
             window.location.href = 'dashboard.html';
         } catch (e) { alert("Fehler: " + e); }
     }
