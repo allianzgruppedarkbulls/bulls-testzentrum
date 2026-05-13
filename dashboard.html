@@ -45,24 +45,23 @@
                 </div>
             </div>
 
-            <div class="card" id="box-blacklist">
-                <h2>Freundschaft +</h2>
-                <div class="btn-stack">
-                    <button class="card-btn">Spieler Melden</button>
-                    <button class="card-btn">Anschauen</button>
-                </div>
-            </div>
+           <div class="card" id="box-blacklist">
+    <h2>Freundschaft +</h2>
+    <div class="btn-stack">
+        <button class="card-btn" onclick="window.location.href='meldung_form.html'">Spieler Melden</button>
+        <button class="card-btn" onclick="window.location.href='blacklist.html'">Anschauen</button>
+    </div>
+</div>
 
-            <div class="card" id="box-pflege">
-                <h2>Freundschaft + Pflege</h2>
-                <div class="grid-2">
-                    <button class="card-btn">Gemeldete</button>
-                    <button class="card-btn">Pflege</button>
-                    <button class="card-btn">Eintragen</button>
-                    <button class="card-btn">Vollansicht</button>
-                </div>
-            </div>
-        </div>
+<div class="card" id="box-pflege">
+    <h2>Freundschaft + Pflege</h2>
+    <div class="grid-2">
+        <button class="card-btn" onclick="window.location.href='blacklist_pflege.html'">Gemeldete</button>
+        <button class="card-btn" onclick="window.location.href='blacklist_pflege.html'">Pflege</button>
+        <button class="card-btn" onclick="alert('In Arbeit...')">Eintragen</button>
+        <button class="card-btn" onclick="window.location.href='blacklist.html'">Vollansicht</button>
+    </div>
+</div>
 
         <div class="right-side">
             <div class="card" id="box-admin">
@@ -106,55 +105,46 @@
             applyPermissions(role, extra);
         }
 
-        function applyPermissions(r, ex) {
-            const boxStats = document.getElementById('btn-stats');
-            const boxBlacklist = document.getElementById('box-blacklist');
-            const boxPflege = document.getElementById('box-pflege');
-            const boxAdmin = document.getElementById('box-admin');
-            const boxElo = document.getElementById('box-elo');
-            const boxAlliChat = document.getElementById('box-allichat');
+       function applyPermissions(r, ex) {
+    const boxStats = document.getElementById('btn-stats');
+    const boxBlacklist = document.getElementById('box-blacklist');
+    const boxPflege = document.getElementById('box-pflege');
+    const boxAdmin = document.getElementById('box-admin');
+    const boxElo = document.getElementById('box-elo');
+    const boxAlliChat = document.getElementById('box-allichat');
 
-            // --- BASIS-LOGIK FÜR HAUPTROLLEN ---
-            if (r === "Gast") {
-                boxStats.classList.add('hidden');
-                boxBlacklist.classList.add('hidden');
-                boxPflege.classList.add('hidden');
-                boxAdmin.classList.add('hidden');
-                boxElo.classList.add('hidden');
-                boxAlliChat.classList.add('hidden');
-            } 
-            else if (r === "Allianz Gast") {
-                boxStats.classList.add('hidden');
-                boxBlacklist.classList.add('hidden');
-                boxPflege.classList.add('hidden');
-                boxAdmin.classList.add('hidden');
-                boxElo.classList.add('hidden');
-            }
-            else if (r === "Mitglied") {
-                boxPflege.classList.add('hidden');
-                boxAdmin.classList.add('hidden');
-                boxElo.classList.add('hidden'); // Standardmäßig für Mitglieder weg
-            }
-            else if (r === "Kampfdivision") {
-                boxStats.classList.add('hidden');
-                boxPflege.classList.add('hidden');
-                boxAdmin.classList.add('hidden');
-                boxElo.classList.add('hidden');
-            }
-            // Ausbilder, Offi, Admin sehen alles standardmäßig.
+    // --- BASIS-LOGIK ---
+    if (r === "Gast") {
+        [boxStats, boxBlacklist, boxPflege, boxAdmin, boxElo, boxAlliChat].forEach(el => el.classList.add('hidden'));
+    } 
+    else if (r === "Allianz Gast") {
+        [boxStats, boxBlacklist, boxPflege, boxAdmin, boxElo].forEach(el => el.classList.add('hidden'));
+    }
+    else if (r === "Mitglied" || r === "Kampfdivision") {
+        boxPflege.classList.add('hidden'); // Standardmäßig verstecken
+        boxAdmin.classList.add('hidden');
+        boxElo.classList.add('hidden');
+    }
 
-            // --- SPEZIAL-ÜBERSTEUERUNG FÜR ZUSATZROLLEN ---
-            
-            // Wenn jemand ELO-Beauftragter ist, kriegt er die Box, egal welche Hauptrolle er hat
-            if (ex === "ELO") {
-                boxElo.classList.remove('hidden');
-            }
+    // --- SPEZIAL-ÜBERSTEUERUNG (Zusatzrollen stechen Hauptrollen) ---
+    
+    // Buchhalter dürfen die Pflege-Box sehen (für Blacklist)
+    if (ex.includes("Buchhalter") || ex.includes("Moderator") || ex.includes("Personalabteilung")) {
+        boxPflege.classList.remove('hidden');
+    }
 
-            // Wenn jemand Buchhalter ist (Beispiel für spätere Funktionen)
-            if (ex === "Buchhalter") {
-                // Hier könnten wir später spezielle Buchhalter-Buttons einblenden
-            }
-        }
+    // ELO-Beauftragte sehen die ELO-Box
+    if (ex.includes("ELO") || ex.includes("Elo bearbeiter")) {
+        boxElo.classList.remove('hidden');
+    }
+
+    // Admins/Offis sehen sowieso alles
+    if (["Admin", "Offizier", "Offi", "Ausbilder"].includes(r)) {
+        boxPflege.classList.remove('hidden');
+        boxAdmin.classList.remove('hidden');
+        boxElo.classList.remove('hidden');
+    }
+}
 
         function logout() {
             localStorage.removeItem('bulls_user');
