@@ -45,13 +45,12 @@
     <div class="info-grid">
         <div class="field"><label>Spielername ID</label><input type="text" id="mID" placeholder="z.B. 1234567"></div>
         <div class="field"><label>Spielername</label><input type="text" id="mName" placeholder="Name"></div>
-        <div class="field">
-            <label>Allianz</label>
-            <select id="mAlli">
-                <option value="Ohne Allianz">Ohne Allianz</option>
-                <option value="Allianz in Beschreibung geschrieben">Allianz in Beschreibung geschrieben</option>
-                </select>
-        </div>
+       <div class="field">
+    <label>Allianz</label>
+    <select id="mAlli">
+        <option value="">Lade Allianzen...</option>
+    </select>
+</div>
         
         <div class="field"><label>Spieler angemeldet am</label><input type="date" id="mJoin"></div>
         <div class="field">
@@ -107,6 +106,18 @@
             const data = await res.json();
             console.log("Daten empfangen:", data);
 
+
+            // Allianzen füllen
+const aDrop = document.getElementById("mAlli");
+aDrop.innerHTML = '<option value="">-- Allianz wählen --</option>';
+if(data.allianzen) { 
+    data.allianzen.forEach(a => {
+        let opt = document.createElement("option");
+        opt.value = a;
+        opt.innerText = a;
+        aDrop.appendChild(opt);
+    });
+}
             const vDrop = document.getElementById("mVerstoss");
             vDrop.innerHTML = "";
             data.vorwuerfe.forEach(v => vDrop.innerHTML += `<option value="${v}">${v}</option>`);
