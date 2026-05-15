@@ -8,23 +8,12 @@
     <style>
         body { background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         .container { width: 400px; background-color: #0f0f0f; border: 2px solid #333; border-radius: 12px; padding: 30px; box-shadow: 0 0 30px rgba(255, 49, 49, 0.2); text-align: center; }
-        
         h1 { color: #ff3131; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 2px; }
         p { color: #39d353; font-size: 18px; margin-bottom: 20px; }
-
-        input { 
-            width: 100%; padding: 12px; margin-bottom: 15px; background: #000; color: #39d353; 
-            border: 1px solid #444; font-family: 'Almendra'; font-size: 20px; text-align: center; border-radius: 5px; box-sizing: border-box;
-        }
-        input:focus { border-color: #ff3131; outline: none; }
-
-        .btn-save { width: 100%; padding: 15px; background: #39d353; color: #000; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 18px; text-transform: uppercase; transition: 0.3s; }
-        .btn-save:hover { filter: brightness(1.2); transform: scale(1.02); }
-        
+        input { width: 100%; padding: 12px; margin-bottom: 15px; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 18px; text-align: center; border-radius: 5px; box-sizing: border-box; }
+        .btn-save { width: 100%; padding: 15px; background: #39d353; color: #000; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 18px; text-transform: uppercase; }
         .btn-back { display: block; margin-top: 20px; color: #888; text-decoration: none; font-size: 16px; }
         .btn-back:hover { color: #fff; }
-
-        #successBox { display: none; margin-top: 20px; padding: 15px; background: rgba(57, 211, 83, 0.1); border: 1px solid #39d353; color: #39d353; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -34,43 +23,40 @@
     <p>Benutzer: <span id="displayUser" style="color:#fff;">...</span></p>
     
     <div id="inputArea">
-        <input type="password" id="newPin1" placeholder="Neue PIN" maxlength="8">
-        <input type="password" id="newPin2" placeholder="PIN wiederholen" maxlength="8">
-        <button class="btn-save" onclick="changePin()">Speichern</button>
+        <input type="password" id="oldPin" placeholder="Alte PIN eingeben">
+        <hr style="border: 0; border-top: 1px solid #333; margin-bottom: 15px;">
+        <input type="password" id="newPin1" placeholder="Neue PIN">
+        <input type="password" id="newPin2" placeholder="PIN wiederholen">
+        <button class="btn-save" onclick="changePin()">SPEICHERN</button>
     </div>
 
-    <div id="successBox">
-        ✓ PIN wurde erfolgreich geändert!
-    </div>
-
-    <a href="dashboard.html" class="btn-back">Zurück zum Panzer</a>
+    <a href="dashboard.html" class="btn-back">Zurück zum Hauptmenü</a>
 </div>
 
 <script>
-    // Sicherheits-Check & Name laden
     const myName = localStorage.getItem('bulls_user');
-    if (!myName) {
-        window.location.href = 'index.html'; // Kick wenn nicht eingeloggt
-    } else {
-        document.getElementById('displayUser').innerText = myName;
+    if (!myName) { 
+        window.location.href = 'index.html'; 
+    } else { 
+        document.getElementById('displayUser').innerText = myName; 
     }
 
     async function changePin() {
-        const pin1 = document.getElementById('newPin1').value;
-        const pin2 = document.getElementById('newPin2').value;
+        const oldP = document.getElementById('oldPin').value;
+        const n1 = document.getElementById('newPin1').value;
+        const n2 = document.getElementById('newPin2').value;
 
-        if (!pin1 || pin1.length < 4) {
-            alert("Die PIN muss mindestens 4 Zeichen lang sein!");
-            return;
+        if (!oldP || !n1 || n1.length < 4) { 
+            alert("Bitte alle Felder ausfüllen (Mindestens 4 Zeichen)!"); 
+            return; 
         }
-
-        if (pin1 !== pin2) {
-            alert("Die PINs stimmen nicht überein!");
-            return;
+        if (n1 !== n2) { 
+            alert("Die neuen PINs stimmen nicht überein!"); 
+            return; 
         }
 
         const btn = document.querySelector('.btn-save');
-        btn.innerText = "Sende Daten...";
+        btn.innerText = "VERARBEITE...";
         btn.disabled = true;
 
         try {
@@ -79,24 +65,23 @@
                 body: JSON.stringify({
                     action: "updatePin",
                     playerName: myName,
-                    newPin: pin1
+                    oldPin: oldP,
+                    newPin: n1
                 })
             });
-
             const result = await response.json();
-
-            if (result.ok || result.success) {
-                document.getElementById('inputArea').style.display = 'none';
-                document.getElementById('successBox').style.display = 'block';
-                setTimeout(() => { window.location.href = 'dashboard.html'; }, 2000);
+            
+            if (result.ok) {
+                alert("✓ PIN erfolgreich geändert!");
+                window.location.href = 'dashboard.html';
             } else {
-                alert("Fehler vom Server: " + (result.error || "Unbekannt"));
-                btn.innerText = "Speichern";
+                alert("❌ Fehler: " + result.error);
+                btn.innerText = "SPEICHERN";
                 btn.disabled = false;
             }
-        } catch (e) {
-            alert("Verbindungsfehler: " + e);
-            btn.innerText = "Speichern";
+        } catch (e) { 
+            alert("❌ Verbindungsfehler zum Server!"); 
+            btn.innerText = "SPEICHERN";
             btn.disabled = false;
         }
     }
