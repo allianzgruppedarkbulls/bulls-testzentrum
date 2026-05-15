@@ -1,1 +1,137 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>DARK BULLS - BLACKLIST PFLEGE</title>
+    <script src="config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 900px; background-color: #0f0f0f; border: 1px solid #444; border-radius: 10px; padding: 30px; box-shadow: 0 0 20px rgba(57, 211, 83, 0.2); }
+        
+        h1 { color: #39d353; text-align: center; text-transform: uppercase; margin-bottom: 25px; }
+        
+        /* Suche Bereich */
+        .search-area { background: #1a1a1a; padding: 20px; border-radius: 8px; border: 1px solid #333; margin-bottom: 30px; display: flex; gap: 15px; align-items: center; }
+        select#editDropdown { flex: 1; background: #000; color: #39d353; border: 1px solid #ff3131; padding: 10px; font-family: 'Almendra'; font-size: 18px; }
 
+        /* Eingabemaske */
+        .edit-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        .field { display: flex; flex-direction: column; margin-bottom: 15px; }
+        .field label { color: #5dade2; font-size: 14px; margin-bottom: 5px; }
+        input, textarea, select { background: #000; border: 1px solid #444; color: #fff; padding: 10px; font-family: 'Almendra'; font-size: 16px; border-radius: 4px; }
+        input:focus { border-color: #39d353; }
+
+        .btn-update { width: 100%; padding: 15px; background: #39d353; color: #000; border: none; font-weight: bold; font-size: 20px; cursor: pointer; font-family: 'Almendra'; margin-top: 20px; text-transform: uppercase; }
+        .btn-update:hover { background: #fff; }
+
+        .btn-back { display: block; text-align: center; margin-top: 20px; color: #888; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Blacklist Pflege</h1>
+    
+    <div class="search-area">
+        <label>Eintrag wählen:</label>
+        <select id="editDropdown" onchange="fillFields()">
+            <option value="">-- Spieler auswählen --</option>
+        </select>
+    </div>
+
+    <div id="editForm" style="display:none;">
+        <div class="edit-grid">
+            <div class="field"><label>Fallnummer</label><input type="text" id="fFall" readonly style="color:#888;"></div>
+            <div class="field"><label>ID (Spalte B)</label><input type="text" id="fID"></div>
+            <div class="field"><label>Name (Spalte C)</label><input type="text" id="fName"></div>
+            
+            <div class="field"><label>Allianz</label><input type="text" id="fAlli"></div>
+            <div class="field"><label>Punkte</label><input type="number" id="fPunkte"></div>
+            <div class="field"><label>Map</label><input type="text" id="fMap"></div>
+            
+            <div class="field"><label>Verstoß</label><input type="text" id="fVerstoss"></div>
+            <div class="field"><label>Beweise</label><select id="fBeweise"><option>Ja</option><option>Nein</option></select></div>
+            <div class="field"><label>Melder</label><input type="text" id="fMelder"></div>
+        </div>
+        
+        <div class="field">
+            <label>Beschreibung</label>
+            <textarea id="fDesc" rows="4"></textarea>
+        </div>
+
+        <button class="btn-update" onclick="updateEntry()">Änderungen Speichern</button>
+    </div>
+
+    <a href="dashboard.html" class="btn-back">ZURÜCK</a>
+</div>
+
+<script>
+    const API = window.BULLS_CONFIG.SCRIPT_URL;
+    let blacklistData = [];
+
+    async function loadBlacklist() {
+        try {
+            const res = await fetch(API + "?action=getBlacklistData");
+            blacklistData = await res.json();
+            const drop = document.getElementById("editDropdown");
+            
+            blacklistData.forEach((item, i) => {
+                const opt = document.createElement("option");
+                opt.value = i;
+                opt.innerText = (item.fallNr || "??") + " - " + item.target;
+                drop.appendChild(opt);
+            });
+        } catch(e) { console.error("Ladefehler"); }
+    }
+
+    function fillFields() {
+        const idx = document.getElementById("editDropdown").value;
+        if(idx === "") {
+            document.getElementById("editForm").style.display = "none";
+            return;
+        }
+        
+        const d = blacklistData[idx];
+        document.getElementById("editForm").style.display = "block";
+        
+        document.getElementById("fFall").value = d.fallNr || "";
+        document.getElementById("fID").value = d.playerID || "";
+        document.getElementById("fName").value = d.playerName || "";
+        document.getElementById("fAlli").value = d.alli || "";
+        document.getElementById("fPunkte").value = d.punkte || "";
+        document.getElementById("fMap").value = d.map || "";
+        document.getElementById("fVerstoss").value = d.verstoss || "";
+        document.getElementById("fBeweise").value = d.beweise || "Ja";
+        document.getElementById("fMelder").value = d.melder || "";
+        document.getElementById("fDesc").value = d.beschreibung || "";
+    }
+
+    async function updateEntry() {
+        if(!confirm("Eintrag wirklich aktualisieren?")) return;
+
+        const data = {
+            action: "fullUpdate", // Diese Aktion muss im Google Script die Zeile überschreiben
+            fallNr: document.getElementById("fFall").value,
+            playerID: document.getElementById("fID").value,
+            playerName: document.getElementById("fName").value,
+            alli: document.getElementById("fAlli").value,
+            punkte: document.getElementById("fPunkte").value,
+            map: document.getElementById("fMap").value,
+            verstoss: document.getElementById("fVerstoss").value,
+            beweise: document.getElementById("fBeweise").value,
+            melder: document.getElementById("fMelder").value,
+            desc: document.getElementById("fDesc").value
+        };
+
+        try {
+            const res = await fetch(API, { method: "POST", body: JSON.stringify(data) });
+            alert("Eintrag wurde erfolgreich aktualisiert!");
+            location.reload();
+        } catch(e) { alert("Fehler beim Speichern!"); }
+    }
+
+    window.onload = loadBlacklist;
+</script>
+</body>
+</html>
