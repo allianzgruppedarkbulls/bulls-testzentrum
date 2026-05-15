@@ -1,1 +1,157 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>DARK BULLS - DIREKT EINTRAG</title>
+    <script src="config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 850px; background-color: #0f0f0f; border: 2px solid #ff3131; border-radius: 10px; padding: 30px; box-shadow: 0 0 20px rgba(255, 49, 49, 0.3); }
+        
+        h1 { color: #ff3131; text-align: center; text-transform: uppercase; margin-bottom: 5px; }
+        p.subtitle { text-align: center; color: #888; margin-bottom: 30px; font-style: italic; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+        .field { display: flex; flex-direction: column; margin-bottom: 15px; }
+        .field label { color: #5dade2; margin-bottom: 5px; font-size: 16px; }
+        
+        input, select, textarea { 
+            background: #000; border: 1px solid #444; color: #39d353; padding: 10px; 
+            font-family: 'Almendra'; font-size: 18px; border-radius: 5px; outline: none;
+        }
+        input:focus { border-color: #ff3131; }
+        
+        .full-width { grid-column: span 3; }
+        
+        .btn-direct { 
+            width: 100%; padding: 15px; background: #ff3131; color: #fff; border: none; 
+            border-radius: 5px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; 
+            font-size: 22px; text-transform: uppercase; margin-top: 20px;
+        }
+        .btn-direct:hover { background: #fff; color: #ff3131; }
+        
+        .btn-back { display: block; text-align: center; margin-top: 20px; color: #888; text-decoration: none; }
+    </style>
+</head>
+<body>
 
+<div class="container">
+    <h1>Direkt-Aufnahme</h1>
+    <p class="subtitle">Spieler ohne Umweg in die Blacklist eintragen</p>
+    
+    <div class="form-grid">
+        <div class="field">
+            <label>Gegner ID (Spalte B)</label>
+            <input type="text" id="pID" placeholder="12345678">
+        </div>
+        <div class="field">
+            <label>Gegner Name (Spalte C)</label>
+            <input type="text" id="pName" placeholder="Spielername">
+        </div>
+        <div class="field">
+            <label>Allianz</label>
+            <input type="text" id="pAlli" placeholder="Allianz-Tag">
+        </div>
+        
+        <div class="field">
+            <label>Verstoß</label>
+            <select id="pVerstoss">
+                <option value="">-- wählen --</option>
+            </select>
+        </div>
+        <div class="field">
+            <label>Map</label>
+            <select id="pMap">
+                <option value="">-- wählen --</option>
+            </select>
+        </div>
+        <div class="field">
+            <label>Punkte</label>
+            <input type="number" id="pPunkte" placeholder="0">
+        </div>
+
+        <div class="field">
+            <label>Beweise vorhanden?</label>
+            <select id="pBeweis">
+                <option>Ja</option>
+                <option>Nein</option>
+            </select>
+        </div>
+        <div class="field">
+            <label>Melder (intern)</label>
+            <input type="text" id="pMelder" value="Buchhaltung">
+        </div>
+        <div class="field">
+            <label>Angemeldet am (optional)</label>
+            <input type="date" id="pJoin">
+        </div>
+
+        <div class="field full-width">
+            <label>Detaillierte Beschreibung</label>
+            <textarea id="pDesc" rows="4" placeholder="Was genau ist vorgefallen?"></textarea>
+        </div>
+    </div>
+
+    <button class="btn-direct" onclick="submitDirect()">Sofort in Blacklist speichern</button>
+    
+    <a href="dashboard.html" class="btn-back">Abbruch & Zurück</a>
+</div>
+
+<script>
+    const API = window.BULLS_CONFIG.SCRIPT_URL;
+
+    // Dropdowns wie beim Melde-Formular laden
+    async function setupForm() {
+        try {
+            const res = await fetch(API + "?action=getDropdownData");
+            const data = await res.json();
+            
+            const fill = (id, list) => {
+                const el = document.getElementById(id);
+                list.forEach(item => {
+                    let opt = document.createElement("option");
+                    opt.value = item; opt.innerText = item;
+                    el.appendChild(opt);
+                });
+            };
+
+            fill("pVerstoss", data.vorwuerfe);
+            fill("pMap", data.maps);
+        } catch(e) { console.error("Fehler beim Laden der Listen"); }
+    }
+
+    async function submitDirect() {
+        const id = document.getElementById("pID").value.trim();
+        const name = document.getElementById("pName").value.trim();
+        
+        if(!id || !name) {
+            alert("ID und Name müssen eingetragen werden!");
+            return;
+        }
+
+        const data = {
+            action: "approveMeldung", // Wir nutzen die approve-Funktion, da sie alles final einträgt
+            target: id + " | " + name,
+            alli: document.getElementById("pAlli").value,
+            verstoss: document.getElementById("pVerstoss").value,
+            map: document.getElementById("pMap").value,
+            punkte: document.getElementById("pPunkte").value,
+            beweise: document.getElementById("pBeweis").value,
+            desc: document.getElementById("pDesc").value,
+            melder: document.getElementById("pMelder").value,
+            joinDate: document.getElementById("pJoin").value,
+            isDirect: true // Flag für das Script
+        };
+
+        try {
+            const response = await fetch(API, { method: "POST", body: JSON.stringify(data) });
+            alert("Spieler wurde erfolgreich in die Blacklist aufgenommen!");
+            window.location.href = 'dashboard.html';
+        } catch(e) { alert("Fehler beim Speichern!"); }
+    }
+
+    window.onload = setupForm;
+</script>
+</body>
+</html>
