@@ -8,24 +8,34 @@
     <style>
         body { margin: 0; padding: 0; width: 100%; height: 100vh; background-color: black; font-family: 'Almendra', serif; color: white; overflow: hidden; }
         #dashboard-bg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 750px; max-width: 95vw; filter: drop-shadow(0 0 50px rgba(255, 0, 0, 0.8)); z-index: 1; }
+        
         .header { position: absolute; top: 15px; right: 20px; display: flex; align-items: center; gap: 15px; z-index: 100; }
         .user-info { color: #ff3131; font-size: 20px; }
         .logout-btn { background: #ff0000; color: white; border: none; padding: 8px 15px; cursor: pointer; font-weight: bold; font-family: 'Almendra'; border-radius: 4px; text-transform: uppercase; }
         
-        /* Die Haupt-Container Logik */
         .side-container { position: absolute; width: 100%; height: 100%; display: flex; justify-content: space-between; padding: 40px; box-sizing: border-box; z-index: 10; }
         .left-side, .right-side { display: flex; flex-direction: column; width: 320px; height: 90vh; }
         
-        .left-side { justify-content: space-between; } /* Verteilt Boxen von oben bis unten */
+        .left-side { justify-content: space-between; } 
         .right-side { justify-content: space-between; align-items: flex-end; }
 
         .card { background: rgba(0, 0, 0, 0.9); padding: 18px; border: 2px solid #ff3131; border-radius: 12px; box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); width: 100%; box-sizing: border-box; }
+        
+        /* Korrektur: Admin Box tiefer setzen */
+        #box-admin { margin-top: 45px; } 
+
         .card h2 { color: #ff3131; margin: 0 0 12px 0; font-size: 20px; text-decoration: underline; text-align: left; }
         .btn-stack { display: flex; flex-direction: column; gap: 10px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         
-        .card-btn { background: #39d353; color: black; border: none; padding: 12px; cursor: pointer; font-family: 'Almendra'; font-weight: bold; border-radius: 5px; font-size: 15px; width: 100%; transition: 0.2s; }
-        .card-btn:hover { background: #2fb145; transform: scale(1.02); }
+        /* Ein einheitlicher Button-Style für alle Admin- und Card-Buttons */
+        .card-btn, .admin-btn { 
+            background: #39d353; color: black; border: none; padding: 12px; 
+            cursor: pointer; font-family: 'Almendra'; font-weight: bold; 
+            border-radius: 5px; font-size: 15px; width: 100%; transition: 0.2s; 
+            text-transform: uppercase; outline: none;
+        }
+        .card-btn:hover, .admin-btn:hover { background: #2fb145; transform: scale(1.02); }
         
         .chat-btn-container { width: 100%; display: flex; justify-content: flex-end; }
         .chat-btn { background: #ff8c00; color: black; border: none; padding: 15px 45px; font-size: 24px; font-weight: bold; border-radius: 8px; cursor: pointer; font-family: 'Almendra'; box-shadow: 0 0 25px rgba(255, 140, 0, 0.5); }
@@ -77,7 +87,7 @@
             <div class="btn-stack">
                 <button class="card-btn" onclick="window.location.href='Ad_UsVer.html'">User-Verwaltung</button>
                 <button class="card-btn" onclick="window.location.href='Ad_ChVer.html'">Chat Verwaltung</button>
-                <button class="admin-btn" onclick="window.location.href='Ad_AllEinst.html'">ALLG. EINSTELLUNGEN</button>
+                <button class="admin-btn" onclick="window.location.href='Ad_AllEinst.html'">Allg. Einstellungen</button>
             </div>
         </div>
 
@@ -90,8 +100,8 @@
         </div>
 
         <div class="chat-btn-container" id="box-allichat">
-    <button class="chat-btn" onclick="window.location.href='Chat.html'">ALLIANZ CHAT</button>
-</div>
+            <button class="chat-btn" onclick="window.location.href='Chat.html'">ALLIANZ CHAT</button>
+        </div>
     </div>
 </div>
 
@@ -110,14 +120,13 @@
         }
 
         function applyPermissions(r, ex) {
-            const boxStats = document.getElementById('box-perso');
+            const boxPerso = document.getElementById('box-perso');
             const boxBlacklist = document.getElementById('box-blacklist');
             const boxPflege = document.getElementById('box-pflege');
             const boxAdmin = document.getElementById('box-admin');
             const boxElo = document.getElementById('box-elo');
             const boxAlliChat = document.getElementById('box-allichat');
 
-            // Grundzustand: Alles ausblenden was kritisch ist
             if (r === "Gast") {
                 [boxBlacklist, boxPflege, boxAdmin, boxElo, boxAlliChat].forEach(el => el.classList.add('hidden'));
             } 
@@ -130,7 +139,6 @@
                 if (!ex.includes("ELO")) boxElo.classList.add('hidden');
             }
 
-            // Zusatzrollen-Check
             if (ex.includes("Buchhalter") || ex.includes("Moderator")) {
                 boxPflege.classList.remove('hidden');
             }
@@ -140,12 +148,6 @@
             if (["Admin", "Offizier", "Offi"].includes(r)) {
                 [boxPflege, boxAdmin, boxElo].forEach(el => el.classList.remove('hidden'));
             }
-        }
-
-        function openChat(typ, ziel) {
-            localStorage.setItem('bulls_messenger_tab', typ);
-            localStorage.setItem('bulls_messenger_partner', ziel);
-            window.location.href = 'messenger.html';
         }
 
         function logout() {
