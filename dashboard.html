@@ -41,58 +41,58 @@
         <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
 
-    <div class="side-container">
-        <div class="left-side">
-            <div class="card" id="box-perso">
-                <h2>Persönlich</h2>
-                <div class="btn-stack">
-                    <button class="card-btn" onclick="alert('Statistik folgt')">Eigene Statistik</button>
-                    <button class="card-btn" onclick="alert('PIN ändern folgt')">Pin ändern</button>
-                    <button class="card-btn" onclick="alert('Support folgt')">Support Chat</button>
-                </div>
-            </div>
-
-            <div class="card" id="box-blacklist">
-                <h2>Freundschaft +</h2>
-                <div class="btn-stack">
-                    <button class="card-btn" onclick="window.location.href='meldung_form.html'">Spieler Melden</button>
-                    <button class="card-btn" onclick="window.location.href='blacklist.html'">Anschauen</button>
-                </div>
-            </div>
-
-            <div class="card" id="box-pflege">
-                <h2>Freundschaft + Pflege</h2>
-                <div class="grid-2">
-                    <button class="card-btn" onclick="window.location.href='blacklist_pflege.html'">Gemeldete</button>
-                    <button class="card-btn" onclick="window.location.href='blacklist_pflege.html'">Pflege</button>
-                    <button class="card-btn" onclick="alert('Direkt-Eintrag folgt')">Eintragen</button>
-                    <button class="card-btn" onclick="window.location.href='blacklist.html'">Vollansicht</button>
-                </div>
+   <div class="side-container">
+    <div class="left-side">
+        <div class="card" id="box-perso">
+            <h2>Persönlich</h2>
+            <div class="btn-stack">
+                <button class="card-btn" onclick="window.location.href='Per_Statistik.html'">Eigene Statistik</button>
+                <button class="card-btn" onclick="window.location.href='Per_Pin.html'">Pin ändern</button>
+                <button class="card-btn" onclick="window.location.href='Per_Supp.html'">Support Chat</button>
             </div>
         </div>
 
-        <div class="right-side">
-            <div class="card" id="box-admin">
-                <h2>Admin</h2>
-                <div class="btn-stack">
-                    <button class="card-btn" onclick="window.location.href='user_admin.html'">User-Verwaltung</button>
-                    <button class="card-btn" onclick="alert('Chat Verwaltung folgt')">Chat Verwaltung</button>
-                </div>
+        <div class="card" id="box-blacklist">
+            <h2>Freundschaft +</h2>
+            <div class="btn-stack">
+                <button class="card-btn" onclick="window.location.href='Freun_SpiMel.html'">Spieler Melden</button>
+                <button class="card-btn" onclick="window.location.href='Freun_Ansch.html'">Anschauen</button>
             </div>
+        </div>
 
-            <div class="card" id="box-elo"> 
-                <h2>Elo Bereich</h2>
-                <div class="btn-stack">
-                    <button class="card-btn">Rohstoffrechner</button>
-                    <button class="card-btn">Einheiten Rechner</button>
-                </div>
-            </div>
-
-            <div class="chat-btn-container" id="box-allichat">
-                <button class="chat-btn" onclick="openChat('GROUP', 'Allianz')">ALLIANZ CHAT</button>
+        <div class="card" id="box-pflege">
+            <h2>Freundschaft + Pflege</h2>
+            <div class="grid-2">
+                <button class="card-btn" onclick="window.location.href='FreunPfl_Gemel.html'">Gemeldete</button>
+                <button class="card-btn" onclick="window.location.href='FreunPfl_Pflege.html'">Pflege</button>
+                <button class="card-btn" onclick="window.location.href='FreunPfl_Eintrag.html'">Eintragen</button>
+                <button class="card-btn" onclick="window.location.href='FreunPfl_VAnsicht.html'">Vollansicht</button>
             </div>
         </div>
     </div>
+
+    <div class="right-side">
+        <div class="card" id="box-admin">
+            <h2>Admin</h2>
+            <div class="btn-stack">
+                <button class="card-btn" onclick="window.location.href='Ad_UsVer.html'">User-Verwaltung</button>
+                <button class="card-btn" onclick="window.location.href='Ad_ChVer.html'">Chat Verwaltung</button>
+            </div>
+        </div>
+
+        <div class="card" id="box-elo"> 
+            <h2>Elo Bereich</h2>
+            <div class="btn-stack">
+                <button class="card-btn" onclick="window.location.href='Elo_RohRech.html'">Rohstoffrechner</button>
+                <button class="card-btn" onclick="window.location.href='Elo_EinRech.html'">Einheiten Rechner</button>
+            </div>
+        </div>
+
+        <div class="chat-btn-container" id="box-allichat">
+            <button class="chat-btn" onclick="openChat('GROUP', 'Allianz')">ALLIANZ CHAT</button>
+        </div>
+    </div>
+</div>
 
     <script>
         const user = localStorage.getItem('bulls_user');
