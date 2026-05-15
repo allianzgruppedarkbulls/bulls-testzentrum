@@ -2,127 +2,225 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>DARK BULLS - BLACKLIST ANSCHAUEN</title>
+    <title>DARK BULLS - BLACKLIST ANSICHT</title>
     <script src="config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .container { width: 950px; background-color: #0f0f0f; border: 1px solid #333; border-radius: 10px; padding: 30px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        
-        h1 { color: #ff3131; text-align: center; font-size: 42px; text-transform: uppercase; margin-bottom: 30px; letter-spacing: 2px; }
-        
-        /* --- DUNKLES DROPDOWN DESIGN --- */
-        .search-bar { display: flex; align-items: center; gap: 15px; background: #000; padding: 10px 20px; border-radius: 5px; margin-bottom: 30px; border: 1px solid #444; }
-        .search-bar label { font-size: 20px; white-space: nowrap; }
-        
-        #blDropdown { 
-            flex: 1; 
-            background-color: #000 !important; 
-            border: 1px solid #ff3131; 
-            color: #39d353 !important; 
-            font-family: 'Almendra'; 
-            font-size: 18px; 
-            outline: none; 
-            cursor: pointer; 
-            padding: 8px;
+        body { 
+            background-color: #050505; 
+            color: #ffffff; 
+            font-family: 'Almendra', serif; 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
         }
 
-        #blDropdown option { background-color: #0a0a0a; color: #ffffff; }
+        .container { 
+            width: 1100px; 
+            background-color: #0f0f0f; 
+            border: 1px solid #333; 
+            border-radius: 15px; 
+            padding: 40px; 
+            box-shadow: 0 0 60px 10px rgba(255, 49, 49, 0.25); 
+            position: relative;
+        }
 
-        .btn-load { background: #39d353; color: #000; border: none; padding: 10px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 18px; }
+        h1 { 
+            color: #ff3131; 
+            text-align: center; 
+            text-transform: uppercase; 
+            margin-bottom: 30px; 
+            letter-spacing: 4px; 
+            font-size: 36px;
+            text-shadow: 0 0 15px rgba(255, 49, 49, 0.6);
+        }
 
-        .section-title { color: #5dade2; font-style: italic; border-bottom: 1px solid #5dade2; margin: 20px 0 15px 0; font-size: 22px; padding-bottom: 5px; }
-        
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .field { display: flex; flex-direction: column; }
-        .field label { font-weight: bold; font-size: 18px; margin-bottom: 2px; color: #888; }
-        .field span { color: #39d353; font-size: 20px; min-height: 24px; }
+        /* Obere Auswahl-Sektion */
+        .search-box {
+            display: flex;
+            gap: 15px;
+            background: #151515;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 35px;
+            align-items: center;
+            border: 1px solid #222;
+        }
 
+        .search-box label { font-size: 20px; white-space: nowrap; }
+
+        select { 
+            flex-grow: 1; 
+            background: #000; 
+            color: #fff; 
+            border: 1px solid #444; 
+            padding: 12px; 
+            font-family: 'Almendra'; 
+            font-size: 18px; 
+            border-radius: 5px;
+        }
+
+        .btn-load { 
+            background: #39d353; 
+            color: #000; 
+            border: none; 
+            padding: 12px 25px; 
+            font-family: 'Almendra'; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            border-radius: 5px; 
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-load:hover { background: #fff; }
+
+        /* Daten-Layout wie auf dem Screenshot */
+        .section-header { 
+            color: #5dade2; 
+            font-style: italic; 
+            font-size: 22px; 
+            border-bottom: 1px solid #5dade2; 
+            margin-bottom: 20px; 
+            padding-bottom: 5px;
+        }
+
+        .data-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px 40px; 
+            margin-bottom: 30px; 
+        }
+
+        .data-row { display: flex; justify-content: space-between; border-bottom: 1px solid #1a1a1a; padding: 8px 0; }
+        .label { font-weight: bold; color: #fff; font-size: 18px; }
+        .val { color: #fff; font-size: 18px; text-align: right; }
+
+        /* Beschreibungstext */
         .desc-label { color: #f1c40f; font-weight: bold; font-size: 20px; margin-bottom: 10px; display: block; }
-        .desc-box { background: #000; border: 1px solid #333; padding: 20px; min-height: 100px; border-radius: 5px; color: #39d353; font-size: 19px; line-height: 1.4; margin-bottom: 25px; white-space: pre-wrap; }
+        .desc-box { 
+            width: 100%; 
+            min-height: 150px; 
+            background: #000; 
+            border: 1px solid #333; 
+            padding: 15px; 
+            color: #fff; 
+            font-size: 18px; 
+            border-radius: 5px; 
+            margin-bottom: 35px;
+            box-sizing: border-box;
+        }
 
-        .btn-back { display: block; width: 200px; margin: 30px auto 0; background: #444; color: #fff; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 18px; text-align: center; text-decoration: none; }
+        .btn-back { 
+            display: block; 
+            width: 250px; 
+            margin: 20px auto 0; 
+            padding: 15px; 
+            background: #f1c40f; 
+            color: #000; 
+            text-align: center; 
+            text-decoration: none; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            border-radius: 5px;
+            font-size: 18px;
+            transition: 0.3s;
+        }
+        .btn-back:hover { background: #fff; transform: scale(1.05); }
+
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>DARK BULLS BLACKLIST</h1>
+    <h1>DARK BULLS BLACK LISTE</h1>
 
-    <div class="search-bar">
-        <label>Gegner suchen:</label>
-        <select id="blDropdown">
+    <div class="search-box">
+        <label>Spieler auswählen</label>
+        <select id="playerSelect">
             <option value="">Lade Blacklist...</option>
         </select>
-        <button class="btn-load" onclick="loadEntry()">Anzeigen</button>
+        <button class="btn-load" onclick="loadSinglePlayer()">Spieler Laden</button>
     </div>
 
-    <div class="section-title">Spielerdaten</div>
-    <div class="info-grid">
-        <div class="field"><label>ID</label><span id="outID"></span></div>
-        <div class="field"><label>Name</label><span id="outName"></span></div>
-        <div class="field"><label>Allianz</label><span id="outAlli"></span></div>
-        
-        <div class="field"><label>Punkte</label><span id="outPunkte"></span></div>
-        <div class="field"><label>Map</label><span id="outMap"></span></div>
-        <div class="field"><label>Beweise?</label><span id="outBeweise"></span></div>
-        
-        <div class="field"><label>Verstoß</label><span id="outVerstoss" style="color: #ff3131;"></span></div>
-        <div class="field"><label>Fallnummer</label><span id="outFallNr"></span></div>
-        <div class="field"><label>Gemeldet am</label><span id="outDatum"></span></div>
+    <div id="details">
+        <div class="section-header">Spielerdaten vom gemeldeten Spieler</div>
+        <div class="data-grid">
+            <div class="data-row"><span class="label">Spielername ID</span> <span class="val" id="dTarget">-</span></div>
+            <div class="data-row"><span class="label">Spieler angemeldet am</span> <span class="val" id="dRegDate">-</span></div>
+            <div class="data-row"><span class="label">Allianz bei Erstkontakt</span> <span class="val" id="dAlli">-</span></div>
+            <div class="data-row"><span class="label">Meistgespielte Map</span> <span class="val" id="dMap">-</span></div>
+            <div class="data-row"><span class="label">Verstoß</span> <span class="val" id="dVerstoss">-</span></div>
+            <div class="data-row"><span class="label">Beweise vorhanden?</span> <span class="val" id="dBeweise">-</span></div>
+            <div class="data-row"><span class="label">Fallnummer</span> <span class="val" id="dFall">-</span></div>
+            <div class="data-row"><span class="label">Datum der Meldung</span> <span class="val" id="dDate">-</span></div>
+        </div>
+
+        <span class="desc-label">Was ist passiert / Beschreibung:</span>
+        <div class="desc-box" id="dDesc">Wähle einen Eintrag aus der Liste oben aus.</div>
+
+        <div class="section-header">Spielerdaten von Zeugen</div>
+        <div class="data-grid">
+            <div class="data-row"><span class="label">Melder</span> <span class="val" id="dMelder">-</span></div>
+            <div class="data-row"><span class="label">Zeuge 1</span> <span class="val" id="dZ1">-</span></div>
+            <div class="data-row"><span class="label">Zeuge 2</span> <span class="val" id="dZ2">-</span></div>
+            <div class="data-row"><span class="label">Zeuge 3</span> <span class="val" id="dZ3">-</span></div>
+            <div class="data-row"><span class="label">Zeuge 4</span> <span class="val" id="dZ4">-</span></div>
+        </div>
     </div>
 
-    <label class="desc-label">Beschreibung:</label>
-    <div class="desc-box" id="outDesc"></div>
-
-    <a href="dashboard.html" class="btn-back">ZURÜCK</a>
+    <a href="dashboard.html" class="btn-back">Zurück</a>
 </div>
 
 <script>
-    const API = window.BULLS_CONFIG.SCRIPT_URL;
     let blacklistData = [];
+    const API = window.BULLS_CONFIG.SCRIPT_URL;
 
-    async function init() {
+    async function loadList() {
         try {
-            const res = await fetch(API + "?action=getBlacklistData");
+            const res = await fetch(API + "?action=getBlacklist");
             blacklistData = await res.json();
-            const drop = document.getElementById("blDropdown");
+            const sel = document.getElementById("playerSelect");
+            sel.innerHTML = '<option value="">-- Bitte wählen --</option>';
             
-            drop.innerHTML = '<option value="">-- Spieler wählen (Name | ID) --</option>';
-
-            blacklistData.forEach((item, i) => {
+            blacklistData.forEach((p, index) => {
                 const opt = document.createElement("option");
-                opt.value = i;
-                // Zeigt im Dropdown: "Name | ID"
-                opt.innerText = item.target; 
-                drop.appendChild(opt);
+                opt.value = index;
+                opt.innerText = p.target;
+                sel.appendChild(opt);
             });
-        } catch(e) { console.error("Ladefehler:", e); }
-    }
-
-    function loadEntry() {
-        const idx = document.getElementById("blDropdown").value;
-        if(idx === "") return;
-        
-        const d = blacklistData[idx];
-        
-        // Zuweisung der Felder aus dem getBlacklistData_() Objekt im Script
-        document.getElementById("outID").innerText = d.playerID || "";
-        document.getElementById("outName").innerText = d.playerName || "";
-        document.getElementById("outAlli").innerText = d.alli || "Unbekannt";
-        document.getElementById("outPunkte").innerText = d.punkte || "0";
-        document.getElementById("outMap").innerText = d.map || "Unbekannt";
-        document.getElementById("outVerstoss").innerText = d.verstoss;
-        document.getElementById("outBeweise").innerText = d.beweise || "Nein";
-        document.getElementById("outFallNr").innerText = d.fallNr;
-        
-        if(d.datum) {
-            document.getElementById("outDatum").innerText = new Date(d.datum).toLocaleDateString('de-DE');
+        } catch(e) {
+            document.getElementById("playerSelect").innerHTML = '<option>Fehler beim Laden!</option>';
         }
-        document.getElementById("outDesc").innerText = d.beschreibung || "";
     }
 
-    window.onload = init;
+    function loadSinglePlayer() {
+        const idx = document.getElementById("playerSelect").value;
+        if(idx === "") return;
+        const p = blacklistData[idx];
+
+        document.getElementById("dTarget").innerText = p.target;
+        document.getElementById("dAlli").innerText = p.alli || "Keine";
+        document.getElementById("dVerstoss").innerText = p.verstoss;
+        document.getElementById("dFall").innerText = "DB-" + (parseInt(idx) + 100);
+        document.getElementById("dRegDate").innerText = p.regDate || "Unbekannt";
+        document.getElementById("dMap").innerText = p.map || "N/A";
+        document.getElementById("dBeweise").innerText = p.beweise || "Ja";
+        document.getElementById("dDate").innerText = new Date(p.datum).toLocaleDateString();
+        document.getElementById("dDesc").innerText = p.desc || p.beschreibung;
+        document.getElementById("dMelder").innerText = p.melder;
+        
+        // Zeugen splitten falls vorhanden
+        const zeugen = (p.zeugen || "").split(",");
+        document.getElementById("dZ1").innerText = zeugen[0] || "-";
+        document.getElementById("dZ2").innerText = zeugen[1] || "-";
+        document.getElementById("dZ3").innerText = zeugen[2] || "-";
+        document.getElementById("dZ4").innerText = zeugen[3] || "-";
+    }
+
+    window.onload = loadList;
 </script>
 </body>
 </html>
