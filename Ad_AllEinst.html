@@ -10,69 +10,54 @@
             background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; 
             margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
-
         .container { 
             width: 650px; background-color: #0f0f0f; border: 1px solid #333; 
-            border-radius: 15px; padding: 40px; box-shadow: 0 0 50px rgba(57, 211, 83, 0.2); 
-            position: relative;
+            border-radius: 15px; padding: 40px; box-shadow: 0 0 70px 15px rgba(255, 49, 49, 0.25); 
+            text-align: center;
         }
-
-        h1 { 
-            color: #39d353; text-align: center; text-transform: uppercase; margin-bottom: 30px; 
-            letter-spacing: 3px; font-size: 32px; text-shadow: 0 0 15px rgba(57, 211, 83, 0.4);
-        }
+        h1 { color: #ff3131; text-transform: uppercase; margin-bottom: 30px; letter-spacing: 3px; font-size: 32px; text-shadow: 0 0 15px rgba(255, 49, 49, 0.5); }
 
         .setting-row {
-            background: #111; padding: 20px; border-radius: 8px; border: 1px solid #222;
+            background: #000; padding: 20px; border-radius: 10px; border: 1px solid #222;
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
         }
-
-        .setting-info { flex: 1; margin-right: 20px; }
+        .setting-info { text-align: left; }
         .setting-info h3 { margin: 0; color: #5dade2; font-size: 18px; }
-        .setting-info p { margin: 5px 0 0; color: #666; font-size: 14px; }
-
-        /* Schalter / Toggle */
-        .switch {
-            position: relative; display: inline-block; width: 60px; height: 34px;
+        
+        /* Dropdown Button Design */
+        .btn-link { 
+            width: 100%; padding: 15px; background: #333; color: #fff; border: 1px solid #444;
+            border-radius: 8px; cursor: pointer; font-family: 'Almendra'; font-size: 18px;
+            text-transform: uppercase; margin-bottom: 25px; transition: 0.3s; display: block; text-decoration: none;
         }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #333; transition: .4s; border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px;
-            background-color: white; transition: .4s; border-radius: 50%;
-        }
-        input:checked + .slider { background-color: #39d353; }
-        input:checked + .slider:before { transform: translateX(26px); }
-
-        textarea, input[type="text"] {
-            width: 100%; background: #000; border: 1px solid #444; color: #39d353; 
-            padding: 12px; font-family: 'Almendra'; font-size: 16px; border-radius: 5px; 
-            margin-top: 10px; box-sizing: border-box; outline: none;
-        }
+        .btn-link:hover { background: #ff3131; color: #fff; border-color: #fff; }
 
         .btn-save {
-            width: 100%; padding: 18px; background: #39d353; color: #000; border: none;
+            width: 100%; padding: 20px; background: #39d353; color: #000; border: none;
             border-radius: 8px; font-weight: bold; cursor: pointer; font-family: 'Almendra';
-            font-size: 20px; text-transform: uppercase; margin-top: 30px; transition: 0.3s;
+            font-size: 22px; text-transform: uppercase; margin-top: 10px;
         }
-        .btn-save:hover { background: #fff; transform: scale(1.02); }
+        /* Toggle Switch */
+        .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #222; transition: .4s; border-radius: 34px; border: 1px solid #444; }
+        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #ff3131; }
+        input:checked + .slider:before { transform: translateX(26px); }
 
-        .btn-back { display: block; text-align: center; margin-top: 25px; color: #666; text-decoration: none; text-transform: uppercase; }
-        .btn-back:hover { color: #fff; }
+        .btn-back { display: block; margin-top: 30px; color: #666; text-decoration: none; text-transform: uppercase; }
     </style>
 </head>
 <body>
-
 <div class="container">
-    <h1>ALLG. EINSTELLUNGEN</h1>
+    <h1>PANZER-STEUERUNG</h1>
+
+    <a href="Ad_VorVer.html" class="btn-link">⚙️ Dropdown-Listen bearbeiten</a>
 
     <div class="setting-row">
         <div class="setting-info">
-            <h3>Wartungsmodus</h3>
-            <p>Sperrt den Zugriff für normale Mitglieder.</p>
+            <h3>Wartungsmodus / Sperre</h3>
+            <p style="color: #888; font-size: 13px; margin: 5px 0 0;">Riegelt den gesamten Panzer ab.</p>
         </div>
         <label class="switch">
             <input type="checkbox" id="wartungToggle">
@@ -81,48 +66,28 @@
     </div>
 
     <div class="setting-row" style="flex-direction: column; align-items: flex-start;">
-        <div class="setting-info">
-            <h3>Globaler News-Banner</h3>
-            <p>Erscheint bei allen Usern auf dem Dashboard.</p>
-        </div>
-        <input type="text" id="newsBanner" placeholder="Z.B. Großer Angriff heute um 20:00 Uhr!">
+        <div class="setting-info"><h3>Sperr-Nachricht</h3></div>
+        <input type="text" id="lockMsg" style="width:100%; background:#000; border:1px solid #444; color:#39d353; padding:12px; font-family:'Almendra'; border-radius:5px; margin-top:10px;" placeholder="Z.B. Panzer wird gerade betankt. Ab 20 Uhr wieder einsatzbereit!">
     </div>
 
-    <div class="setting-row">
-        <div class="setting-info">
-            <h3>Panzer Version</h3>
-            <p>Aktuelle Software-Revision</p>
-        </div>
-        <span style="color: #39d353; font-weight: bold;">v3.1-FLASH</span>
-    </div>
-
-    <button class="btn-save" onclick="saveSettings()">KONFIGURATION SPEICHERN</button>
-    
-    <a href="dashboard.html" class="btn-back">ZURÜCK ZUM HAUPTMENÜ</a>
+    <button class="btn-save" onclick="saveSettings()">SYSTEM AKTUALISIEREN</button>
+    <a href="dashboard.html" class="btn-back">ZURÜCK</a>
 </div>
 
 <script>
     const API = window.BULLS_CONFIG.SCRIPT_URL;
 
     async function saveSettings() {
-        const settings = {
+        const data = {
             action: "saveGlobalSettings",
             wartung: document.getElementById("wartungToggle").checked,
-            news: document.getElementById("newsBanner").value
+            msg: document.getElementById("lockMsg").value
         };
-
         try {
-            await fetch(API, { method: "POST", body: JSON.stringify(settings) });
-            alert("✓ SYSTEM-KONFIGURATION AKTUALISIERT!");
-        } catch(e) {
-            alert("❌ FEHLER BEIM SPEICHERN!");
-        }
+            await fetch(API, { method: "POST", body: JSON.stringify(data) });
+            alert("✓ SYSTEM-KONFIGURATION GESPEICHERT!");
+        } catch(e) { alert("❌ FUNKSTÖRUNG!"); }
     }
-
-    // Hier könnten wir beim Laden die aktuellen Werte aus dem Sheet holen
-    window.onload = async () => {
-        console.log("Lade aktuelle Konfiguration...");
-    };
 </script>
 </body>
 </html>
