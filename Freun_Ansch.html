@@ -1,1 +1,128 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>DARK BULLS - BLACKLIST ANSCHAUEN</title>
+    <script src="config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 950px; background-color: #0f0f0f; border: 1px solid #333; border-radius: 10px; padding: 30px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        
+        h1 { color: #ff3131; text-align: center; font-size: 42px; text-transform: uppercase; margin-bottom: 30px; letter-spacing: 2px; }
+        
+        /* --- DUNKLES DROPDOWN DESIGN --- */
+        .search-bar { display: flex; align-items: center; gap: 15px; background: #000; padding: 10px 20px; border-radius: 5px; margin-bottom: 30px; border: 1px solid #444; }
+        .search-bar label { font-size: 20px; white-space: nowrap; }
+        
+        #blDropdown { 
+            flex: 1; 
+            background-color: #000 !important; 
+            border: 1px solid #ff3131; 
+            color: #39d353 !important; 
+            font-family: 'Almendra'; 
+            font-size: 18px; 
+            outline: none; 
+            cursor: pointer; 
+            padding: 8px;
+        }
 
+        #blDropdown option { background-color: #0a0a0a; color: #ffffff; }
+
+        .btn-load { background: #39d353; color: #000; border: none; padding: 10px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 18px; }
+
+        .section-title { color: #5dade2; font-style: italic; border-bottom: 1px solid #5dade2; margin: 20px 0 15px 0; font-size: 22px; padding-bottom: 5px; }
+        
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .field { display: flex; flex-direction: column; }
+        .field label { font-weight: bold; font-size: 18px; margin-bottom: 2px; color: #888; }
+        .field span { color: #39d353; font-size: 20px; min-height: 24px; }
+
+        .desc-label { color: #f1c40f; font-weight: bold; font-size: 20px; margin-bottom: 10px; display: block; }
+        .desc-box { background: #000; border: 1px solid #333; padding: 20px; min-height: 100px; border-radius: 5px; color: #39d353; font-size: 19px; line-height: 1.4; margin-bottom: 25px; white-space: pre-wrap; }
+
+        .btn-back { display: block; width: 200px; margin: 30px auto 0; background: #444; color: #fff; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 18px; text-align: center; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>DARK BULLS BLACKLIST</h1>
+
+    <div class="search-bar">
+        <label>Gegner suchen:</label>
+        <select id="blDropdown">
+            <option value="">Lade Blacklist...</option>
+        </select>
+        <button class="btn-load" onclick="loadEntry()">Anzeigen</button>
+    </div>
+
+    <div class="section-title">Spielerdaten</div>
+    <div class="info-grid">
+        <div class="field"><label>ID</label><span id="outID"></span></div>
+        <div class="field"><label>Name</label><span id="outName"></span></div>
+        <div class="field"><label>Allianz</label><span id="outAlli"></span></div>
+        
+        <div class="field"><label>Punkte</label><span id="outPunkte"></span></div>
+        <div class="field"><label>Map</label><span id="outMap"></span></div>
+        <div class="field"><label>Beweise?</label><span id="outBeweise"></span></div>
+        
+        <div class="field"><label>Verstoß</label><span id="outVerstoss" style="color: #ff3131;"></span></div>
+        <div class="field"><label>Fallnummer</label><span id="outFallNr"></span></div>
+        <div class="field"><label>Gemeldet am</label><span id="outDatum"></span></div>
+    </div>
+
+    <label class="desc-label">Beschreibung:</label>
+    <div class="desc-box" id="outDesc"></div>
+
+    <a href="dashboard.html" class="btn-back">ZURÜCK</a>
+</div>
+
+<script>
+    const API = window.BULLS_CONFIG.SCRIPT_URL;
+    let blacklistData = [];
+
+    async function init() {
+        try {
+            const res = await fetch(API + "?action=getBlacklistData");
+            blacklistData = await res.json();
+            const drop = document.getElementById("blDropdown");
+            
+            drop.innerHTML = '<option value="">-- Spieler wählen (Name | ID) --</option>';
+
+            blacklistData.forEach((item, i) => {
+                const opt = document.createElement("option");
+                opt.value = i;
+                // Zeigt im Dropdown: "Name | ID"
+                opt.innerText = item.target; 
+                drop.appendChild(opt);
+            });
+        } catch(e) { console.error("Ladefehler:", e); }
+    }
+
+    function loadEntry() {
+        const idx = document.getElementById("blDropdown").value;
+        if(idx === "") return;
+        
+        const d = blacklistData[idx];
+        
+        // Zuweisung der Felder aus dem getBlacklistData_() Objekt im Script
+        document.getElementById("outID").innerText = d.playerID || "";
+        document.getElementById("outName").innerText = d.playerName || "";
+        document.getElementById("outAlli").innerText = d.alli || "Unbekannt";
+        document.getElementById("outPunkte").innerText = d.punkte || "0";
+        document.getElementById("outMap").innerText = d.map || "Unbekannt";
+        document.getElementById("outVerstoss").innerText = d.verstoss;
+        document.getElementById("outBeweise").innerText = d.beweise || "Nein";
+        document.getElementById("outFallNr").innerText = d.fallNr;
+        
+        if(d.datum) {
+            document.getElementById("outDatum").innerText = new Date(d.datum).toLocaleDateString('de-DE');
+        }
+        document.getElementById("outDesc").innerText = d.beschreibung || "";
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
