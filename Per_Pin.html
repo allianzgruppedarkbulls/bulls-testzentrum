@@ -10,9 +10,11 @@
         .container { width: 400px; background-color: #0f0f0f; border: 2px solid #333; border-radius: 12px; padding: 30px; box-shadow: 0 0 30px rgba(255, 49, 49, 0.2); text-align: center; }
         h1 { color: #ff3131; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 2px; }
         p { color: #39d353; font-size: 18px; margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 18px; text-align: center; border-radius: 5px; box-sizing: border-box; }
-        .btn-save { width: 100%; padding: 15px; background: #39d353; color: #000; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 18px; text-transform: uppercase; }
-        .btn-back { display: block; margin-top: 20px; color: #888; text-decoration: none; font-size: 16px; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 18px; text-align: center; border-radius: 5px; box-sizing: border-box; outline: none; }
+        input:focus { border-color: #ff3131; }
+        .btn-save { width: 100%; padding: 15px; background: #39d353; color: #000; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 18px; text-transform: uppercase; transition: 0.3s; }
+        .btn-save:hover { background: #fff; }
+        .btn-back { display: block; margin-top: 25px; color: #888; text-decoration: none; font-size: 16px; }
         .btn-back:hover { color: #fff; }
     </style>
 </head>
@@ -23,14 +25,15 @@
     <p>Benutzer: <span id="displayUser" style="color:#fff;">...</span></p>
     
     <div id="inputArea">
-        <input type="password" id="oldPin" placeholder="Alte PIN eingeben">
+        <input type="password" id="oldPin" placeholder="Alte PIN">
         <hr style="border: 0; border-top: 1px solid #333; margin-bottom: 15px;">
         <input type="password" id="newPin1" placeholder="Neue PIN">
         <input type="password" id="newPin2" placeholder="PIN wiederholen">
-        <button class="btn-save" onclick="changePin()">SPEICHERN</button>
+        
+        <button class="btn-save" id="saveBtn" onclick="changePin()">SPEICHERN</button>
     </div>
 
-    <a href="dashboard.html" class="btn-back">Zurück zum Hauptmenü</a>
+    <a href="dashboard.html" class="btn-back">ZURÜCK ZUM HAUPTMENÜ</a>
 </div>
 
 <script>
@@ -45,9 +48,10 @@
         const oldP = document.getElementById('oldPin').value;
         const n1 = document.getElementById('newPin1').value;
         const n2 = document.getElementById('newPin2').value;
+        const btn = document.getElementById('saveBtn');
 
         if (!oldP || !n1 || n1.length < 4) { 
-            alert("Bitte alle Felder ausfüllen (Mindestens 4 Zeichen)!"); 
+            alert("Bitte alle Felder ausfüllen (PIN min. 4 Zeichen)!"); 
             return; 
         }
         if (n1 !== n2) { 
@@ -55,7 +59,6 @@
             return; 
         }
 
-        const btn = document.querySelector('.btn-save');
         btn.innerText = "VERARBEITE...";
         btn.disabled = true;
 
@@ -80,7 +83,7 @@
                 btn.disabled = false;
             }
         } catch (e) { 
-            alert("❌ Verbindungsfehler zum Server!"); 
+            alert("❌ Funkstörung zum Server!"); 
             btn.innerText = "SPEICHERN";
             btn.disabled = false;
         }
