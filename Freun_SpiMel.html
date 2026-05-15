@@ -1,1 +1,139 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>DARK BULLS - SPIELER MELDEN</title>
+    <script src="config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 800px; background-color: #0f0f0f; border: 2px solid #333; border-radius: 10px; padding: 30px; box-shadow: 0 0 20px rgba(255, 49, 49, 0.3); }
+        
+        h1 { color: #ff3131; text-align: center; text-transform: uppercase; margin-bottom: 30px; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .field { display: flex; flex-direction: column; margin-bottom: 15px; }
+        .field label { color: #5dade2; margin-bottom: 5px; font-size: 18px; }
+        
+        input, select, textarea { 
+            background: #000; border: 1px solid #444; color: #39d353; padding: 10px; 
+            font-family: 'Almendra'; font-size: 18px; border-radius: 5px; outline: none;
+        }
+        input:focus, select:focus { border-color: #ff3131; }
+        
+        .full-width { grid-column: span 2; }
+        
+        .btn-submit { 
+            width: 100%; padding: 15px; background: #ff3131; color: #fff; border: none; 
+            border-radius: 5px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; 
+            font-size: 22px; text-transform: uppercase; margin-top: 20px;
+        }
+        .btn-submit:hover { background: #d50000; }
+        
+        .btn-back { display: block; text-align: center; margin-top: 20px; color: #888; text-decoration: none; }
+    </style>
+</head>
+<body>
 
+<div class="container">
+    <h1>Gegner Melden</h1>
+    
+    <div class="form-grid">
+        <div class="field">
+            <label>Gegner (ID | Name)</label>
+            <input type="text" id="target" placeholder="z.B. 12345 | Schattenkrieger">
+        </div>
+        <div class="field">
+            <label>Gegner Allianz</label>
+            <select id="alliList">
+                <option value="">-- Allianz wählen --</option>
+            </select>
+        </div>
+        <div class="field">
+            <label>Verstoß</label>
+            <select id="verstossList">
+                <option value="">-- Grund wählen --</option>
+            </select>
+        </div>
+        <div class="field">
+            <label>Map</label>
+            <select id="mapList">
+                <option value="">-- Map wählen --</option>
+            </select>
+        </div>
+        <div class="field">
+            <label>Punktestand</label>
+            <input type="number" id="punkte" placeholder="Aktuelle Punkte">
+        </div>
+        <div class="field">
+            <label>Zeugen (Namen mit Komma)</label>
+            <input type="text" id="zeugen" placeholder="Zeuge1, Zeuge2">
+        </div>
+        <div class="field full-width">
+            <label>Beschreibung / Was ist passiert?</label>
+            <textarea id="beschreibung" rows="4"></textarea>
+        </div>
+    </div>
+
+    <button class="btn-submit" onclick="sendMeldung()">Meldung an Buchhaltung senden</button>
+    
+    <a href="dashboard.html" class="btn-back">Abbruch & Zurück</a>
+</div>
+
+<script>
+    const API = window.BULLS_CONFIG.SCRIPT_URL;
+    const myName = localStorage.getItem('bulls_user');
+
+    if(!myName) window.location.href = 'index.html';
+
+    // Dropdowns beim Start laden
+    async function setupForm() {
+        try {
+            const res = await fetch(API + "?action=getDropdownData");
+            const data = await res.json();
+            
+            const fill = (id, list) => {
+                const el = document.getElementById(id);
+                list.forEach(item => {
+                    let opt = document.createElement("option");
+                    opt.value = item;
+                    opt.innerText = item;
+                    el.appendChild(opt);
+                });
+            };
+
+            fill("alliList", data.allianzen);
+            fill("verstossList", data.vorwuerfe);
+            fill("mapList", data.maps);
+        } catch(e) { console.error("Dropdown Fehler"); }
+    }
+
+    async function sendMeldung() {
+        const data = {
+            action: "addMeldung",
+            target: document.getElementById("target").value,
+            alli: document.getElementById("alliList").value,
+            verstoss: document.getElementById("verstossList").value,
+            map: document.getElementById("mapList").value,
+            punkte: document.getElementById("punkte").value,
+            zeugen: document.getElementById("zeugen").value,
+            beschreibung: document.getElementById("beschreibung").value,
+            melder: myName
+        };
+
+        if(!data.target || !data.verstoss) {
+            alert("Name und Verstoß müssen ausgefüllt sein!");
+            return;
+        }
+
+        try {
+            await fetch(API, { method: "POST", body: JSON.stringify(data) });
+            alert("Meldung wurde im Vorspeicher abgelegt!");
+            window.location.href = 'dashboard.html';
+        } catch(e) { alert("Fehler beim Senden"); }
+    }
+
+    window.onload = setupForm;
+</script>
+</body>
+</html>
