@@ -2,79 +2,103 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>DARK BULLS - LISTEN PFLEGE</title>
+    <title>DARK BULLS - DROPDOWN PFLEGE</title>
     <script src="config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { width: 600px; background-color: #0f0f0f; border: 1px solid #333; border-radius: 15px; padding: 40px; box-shadow: 0 0 50px rgba(57, 211, 83, 0.15); text-align: center; }
-        h1 { color: #39d353; text-transform: uppercase; margin-bottom: 30px; letter-spacing: 2px; }
+        .container { width: 650px; background-color: #0f0f0f; border: 1px solid #333; border-radius: 15px; padding: 40px; box-shadow: 0 0 60px 15px rgba(255, 49, 49, 0.2); text-align: center; }
+        h1 { color: #ff3131; text-transform: uppercase; margin-bottom: 30px; letter-spacing: 3px; font-size: 32px; text-shadow: 0 0 15px rgba(255, 49, 49, 0.5); }
         
+        label { color: #5dade2; display: block; margin-bottom: 10px; font-style: italic; font-size: 18px; }
         select, input { width: 100%; padding: 12px; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 18px; border-radius: 5px; margin-bottom: 20px; box-sizing: border-box; outline: none; }
+        select:focus, input:focus { border-color: #ff3131; }
+
+        .list-box { background: #000; border: 1px solid #222; height: 300px; overflow-y: auto; text-align: left; padding: 10px; margin-bottom: 20px; border-radius: 5px; border-top: 2px solid #ff3131; }
+        .list-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #111; align-items: center; transition: 0.2s; }
+        .list-item:hover { background: #111; }
+        .list-item span { font-size: 18px; }
         
-        .list-box { background: #000; border: 1px solid #222; height: 250px; overflow-y: auto; text-align: left; padding: 10px; margin-bottom: 20px; border-radius: 5px; }
-        .list-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #111; align-items: center; }
-        .list-item:hover { background: #0a0a0a; }
+        .btn-del { background: #ff3131; color: #fff; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-family: 'Almendra'; text-transform: uppercase; font-size: 12px; }
+        .btn-add { width: 100%; padding: 18px; background: #ff3131; color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 20px; text-transform: uppercase; box-shadow: 0 4px 15px rgba(255, 49, 49, 0.3); }
+        .btn-add:hover { background: #fff; transform: scale(1.02); }
         
-        .btn-del { background: #ff3131; color: #fff; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; font-family: 'Almendra'; }
-        .btn-add { width: 100%; padding: 15px; background: #39d353; color: #000; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 18px; text-transform: uppercase; }
-        
-        .btn-back { display: block; margin-top: 25px; color: #666; text-decoration: none; }
+        .btn-back { display: block; margin-top: 25px; color: #666; text-decoration: none; text-transform: uppercase; font-size: 14px; }
+        .btn-back:hover { color: #fff; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Listen-Verwaltung</h1>
+    <h1>Dropdown Pflege</h1>
     
-    <label style="color: #888; display: block; margin-bottom: 10px;">Welche Liste bearbeiten?</label>
+    <label>Welche Liste bearbeiten?</label>
     <select id="listType" onchange="loadCurrentList()">
-        <option value="Allianzen">Allianzen</option>
-        <option value="Vorwürfe">Verstöße / Vorwürfe</option>
-        <option value="Maps">Karten / Maps</option>
+        <option value="Anschuldigung">Anschuldigungen (B)</option>
+        <option value="Spieler master">Spieler master (C)</option>
+        <option value="Daten vorhanden">Daten vorhanden (F)</option>
+        <option value="intervall">Intervall (J)</option>
+        <option value="aktiv?">Aktiv-Status (L)</option>
+        <option value="aktivität">Aktivität (M)</option>
+        <option value="Maps">Maps (R)</option>
+        <option value="Allianz Rang">Allianz Rang (V)</option>
+        <option value="Allianzname">Allianzname (Tabelle 2)</option>
     </select>
 
     <div class="list-box" id="itemContainer">
-        <p style="text-align:center; color:#444;">Wähle eine Liste aus...</p>
+        <p style="text-align:center; color:#444; margin-top:130px;">Lade Daten aus der Datenbank...</p>
     </div>
 
-    <hr style="border:0; border-top: 1px solid #222; margin-bottom: 20px;">
-    
-    <input type="text" id="newValue" placeholder="Neuen Eintrag tippen...">
+    <input type="text" id="newValue" placeholder="Neuen Eintrag für die Liste tippen...">
     <button class="btn-add" onclick="addItem()">Eintrag hinzufügen</button>
 
-    <a href="dashboard.html" class="btn-back">ZURÜCK ZUM HAUPTMENÜ</a>
+    <a href="Ad_AllEinst.html" class="btn-back">Zurück zur Zentrale</a>
 </div>
 
 <script>
     const API = window.BULLS_CONFIG.SCRIPT_URL;
-    let currentData = {};
+    let allData = {};
 
     async function loadCurrentList() {
-        const type = document.getElementById("listType").value;
         const container = document.getElementById("itemContainer");
-        container.innerHTML = "<p style='text-align:center;'>Lade Daten...</p>";
-
+        container.innerHTML = "<p style='text-align:center; margin-top:130px;'>Synchronisiere...</p>";
+        
         try {
             const res = await fetch(API + "?action=getDropdownData");
-            currentData = await res.json();
-            renderItems(type);
-        } catch(e) { container.innerHTML = "Fehler beim Laden."; }
+            allData = await res.json();
+            renderItems();
+        } catch(e) { container.innerHTML = "Fehler bei der Funkverbindung!"; }
     }
 
-    function renderItems(type) {
+    function renderItems() {
+        const type = document.getElementById("listType").value;
         const container = document.getElementById("itemContainer");
         container.innerHTML = "";
         
-        let list = [];
-        if(type === "Allianzen") list = currentData.allianzen;
-        else if(type === "Vorwürfe") list = currentData.vorwuerfe;
-        else if(type === "Maps") list = currentData.maps;
+        // Mapping der Keys aus dem Google Script
+        const keyMap = {
+            "Anschuldigung": "vorwuerfe",
+            "Spieler master": "spielerMaster",
+            "Daten vorhanden": "datenVorhanden",
+            "intervall": "intervall",
+            "aktiv?": "aktivStatus",
+            "aktivität": "aktivitaet",
+            "Maps": "maps",
+            "Allianz Rang": "allianzRang",
+            "Allianzname": "allianzen"
+        };
+
+        const list = allData[keyMap[type]] || [];
+
+        if(list.length === 0) {
+            container.innerHTML = "<p style='text-align:center; color:#444; margin-top:130px;'>Liste ist leer.</p>";
+            return;
+        }
 
         list.forEach(item => {
             const div = document.createElement("div");
             div.className = "list-item";
-            div.innerHTML = `<span>${item}</span><button class="btn-del" onclick="deleteItem('${item}')">LÖSCHEN</button>`;
+            div.innerHTML = `<span>${item}</span><button class="btn-del" onclick="deleteItem('${item}')">Löschen</button>`;
             container.appendChild(div);
         });
     }
@@ -90,7 +114,7 @@
     }
 
     async function deleteItem(val) {
-        if(!confirm("Eintrag '" + val + "' wirklich entfernen?")) return;
+        if(!confirm("Eintrag '" + val + "' wirklich aus der Datenbank löschen?")) return;
         const type = document.getElementById("listType").value;
         await sendUpdate(type, "delete", val);
         loadCurrentList();
