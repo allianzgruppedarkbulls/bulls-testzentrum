@@ -1,1 +1,118 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>DARK BULLS - USER VERWALTUNG</title>
+    <script src="config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 950px; background-color: #0f0f0f; border: 2px solid #39d353; border-radius: 10px; padding: 30px; box-shadow: 0 0 20px rgba(57, 211, 83, 0.2); }
+        
+        h1 { color: #39d353; text-align: center; text-transform: uppercase; margin-bottom: 30px; letter-spacing: 2px; }
+        
+        /* Toolbar */
+        .admin-tools { display: flex; justify-content: space-between; align-items: center; background: #1a1a1a; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; }
+        .search-box { background: #000; border: 1px solid #444; color: #39d353; padding: 10px; font-family: 'Almendra'; font-size: 16px; width: 300px; }
 
+        /* Mitglieder Tabelle */
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #222; color: #39d353; padding: 12px; text-align: left; border-bottom: 2px solid #39d353; }
+        td { padding: 12px; border-bottom: 1px solid #222; font-size: 16px; }
+        tr:hover { background: rgba(57, 211, 83, 0.05); }
+
+        /* Rollen Badges */
+        .badge { padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 14px; color: #000; text-transform: uppercase; }
+        .bg-admin { background: #ff3131; }
+        .bg-support { background: #5dade2; }
+        .bg-member { background: #39d353; }
+        .bg-gast { background: #888; }
+
+        .btn-edit { background: #444; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-family: 'Almendra'; }
+        .btn-edit:hover { background: #39d353; color: #000; }
+
+        .btn-back { display: inline-block; background: #444; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="dashboard.html" class="btn-back">← Zurück</a>
+    <h1>Bulls - Mitglieder Verwaltung</h1>
+    
+    <div class="admin-tools">
+        <input type="text" id="userSearch" class="search-box" placeholder="Mitglied suchen..." onkeyup="filterUsers()">
+        <div style="color: #888;">Gesamt: <span id="userCount" style="color:#39d353;">0</span> Bullen</div>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Allianz</th>
+                    <th>Rolle</th>
+                    <th>Letzte Aktivität</th>
+                    <th>Aktion</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                <tr><td colspan="5" style="text-align:center; padding: 30px;">Lade Mitgliederliste...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const API = window.BULLS_CONFIG.SCRIPT_URL;
+    let allUsers = [];
+
+    async function loadUsers() {
+        try {
+            const res = await fetch(API + "?action=getUsers");
+            allUsers = await res.json();
+            renderUsers(allUsers);
+        } catch(e) { 
+            console.error("Ladefehler");
+            document.getElementById("userTableBody").innerHTML = '<tr><td colspan="5" style="color:red; text-align:center;">Fehler beim Laden der Mitglieder.</td></tr>';
+        }
+    }
+
+    function renderUsers(data) {
+        const body = document.getElementById("userTableBody");
+        body.innerHTML = "";
+        document.getElementById("userCount").innerText = data.length;
+
+        data.forEach(u => {
+            const roleClass = u.role === "Admin" ? "bg-admin" : (u.role === "Support" ? "bg-support" : (u.role === "Gast" ? "bg-gast" : "role-member bg-member"));
+            
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td style="font-weight:bold;">${u.name}</td>
+                <td>${u.allianz || '-'}</td>
+                <td><span class="badge ${roleClass}">${u.role}</span></td>
+                <td style="color:#888; font-size:14px;">${u.extra || 'Keine Info'}</td>
+                <td>
+                    <button class="btn-edit" onclick="editUser('${u.name}')">Bearbeiten</button>
+                </td>
+            `;
+            body.appendChild(row);
+        });
+    }
+
+    function filterUsers() {
+        const val = document.getElementById("userSearch").value.toLowerCase();
+        const filtered = allUsers.filter(u => u.name.toLowerCase().includes(val) || (u.allianz || "").toLowerCase().includes(val));
+        renderUsers(filtered);
+    }
+
+    function editUser(name) {
+        // Hier können wir später das "Ampel-System" und die "Erstaufnahme" verknüpfen
+        alert("User-Management für " + name + " öffnet sich bald.");
+    }
+
+    window.onload = loadUsers;
+</script>
+</body>
+</html>
