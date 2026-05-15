@@ -2,38 +2,86 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>DARK BULLS - PIN ÄNDERN</title>
+    <title>DARK BULLS - SICHERHEITSKOPF</title>
     <script src="config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { width: 400px; background-color: #0f0f0f; border: 2px solid #333; border-radius: 12px; padding: 30px; box-shadow: 0 0 30px rgba(255, 49, 49, 0.2); text-align: center; }
-        h1 { color: #ff3131; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 2px; }
-        p { color: #39d353; font-size: 18px; margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 18px; text-align: center; border-radius: 5px; box-sizing: border-box; outline: none; }
-        input:focus { border-color: #ff3131; }
-        .btn-save { width: 100%; padding: 15px; background: #39d353; color: #000; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 18px; text-transform: uppercase; transition: 0.3s; }
-        .btn-save:hover { background: #fff; }
-        .btn-back { display: block; margin-top: 25px; color: #888; text-decoration: none; font-size: 16px; }
-        .btn-back:hover { color: #fff; }
+        .container { width: 450px; background-color: #0f0f0f; border: 2px solid #333; border-radius: 15px; padding: 40px; box-shadow: 0 0 40px rgba(255, 49, 49, 0.15); text-align: center; position: relative; }
+        
+        h1 { color: #ff3131; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 3px; font-size: 28px; }
+        .user-tag { color: #5dade2; font-size: 20px; margin-bottom: 30px; border-bottom: 1px solid #222; padding-bottom: 10px; }
+        
+        .input-group { margin-bottom: 25px; text-align: left; }
+        .input-group label { display: block; color: #888; margin-bottom: 8px; font-size: 14px; margin-left: 5px; }
+        
+        input { 
+            width: 100%; padding: 14px; background: #000; color: #39d353; 
+            border: 1px solid #444; font-family: 'Almendra'; font-size: 18px; 
+            text-align: center; border-radius: 8px; box-sizing: border-box; outline: none; transition: 0.3s;
+        }
+        input:focus { border-color: #ff3131; box-shadow: 0 0 10px rgba(255, 49, 49, 0.3); }
+
+        .btn-save { 
+            width: 100%; padding: 18px; background: #ff3131; color: #fff; border: none; 
+            border-radius: 8px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; 
+            font-size: 20px; text-transform: uppercase; letter-spacing: 1px; transition: 0.4s;
+        }
+        .btn-save:hover { background: #fff; color: #000; transform: translateY(-2px); }
+        .btn-save:disabled { background: #444; cursor: not-allowed; }
+
+        /* Erfolgsmeldung Overlay */
+        #successBox { 
+            display: none; background: #0f0f0f; position: absolute; top: 0; left: 0; 
+            width: 100%; height: 100%; border-radius: 15px; flex-direction: column; 
+            justify-content: center; align-items: center; padding: 30px; box-sizing: border-box; z-index: 10;
+        }
+        .success-icon { font-size: 60px; color: #39d353; margin-bottom: 20px; }
+        .success-text { color: #39d353; font-size: 22px; margin-bottom: 15px; font-weight: bold; }
+        .success-info { color: #ccc; font-size: 16px; line-height: 1.5; margin-bottom: 25px; font-style: italic; }
+        
+        .btn-back { display: block; margin-top: 30px; color: #666; text-decoration: none; font-size: 16px; transition: 0.3s; }
+        .btn-back:hover { color: #ff3131; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>PIN ÄNDERN</h1>
-    <p>Benutzer: <span id="displayUser" style="color:#fff;">...</span></p>
-    
-    <div id="inputArea">
-        <input type="password" id="oldPin" placeholder="Alte PIN">
-        <hr style="border: 0; border-top: 1px solid #333; margin-bottom: 15px;">
-        <input type="password" id="newPin1" placeholder="Neue PIN">
-        <input type="password" id="newPin2" placeholder="PIN wiederholen">
+    <div id="formContent">
+        <h1>PIN-ZENTRALE</h1>
+        <div class="user-tag">Bulle: <span id="displayUser">...</span></div>
         
-        <button class="btn-save" id="saveBtn" onclick="changePin()">SPEICHERN</button>
+        <div class="input-group">
+            <label>Aktuelle Verifizierung</label>
+            <input type="password" id="oldPin" placeholder="ALTE PIN">
+        </div>
+
+        <div style="height: 1px; background: #333; margin: 30px 0;"></div>
+
+        <div class="input-group">
+            <label>Neue Identifikations-Nummer</label>
+            <input type="password" id="newPin1" placeholder="NEUE PIN">
+        </div>
+
+        <div class="input-group">
+            <label>Bestätigung der neuen PIN</label>
+            <input type="password" id="newPin2" placeholder="PIN WIEDERHOLEN">
+        </div>
+        
+        <button class="btn-save" id="saveBtn" onclick="changePin()">DATEN AKTUALISIEREN</button>
+        <a href="dashboard.html" class="btn-back">ZURÜCK ZUM HAUPTMENÜ</a>
     </div>
 
-    <a href="dashboard.html" class="btn-back">ZURÜCK ZUM HAUPTMENÜ</a>
+    <div id="successBox">
+        <div class="success-icon">✓</div>
+        <div class="success-text">SYSTEM AKTUALISIERT</div>
+        <div class="success-info">
+            Hallo <span id="finalUser" style="color:#fff;"></span>, deine neue PIN wurde sicher im Panzer-System verschlüsselt. <br><br>
+            Gehe sorgfältig mit deinen Zugangsdaten um und gib sie niemals an Dritte weiter – auch nicht an andere Bullen. 
+            Sicherheit ist unser höchstes Gebot!
+        </div>
+        <button class="btn-save" style="background:#39d353; color:#000;" onclick="window.location.href='dashboard.html'">VERSTANDEN</button>
+    </div>
 </div>
 
 <script>
@@ -42,6 +90,7 @@
         window.location.href = 'index.html'; 
     } else { 
         document.getElementById('displayUser').innerText = myName; 
+        document.getElementById('finalUser').innerText = myName;
     }
 
     async function changePin() {
@@ -51,15 +100,15 @@
         const btn = document.getElementById('saveBtn');
 
         if (!oldP || !n1 || n1.length < 4) { 
-            alert("Bitte alle Felder ausfüllen (PIN min. 4 Zeichen)!"); 
+            alert("Fehler: Alle Sicherheitsfelder müssen ausgefüllt sein (min. 4 Zeichen)!"); 
             return; 
         }
         if (n1 !== n2) { 
-            alert("Die neuen PINs stimmen nicht überein!"); 
+            alert("Fehler: Die neuen PIN-Eingaben stimmen nicht überein!"); 
             return; 
         }
 
-        btn.innerText = "VERARBEITE...";
+        btn.innerText = "SYNCHRONISIERE...";
         btn.disabled = true;
 
         try {
@@ -75,16 +124,19 @@
             const result = await response.json();
             
             if (result.ok) {
-                alert("✓ PIN erfolgreich geändert!");
-                window.location.href = 'dashboard.html';
+                document.getElementById('formContent').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('formContent').style.display = 'none';
+                    document.getElementById('successBox').style.display = 'flex';
+                }, 300);
             } else {
-                alert("❌ Fehler: " + result.error);
-                btn.innerText = "SPEICHERN";
+                alert("SYSTEM-ABBRUCH: " + result.error);
+                btn.innerText = "DATEN AKTUALISIEREN";
                 btn.disabled = false;
             }
         } catch (e) { 
-            alert("❌ Funkstörung zum Server!"); 
-            btn.innerText = "SPEICHERN";
+            alert("VERBINDUNGSFEHLER: Funkmast außer Reichweite!"); 
+            btn.innerText = "DATEN AKTUALISIEREN";
             btn.disabled = false;
         }
     }
