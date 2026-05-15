@@ -1,1 +1,100 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>DARK BULLS - SUPPORT CHAT</title>
+    <script src="config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 600px; height: 90vh; background-color: #0f0f0f; border: 2px solid #444; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 30px rgba(91, 155, 213, 0.2); }
+        
+        .chat-header { background: #1a1a1a; padding: 20px; text-align: center; border-bottom: 2px solid #333; }
+        .chat-header h1 { color: #5dade2; margin: 0; font-size: 24px; text-transform: uppercase; }
+        
+        .chat-history { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #000; }
+        
+        .msg { padding: 10px 15px; border-radius: 8px; max-width: 80%; font-size: 18px; line-height: 1.4; }
+        .msg-own { align-self: flex-end; background: #1b4d1b; border-right: 4px solid #39d353; color: #fff; }
+        .msg-support { align-self: flex-start; background: #222; border-left: 4px solid #5dade2; color: #fff; }
+        .msg-meta { font-size: 12px; color: #888; margin-bottom: 4px; display: block; }
 
+        .chat-input-area { padding: 20px; background: #1a1a1a; display: flex; gap: 10px; border-top: 2px solid #333; }
+        input { flex: 1; background: #000; border: 1px solid #444; color: #39d353; padding: 12px; font-family: 'Almendra'; font-size: 18px; border-radius: 5px; outline: none; }
+        input:focus { border-color: #5dade2; }
+        
+        .btn-send { background: #5dade2; color: #000; border: none; padding: 0 20px; border-radius: 5px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 18px; }
+        
+        .btn-back { position: absolute; top: 20px; left: 20px; color: #888; text-decoration: none; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+<a href="dashboard.html" class="btn-back">← Zurück</a>
+
+<div class="container">
+    <div class="chat-header">
+        <h1>🛡️ Buchhaltungs Support</h1>
+    </div>
+    
+    <div class="chat-history" id="chatBox">
+        <div class="msg msg-support"><small class="msg-meta">System</small>Verbindung zum Support wird hergestellt...</div>
+    </div>
+    
+    <div class="chat-input-area">
+        <input type="text" id="chatInput" placeholder="Deine Nachricht an den Support..." onkeypress="if(event.key==='Enter') sendSupportMsg()">
+        <button class="btn-send" onclick="sendSupportMsg()">Senden</button>
+    </div>
+</div>
+
+<script>
+    const API = window.BULLS_CONFIG.SCRIPT_URL;
+    const myName = localStorage.getItem('bulls_user');
+    const kanalID = "SUPPORT-" + myName;
+
+    if (!myName) window.location.href = 'index.html';
+
+    async function loadChat() {
+        try {
+            const res = await fetch(API + "?action=getMessages&kanal=" + kanalID);
+            const messages = await res.json();
+            const chatBox = document.getElementById("chatBox");
+            chatBox.innerHTML = "";
+
+            messages.forEach(m => {
+                const isOwn = m.absender === myName;
+                const div = document.createElement("div");
+                div.className = `msg ${isOwn ? 'msg-own' : 'msg-support'}`;
+                div.innerHTML = `<small class="msg-meta">${m.absender}</small>${m.nachricht}`;
+                chatBox.appendChild(div);
+            });
+            chatBox.scrollTop = chatBox.scrollHeight;
+        } catch (e) { console.log("Fehler beim Laden"); }
+    }
+
+    async function sendSupportMsg() {
+        const input = document.getElementById("chatInput");
+        const msg = input.value.trim();
+        if (!msg) return;
+
+        input.value = "";
+        try {
+            await fetch(API, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "sendChat",
+                    absender: myName,
+                    kanal: kanalID,
+                    nachricht: msg
+                })
+            });
+            loadChat();
+        } catch (e) { alert("Senden fehlgeschlagen"); }
+    }
+
+    // Automatisch alle 5 Sekunden aktualisieren
+    setInterval(loadChat, 5000);
+    window.onload = loadChat;
+</script>
+</body>
+</html>
