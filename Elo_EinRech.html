@@ -1,1 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>DARK BULLS - EINHEITEN RECHNER</title>
+    <script src="config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 700px; background-color: #0f0f0f; border: 2px solid #f1c40f; border-radius: 10px; padding: 30px; box-shadow: 0 0 20px rgba(241, 196, 15, 0.2); }
+        
+        h1 { color: #f1c40f; text-align: center; text-transform: uppercase; margin-bottom: 30px; letter-spacing: 2px; }
+        
+        .unit-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 15px; margin-bottom: 10px; align-items: center; border-bottom: 1px solid #222; padding-bottom: 10px; }
+        .unit-name { color: #5dade2; font-size: 18px; font-weight: bold; }
+        
+        label { color: #888; font-size: 12px; display: block; margin-bottom: 3px; }
+        input { background: #000; border: 1px solid #333; color: #39d353; padding: 8px; font-family: 'Almendra'; font-size: 18px; border-radius: 5px; width: 100%; box-sizing: border-box; text-align: center; }
+        input:focus { border-color: #f1c40f; outline: none; }
 
+        .summary-box { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
+        .stat-card { background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #444; text-align: center; }
+        .stat-card h3 { margin: 0; color: #f1c40f; text-transform: uppercase; font-size: 16px; }
+        .stat-val { font-size: 28px; color: #39d353; font-weight: bold; margin-top: 5px; }
+
+        .btn-reset { width: 100%; padding: 12px; background: #444; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-family: 'Almendra'; font-size: 16px; margin-top: 20px; }
+        .btn-back { display: block; text-align: center; margin-top: 25px; color: #888; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Einheiten Rechner</h1>
+    
+    <div id="unitList">
+        <div class="unit-row">
+            <div class="unit-name">Infanterie</div>
+            <div><label>Anzahl</label><input type="number" class="u-count" data-off="10" data-def="15" value="0" oninput="calcUnits()"></div>
+            <div><label>Stärke</label><div class="u-res" style="color:#888;">0</div></div>
+        </div>
+        <div class="unit-row">
+            <div class="unit-name">Kavallerie</div>
+            <div><label>Anzahl</label><input type="number" class="u-count" data-off="25" data-def="10" value="0" oninput="calcUnits()"></div>
+            <div><label>Stärke</label><div class="u-res" style="color:#888;">0</div></div>
+        </div>
+        <div class="unit-row">
+            <div class="unit-name">Artillerie</div>
+            <div><label>Anzahl</label><input type="number" class="u-count" data-off="50" data-def="5" value="0" oninput="calcUnits()"></div>
+            <div><label>Stärke</label><div class="u-res" style="color:#888;">0</div></div>
+        </div>
+        <div class="unit-row">
+            <div class="unit-name">Panzerabwer</div>
+            <div><label>Anzahl</label><input type="number" class="u-count" data-off="5" data-def="60" value="0" oninput="calcUnits()"></div>
+            <div><label>Stärke</label><div class="u-res" style="color:#888;">0</div></div>
+        </div>
+    </div>
+
+    <div class="summary-box">
+        <div class="stat-card">
+            <h3>Gesamt Angriff</h3>
+            <div id="totalOff" class="stat-val">0</div>
+        </div>
+        <div class="stat-card">
+            <h3>Gesamt Verteidigung</h3>
+            <div id="totalDef" class="stat-val">0</div>
+        </div>
+    </div>
+
+    <button class="btn-reset" onclick="resetAll()">Truppen entlassen (Reset)</button>
+    
+    <a href="dashboard.html" class="btn-back">Zurück zum Panzer</a>
+</div>
+
+<script>
+    function calcUnits() {
+        let totalOff = 0;
+        let totalDef = 0;
+        const rows = document.querySelectorAll('.unit-row');
+
+        rows.forEach(row => {
+            const input = row.querySelector('.u-count');
+            const resDiv = row.querySelector('.u-res');
+            const count = parseFloat(input.value) || 0;
+            const offPower = parseFloat(input.dataset.off);
+            const defPower = parseFloat(input.dataset.def);
+
+            const rowStrength = (count * offPower) + (count * defPower);
+            resDiv.innerText = rowStrength.toLocaleString('de-DE');
+
+            totalOff += (count * offPower);
+            totalDef += (count * defPower);
+        });
+
+        document.getElementById('totalOff').innerText = totalOff.toLocaleString('de-DE');
+        document.getElementById('totalDef').innerText = totalDef.toLocaleString('de-DE');
+    }
+
+    function resetAll() {
+        document.querySelectorAll('.u-count').forEach(i => i.value = 0);
+        calcUnits();
+    }
+</script>
+</body>
+</html>
