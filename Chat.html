@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>DARK BULLS - FUNKRAUM</title>
+    <script src="config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; margin: 0; padding: 10px; display: flex; justify-content: center; height: 95vh; }
+        .chat-container { width: 100%; max-width: 800px; background-color: #0f0f0f; border: 2px solid #39d353; border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 20px rgba(57, 211, 83, 0.2); }
+        
+        .chat-header { background: #1a1a1a; padding: 15px; text-align: center; border-bottom: 2px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .chat-header h1 { color: #39d353; margin: 0; font-size: 22px; text-transform: uppercase; letter-spacing: 2px; }
+        
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; background: #000; display: flex; flex-direction: column; gap: 10px; }
+        
+        .msg { padding: 10px 15px; border-radius: 8px; max-width: 85%; position: relative; font-size: 17px; border: 1px solid #333; }
+        .msg-own { align-self: flex-end; background: #1b4d1b; border-right: 4px solid #39d353; }
+        .msg-others { align-self: flex-start; background: #222; border-left: 4px solid #ff3131; }
+        
+        .msg-meta { font-size: 11px; color: #888; display: block; margin-bottom: 4px; }
+        .msg-sender { font-weight: bold; color: #5dade2; margin-right: 10px; }
+
+        .chat-input-area { padding: 15px; background: #1a1a1a; display: flex; gap: 10px; border-top: 2px solid #333; }
+        input { flex: 1; background: #000; border: 1px solid #444; color: #39d353; padding: 12px; font-family: 'Almendra'; font-size: 18px; border-radius: 5px; outline: none; }
+        input:focus { border-color: #39d353; }
+        
+        .btn-send { background: #39d353; color: #000; border: none; padding: 0 25px; border-radius: 5px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 18px; }
+        .btn-back { color: #888; text-decoration: none; font-size: 16px; transition: 0.3s; }
+        .btn-back:hover { color: #fff; }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="chat-header">
+        <a href="dashboard.html" class="btn-back">← ZURÜCK</a>
+        <h1>Allianz Funkraum</h1>
+        <div style="width: 60px;"></div> 
+    </div>
+    
+    <div class="chat-messages" id="chatBox">
+        <div style="text-align:center; color:#444; padding-top: 20px;">Verbindung zum Funkmast wird aufgebaut...</div>
+    </div>
+    
+    <div class="chat-input-area">
+        <input type="text" id="chatInput" placeholder="Nachricht in den Funkraum werfen..." maxlength="250" onkeypress="if(event.key==='Enter') sendMsg()">
+        <button class="btn-send" onclick="sendMsg()">SENDEN</button>
+    </div>
+</div>
+
+<script>
+    const API = window.BULLS_CONFIG.SCRIPT_URL;
+    const myName = localStorage.getItem('bulls_user');
+
+    if (!myName) window.location.href = 'index.html';
+
+    async function loadChat() {
+        try {
+            const res = await fetch(API + "?action=getMessages&kanal=Allianz");
+            const messages = await res.json();
+            const chatBox = document.getElementById("chatBox");
+            
+            const isAtBottom = chatBox.scrollHeight - chatBox.clientHeight <= chatBox.scrollTop + 50;
+
+            chatBox.innerHTML = "";
+            messages.forEach(m => {
+                const isOwn = m.absender === myName;
+                const div = document.createElement("div");
+                div.className = `msg ${isOwn ? 'msg-own' : 'msg-others'}`;
+                
+                const time = m.zeitstempel ? new Date(m.zeitstempel).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "";
+                
+                div.innerHTML = `
+                    <span class="msg-meta"><span class="msg-sender">${m.absender}</span> ${time}</span>
+                    ${m.nachricht}
+                `;
+                chatBox.appendChild(div);
+            });
+
+            if (isAtBottom) {
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        } catch (e) { console.error("Funkstörung beim Laden."); }
+    }
+
+    async function sendMsg() {
+        const input = document.getElementById("chatInput");
+        const msg = input.value.trim();
+        if (!msg) return;
+
+        input.value = "";
+        try {
+            await fetch(API, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "sendChat",
+                    absender: myName,
+                    kanal: "Allianz",
+                    nachricht: msg
+                })
+            });
+            loadChat();
+        } catch (e) { alert("Senden fehlgeschlagen. Funkmast down?"); }
+    }
+
+    setInterval(loadChat, 4000);
+    window.onload = loadChat;
+</script>
+</body>
+</html>
