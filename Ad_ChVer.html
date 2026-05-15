@@ -1,1 +1,108 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>DARK BULLS - CHAT VERWALTUNG</title>
+    <script src="config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 1000px; background-color: #0f0f0f; border: 2px solid #ff8c00; border-radius: 10px; padding: 30px; box-shadow: 0 0 20px rgba(255, 140, 0, 0.2); }
+        
+        h1 { color: #ff8c00; text-align: center; text-transform: uppercase; margin-bottom: 25px; }
+        
+        .chat-controls { display: flex; gap: 15px; margin-bottom: 20px; background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #333; }
+        select, input { background: #000; border: 1px solid #444; color: #39d353; padding: 10px; font-family: 'Almendra'; font-size: 16px; }
 
+        .log-container { height: 60vh; overflow-y: auto; background: #000; border: 1px solid #333; padding: 15px; border-radius: 5px; }
+        
+        .log-entry { border-bottom: 1px solid #222; padding: 8px 0; font-size: 14px; display: grid; grid-template-columns: 150px 120px 150px 1fr; gap: 10px; }
+        .log-header { font-weight: bold; color: #ff8c00; border-bottom: 2px solid #ff8c00; padding-bottom: 10px; margin-bottom: 10px; }
+        
+        .time { color: #888; }
+        .user { color: #39d353; font-weight: bold; }
+        .channel { color: #5dade2; }
+        .msg { color: #fff; word-break: break-all; }
+
+        .btn-refresh { background: #39d353; color: #000; border: none; padding: 10px 20px; cursor: pointer; font-family: 'Almendra'; font-weight: bold; border-radius: 4px; }
+        .btn-back { display: inline-block; background: #444; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="dashboard.html" class="btn-back">← Zurück</a>
+    <h1>Chat Protokolle & Verwaltung</h1>
+    
+    <div class="chat-controls">
+        <select id="channelFilter" onchange="loadLogs()">
+            <option value="ALL">Alle Kanäle</option>
+            <option value="Allianz">Allianz-Chat</option>
+            <option value="SUPPORT">Support-Kanäle</option>
+        </select>
+        <input type="text" id="userFilter" placeholder="Nach User filtern..." onkeyup="loadLogs()">
+        <button class="btn-refresh" onclick="loadLogs()">Aktualisieren</button>
+    </div>
+
+    <div class="log-container">
+        <div class="log-entry log-header">
+            <div>Zeitstempel</div>
+            <div>Absender</div>
+            <div>Kanal</div>
+            <div>Nachricht</div>
+        </div>
+        <div id="logBody">
+            <div style="text-align:center; padding: 20px;">Lade Chat-Daten...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API = window.BULLS_CONFIG.SCRIPT_URL;
+
+    async function loadLogs() {
+        try {
+            const res = await fetch(API + "?action=getMessages"); // Nutzt die getMessages Funktion im Script
+            const logs = await res.json();
+            renderLogs(logs);
+        } catch(e) { 
+            console.error("Ladefehler"); 
+            document.getElementById("logBody").innerHTML = "Fehler beim Laden der Protokolle.";
+        }
+    }
+
+    function renderLogs(data) {
+        const body = document.getElementById("logBody");
+        const chanFilter = document.getElementById("channelFilter").value;
+        const userFilter = document.getElementById("userFilter").value.toLowerCase();
+        body.innerHTML = "";
+
+        // Wir drehen die Logs um, damit das Neueste oben steht
+        const filtered = data.reverse().filter(entry => {
+            const matchUser = entry.absender.toLowerCase().includes(userFilter);
+            let matchChan = true;
+            if(chanFilter === "Allianz") matchChan = entry.kanal === "Allianz";
+            if(chanFilter === "SUPPORT") matchChan = entry.kanal.startsWith("SUPPORT-");
+            
+            return matchUser && matchChan;
+        });
+
+        filtered.forEach(entry => {
+            const div = document.createElement("div");
+            div.className = "log-entry";
+            const date = new Date(entry.zeitstempel || entry.datum || new Date()).toLocaleString('de-DE');
+            
+            div.innerHTML = `
+                <div class="time">${date}</div>
+                <div class="user">${entry.absender}</div>
+                <div class="channel">${entry.kanal}</div>
+                <div class="msg">${entry.nachricht}</div>
+            `;
+            body.appendChild(div);
+        });
+    }
+
+    window.onload = loadLogs;
+</script>
+</body>
+</html>
