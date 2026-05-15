@@ -2,156 +2,230 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>DARK BULLS - GEMELDETE FÄLLE</title>
+    <title>DARK BULLS - BLACKLIST WARTESCHLANGE</title>
     <script src="config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .container { width: 1000px; background-color: #0f0f0f; border: 1px solid #444; border-radius: 10px; padding: 30px; box-shadow: 0 0 20px rgba(241, 196, 15, 0.2); }
-        
-        h1 { color: #f1c40f; text-align: center; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; }
-        
-        .queue-table { width: 100%; border-collapse: collapse; background: #000; margin-bottom: 20px; }
-        .queue-table th { background: #1a1a1a; color: #5dade2; padding: 12px; border: 1px solid #333; text-align: left; }
-        .queue-table td { padding: 12px; border: 1px solid #222; color: #39d353; font-size: 16px; }
-        
-        .btn-process { background: #f1c40f; color: #000; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-family: 'Almendra'; font-weight: bold; }
-        .btn-process:hover { background: #fff; }
+        body { 
+            background-color: #050505; 
+            color: #ffffff; 
+            font-family: 'Almendra', serif; 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+        }
 
-        /* Modal / Bearbeitungsfenster */
-        #processModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: #0f0f0f; border: 2px solid #f1c40f; padding: 30px; border-radius: 10px; width: 600px; max-height: 90vh; overflow-y: auto; }
+        .container { 
+            width: 950px; 
+            background-color: #0f0f0f; 
+            border: 1px solid #333; 
+            border-radius: 15px; 
+            padding: 40px; 
+            box-shadow: 0 0 60px 10px rgba(255, 49, 49, 0.2); 
+            position: relative;
+        }
+
+        h1 { 
+            color: #ff3131; 
+            text-align: center; 
+            text-transform: uppercase; 
+            margin-bottom: 30px; 
+            letter-spacing: 3px; 
+            font-size: 32px;
+            text-shadow: 0 0 10px rgba(255, 49, 49, 0.5);
+        }
+
+        /* Liste Design */
+        .list-section { 
+            background: #000; 
+            border: 1px solid #222; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            margin-bottom: 30px;
+        }
         
-        .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-        .modal-field { display: flex; flex-direction: column; }
-        .modal-field label { color: #f1c40f; font-size: 14px; margin-bottom: 5px; }
-        .modal-field input, .modal-field textarea { background: #000; border: 1px solid #444; color: #fff; padding: 8px; font-family: 'Almendra'; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #111; color: #5dade2; padding: 15px; text-align: left; text-transform: uppercase; font-size: 14px; border-bottom: 2px solid #ff3131; }
+        td { padding: 12px 15px; border-bottom: 1px solid #111; cursor: pointer; transition: 0.3s; font-size: 16px; }
+        tr:hover td { background: #1a1a1a; color: #ff3131; }
 
-        .modal-btns { display: flex; justify-content: space-between; margin-top: 20px; gap: 10px; }
-        .btn-approve { background: #39d353; color: #000; flex: 1; padding: 10px; border: none; cursor: pointer; font-family: 'Almendra'; font-weight: bold; }
-        .btn-reject { background: #ff3131; color: #fff; flex: 1; padding: 10px; border: none; cursor: pointer; font-family: 'Almendra'; font-weight: bold; }
-        .btn-close { background: #444; color: #fff; border: none; padding: 10px 20px; cursor: pointer; }
+        /* Maske (Detail-Ansicht) */
+        #editMask { 
+            display: none; 
+            border-top: 1px solid #333; 
+            padding-top: 30px; 
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .btn-back { display: block; width: 180px; margin: 20px auto 0; background: #444; color: #fff; padding: 10px; text-align: center; text-decoration: none; border-radius: 5px; }
+        .section-title { color: #5dade2; font-size: 22px; margin-bottom: 25px; text-align: center; border-bottom: 1px solid #222; padding-bottom: 10px; }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+        .field { display: flex; flex-direction: column; margin-bottom: 15px; }
+        .field label { color: #888; font-size: 13px; margin-bottom: 6px; text-transform: uppercase; }
+        
+        input, textarea { 
+            background: #000; border: 1px solid #444; color: #39d353; 
+            padding: 12px; font-family: 'Almendra'; font-size: 18px; 
+            border-radius: 6px; outline: none; transition: 0.3s;
+        }
+        input:focus, textarea:focus { border-color: #ff3131; box-shadow: 0 0 10px rgba(255, 49, 49, 0.2); }
+
+        textarea { height: 120px; resize: none; grid-column: span 3; }
+
+        .btn-row { display: flex; justify-content: center; gap: 15px; margin-top: 30px; }
+        .btn { 
+            padding: 15px 25px; border-radius: 6px; font-weight: bold; cursor: pointer; 
+            font-family: 'Almendra'; text-transform: uppercase; border: none; font-size: 16px; transition: 0.3s;
+        }
+        .btn-approve { background: #39d353; color: #000; box-shadow: 0 4px 15px rgba(57, 211, 83, 0.2); }
+        .btn-delete { background: #ff3131; color: #fff; }
+        .btn-contact { background: #f1c40f; color: #000; }
+        .btn-back { background: #444; color: #fff; }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
+
+        /* Erfolgs-Overlay */
+        #successBox { 
+            display: none; background: #0f0f0f; position: absolute; top: 0; left: 0; 
+            width: 100%; height: 100%; border-radius: 15px; flex-direction: column; 
+            justify-content: center; align-items: center; padding: 40px; z-index: 20;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Warteschlange: Neue Meldungen</h1>
-    
-    <table class="queue-table">
-        <thead>
-            <tr>
-                <th>Datum</th>
-                <th>Spieler (ID|Name)</th>
-                <th>Verstoß</th>
-                <th>Melder</th>
-                <th>Aktion</th>
-            </tr>
-        </thead>
-        <tbody id="queueBody">
-            <tr><td colspan="5" style="text-align:center;">Lade gemeldete Fälle...</td></tr>
-        </tbody>
-    </table>
+    <div id="mainContent">
+        <h1>BULLS WARTESCHLANGE</h1>
 
-    <a href="dashboard.html" class="btn-back">ZURÜCK</a>
-</div>
+        <div class="list-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Gegner (ID | Name)</th>
+                        <th>Verstoß</th>
+                        <th>Melder</th>
+                        <th>Datum</th>
+                    </tr>
+                </thead>
+                <tbody id="queueBody">
+                    <tr><td colspan="4" style="text-align:center; padding:30px;">Suche nach neuen Sündern...</td></tr>
+                </tbody>
+            </table>
+        </div>
 
-<div id="processModal">
-    <div class="modal-content">
-        <h2 style="color:#f1c40f; margin-top:0;">Fall bearbeiten</h2>
-        <div class="modal-grid">
-            <div class="modal-field"><label>Zielperson</label><input type="text" id="mTarget"></div>
-            <div class="modal-field"><label>Allianz</label><input type="text" id="mAlli"></div>
-            <div class="modal-field"><label>Verstoß</label><input type="text" id="mVerstoss"></div>
-            <div class="modal-field"><label>Punkte</label><input type="text" id="mPunkte"></div>
-            <div class="modal-field"><label>Map</label><input type="text" id="mMap"></div>
-            <div class="modal-field"><label>Melder</label><input type="text" id="mMelder" readonly></div>
+        <div id="editMask">
+            <div class="section-title">FALLÜBERNAHME & PRÜFUNG</div>
+            <div class="info-grid">
+                <div class="field"><label>Gegner Identität</label><input type="text" id="mTarget"></div>
+                <div class="field"><label>Allianz-Zugehörigkeit</label><input type="text" id="mAlli"></div>
+                <div class="field"><label>Kampf-Punkte</label><input type="text" id="mPunkte"></div>
+                <div class="field"><label>Operations-Map</label><input type="text" id="mMap"></div>
+                <div class="field"><label>Haupt-Verstoß</label><input type="text" id="mVerstoss"></div>
+                <div class="field"><label>Beweis-Status</label><input type="text" id="mBeweise"></div>
+                
+                <div class="field" style="grid-column: span 3;">
+                    <label>Tatgang / Beschreibung</label>
+                    <textarea id="mDesc"></textarea>
+                </div>
+
+                <div class="field"><label>Melder</label><input type="text" id="mMelder" readonly></div>
+                <div class="field" style="grid-column: span 2;"><label>Bestätigte Zeugen</label><input type="text" id="mZeugen"></div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-approve" onclick="runAction('approveMeldung')">In Blacklist eintragen</button>
+                <button class="btn btn-contact" onclick="contactMelder()">Melder kontaktieren</button>
+                <button class="btn btn-delete" onclick="runAction('rejectMeldung')">Löschen</button>
+                <button class="btn btn-back" onclick="location.reload()">Abbrechen</button>
+            </div>
         </div>
-        <div class="modal-field" style="margin-top:10px;">
-            <label>Beschreibung</label>
-            <textarea id="mDesc" rows="4"></textarea>
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="dashboard.html" style="color: #666; text-decoration: none; font-size: 14px;">ZURÜCK ZUM HAUPTMENÜ</a>
         </div>
-        
-        <div class="modal-btns">
-            <button class="btn-reject" onclick="handleAction('reject')">Löschen</button>
-            <button class="btn-approve" onclick="handleAction('approve')">Freigeben (Blacklist)</button>
+    </div>
+
+    <div id="successBox">
+        <div style="font-size: 80px; color: #39d353; margin-bottom: 20px;">✓</div>
+        <div style="color: #39d353; font-size: 28px; font-weight: bold; text-transform: uppercase;">Aktion erfolgreich</div>
+        <div id="successMessage" style="color: #eee; font-size: 18px; text-align: center; margin: 20px 0 35px; line-height: 1.5;">
+            Die Akte wurde erfolgreich verarbeitet und der Status der Blacklist aktualisiert.
         </div>
-        <button class="btn-close" style="width:100%; margin-top:10px;" onclick="closeModal()">Abbrechen</button>
+        <button class="btn btn-approve" onclick="location.reload()">WEITERARBEITEN</button>
     </div>
 </div>
 
 <script>
     const API = window.BULLS_CONFIG.SCRIPT_URL;
-    let currentQueue = [];
-    let activeIndex = -1;
+    let selectedMeldung = null;
 
     async function loadQueue() {
         try {
             const res = await fetch(API + "?action=listMeldungen");
-            currentQueue = await res.json();
-            const body = document.getElementById("queueBody");
-            body.innerHTML = "";
-
-            if(currentQueue.length === 0) {
-                body.innerHTML = '<tr><td colspan="5" style="text-align:center;">Keine neuen Meldungen vorhanden.</td></tr>';
+            const data = await res.json();
+            const tbody = document.getElementById("queueBody");
+            tbody.innerHTML = "";
+            
+            if(!data || data.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:30px; color:#444;'>Keine offenen Meldungen. Der Panzer ist sauber.</td></tr>";
                 return;
             }
 
-            currentQueue.forEach((m, i) => {
-                body.innerHTML += `
-                    <tr>
-                        <td>${new Date(m.datum).toLocaleDateString()}</td>
-                        <td>${m.target}</td>
-                        <td>${m.verstoss}</td>
-                        <td>${m.melder}</td>
-                        <td><button class="btn-process" onclick="openModal(${i})">Bearbeiten</button></td>
-                    </tr>
-                `;
+            data.forEach(m => {
+                const tr = document.createElement("tr");
+                tr.onclick = () => openEdit(m);
+                tr.innerHTML = `<td>${m.target}</td><td>${m.verstoss}</td><td>${m.melder}</td><td>${new Date(m.datum).toLocaleDateString()}</td>`;
+                tbody.appendChild(tr);
             });
-        } catch(e) { console.error("Fehler beim Laden"); }
+        } catch(e) { console.error("Ladefehler"); }
     }
 
-    function openModal(index) {
-        activeIndex = index;
-        const m = currentQueue[index];
+    function openEdit(m) {
+        selectedMeldung = m;
+        document.getElementById("editMask").style.display = "block";
         document.getElementById("mTarget").value = m.target;
         document.getElementById("mAlli").value = m.alli || "";
-        document.getElementById("mVerstoss").value = m.verstoss;
         document.getElementById("mPunkte").value = m.punkte || "";
         document.getElementById("mMap").value = m.map || "";
+        document.getElementById("mVerstoss").value = m.verstoss;
+        document.getElementById("mBeweise").value = m.beweise || "Ja";
+        document.getElementById("mDesc").value = m.desc || m.beschreibung;
         document.getElementById("mMelder").value = m.melder;
-        document.getElementById("mDesc").value = m.beschreibung || "";
-        document.getElementById("processModal").style.display = "flex";
+        document.getElementById("mZeugen").value = m.zeugen || "";
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
 
-    function closeModal() {
-        document.getElementById("processModal").style.display = "none";
-    }
-
-    async function handleAction(type) {
-        const confirmMsg = type === 'approve' ? "In Blacklist verschieben?" : "Meldung endgültig löschen?";
+    async function runAction(act) {
+        const confirmMsg = act === 'approveMeldung' ? "Fall DB-MASTER: In Blacklist übernehmen?" : "Meldung endgültig vernichten?";
         if(!confirm(confirmMsg)) return;
 
-        const data = {
-            action: type === 'approve' ? "approveMeldung" : "rejectMeldung",
+        const payload = {
+            action: act,
             target: document.getElementById("mTarget").value,
             alli: document.getElementById("mAlli").value,
-            verstoss: document.getElementById("mVerstoss").value,
             punkte: document.getElementById("mPunkte").value,
             map: document.getElementById("mMap").value,
+            verstoss: document.getElementById("mVerstoss").value,
+            beweise: document.getElementById("mBeweise").value,
             desc: document.getElementById("mDesc").value,
-            melder: document.getElementById("mMelder").value,
-            index: activeIndex // Wichtig für das Script zum Finden der Zeile
+            zeugen: document.getElementById("mZeugen").value,
+            melder: document.getElementById("mMelder").value
         };
 
         try {
-            await fetch(API, { method: "POST", body: JSON.stringify(data) });
-            alert("Erledigt!");
-            closeModal();
-            loadQueue();
-        } catch(e) { alert("Fehler bei der Verarbeitung"); }
+            await fetch(API, { method: "POST", body: JSON.stringify(payload) });
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('successBox').style.display = 'flex';
+        } catch(e) { alert("Übertragungsfehler!"); }
+    }
+
+    function contactMelder() {
+        localStorage.setItem('bulls_messenger_partner', document.getElementById("mMelder").value);
+        window.location.href = 'messenger.html';
     }
 
     window.onload = loadQueue;
