@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dark Bulls - Allianz Zentrale</title>
+    <script src="config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; padding: 0; width: 100%; height: 100vh; background-color: black; font-family: 'Almendra', serif; color: white; overflow: hidden; }
@@ -13,6 +14,7 @@
         .user-info { color: #ff3131; font-size: 20px; }
         .logout-btn { background: #ff0000; color: white; border: none; padding: 8px 15px; cursor: pointer; font-weight: bold; font-family: 'Almendra'; border-radius: 4px; text-transform: uppercase; }
         
+        /* Die Haupt-Container Logik */
         .side-container { position: absolute; width: 100%; height: 100%; display: flex; justify-content: space-between; padding: 40px; box-sizing: border-box; z-index: 10; }
         .left-side, .right-side { display: flex; flex-direction: column; width: 320px; height: 90vh; }
         
@@ -21,14 +23,13 @@
 
         .card { background: rgba(0, 0, 0, 0.9); padding: 18px; border: 2px solid #ff3131; border-radius: 12px; box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); width: 100%; box-sizing: border-box; }
         
-        /* Korrektur: Admin Box tiefer setzen */
+        /* Admin Box tiefer setzen */
         #box-admin { margin-top: 45px; } 
 
         .card h2 { color: #ff3131; margin: 0 0 12px 0; font-size: 20px; text-decoration: underline; text-align: left; }
         .btn-stack { display: flex; flex-direction: column; gap: 10px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         
-        /* Ein einheitlicher Button-Style für alle Admin- und Card-Buttons */
         .card-btn, .admin-btn { 
             background: #39d353; color: black; border: none; padding: 12px; 
             cursor: pointer; font-family: 'Almendra'; font-weight: bold; 
@@ -39,6 +40,8 @@
         
         .chat-btn-container { width: 100%; display: flex; justify-content: flex-end; }
         .chat-btn { background: #ff8c00; color: black; border: none; padding: 15px 45px; font-size: 24px; font-weight: bold; border-radius: 8px; cursor: pointer; font-family: 'Almendra'; box-shadow: 0 0 25px rgba(255, 140, 0, 0.5); }
+        
+        /* WICHTIG: Das hat gefehlt! Macht das Ausblenden erst wirksam */
         .hidden { display: none !important; }
     </style>
 </head>
@@ -99,7 +102,7 @@
             </div>
         </div>
 
-      <div class="chat-btn-container" id="box-allichat">
+        <div class="chat-btn-container" id="box-allichat">
             <button class="chat-btn" onclick="window.location.href='Chat.html'">ALLIANZ CHAT</button>
         </div>
     </div>
@@ -107,7 +110,8 @@
 
     <script>
         const user = localStorage.getItem('bulls_user');
-        const role = localStorage.getItem('bulls_role');
+        // trim() entfernt unsichtbare Leerzeichen aus der Tabelle
+        const role = localStorage.getItem('bulls_role') ? localStorage.getItem('bulls_role').trim() : "";
         const extra = localStorage.getItem('bulls_extra') || "";
 
         if (!user) {
@@ -118,17 +122,15 @@
             document.getElementById('userDisplay').innerText = user + " (" + displayRole + ")";
             applyPermissions(role, extra);
             
-            // HIER NEU: Startet den Check für die Dashboard-Meldung sofort nach dem Login-Check
+            // Startet den Check für die Dashboard-Ankündigung
             checkNews(); 
         }
 
-        // NEU: Holt die Einstellungen und baut das Pop-up bei Bedarf vollautomatisch
         async function checkNews() {
             try {
                 const res = await fetch(window.BULLS_CONFIG.SCRIPT_URL + "?action=getGlobalSettings");
                 const s = await res.json();
                 
-                // Nur aufploppen, wenn der News-Schalter AN ist und ein Text drinsteht
                 if (s.newsActive && s.newsMsg) {
                     const newsDiv = document.createElement("div");
                     newsDiv.id = "newsOverlay";
@@ -137,14 +139,12 @@
                         <div style="background:#111; border:2px solid #ff3131; padding:40px; border-radius:15px; text-align:center; max-width:500px; box-shadow:0 0 40px rgba(255,49,49,0.5);">
                             <h2 style="color:#ff3131; text-transform:uppercase; margin-top:0; letter-spacing:2px;">⚠️ System-Meldung</h2>
                             <p style="color:#fff; font-size:22px; margin:20px 0; line-height:1.4;">${s.newsMsg}</p>
-                            <button onclick="document.getElementById('newsOverlay').remove()" style="background:#ff3131; color:#fff; border:none; padding:12px 40px; font-family:'Almendra'; font-weight:bold; cursor:pointer; border-radius:5px; text-transform:uppercase; font-size:18px; box-shadow:0 0 15px red; transition: 0.2s;">Verstanden</button>
+                            <button onclick="document.getElementById('newsOverlay').remove()" style="background:#ff3131; color:#fff; border:none; padding:12px 40px; font-family:'Almendra'; font-weight:bold; cursor:pointer; border-radius:5px; text-transform:uppercase; font-size:18px; box-shadow:0 0 15px red;">Verstanden</button>
                         </div>
                     `;
                     document.body.appendChild(newsDiv);
                 }
-            } catch(e) { 
-                console.log("Ankündigungs-Fehler: Verbindung zum Google Script fehlgeschlagen."); 
-            }
+            } catch(e) { console.log("Ankündigungs-Fehler."); }
         }
 
         function applyPermissions(r, ex) {
@@ -155,27 +155,39 @@
             const boxElo = document.getElementById('box-elo');
             const boxAlliChat = document.getElementById('box-allichat');
 
-            if (r === "Gast") {
-                [boxBlacklist, boxPflege, boxAdmin, boxElo, boxAlliChat].forEach(el => el.classList.add('hidden'));
-            } 
-            else if (r === "Allianz Gast") {
-                [boxBlacklist, boxPflege, boxAdmin, boxElo].forEach(el => el.classList.add('hidden'));
+            // 1. ZUERST ALLES KRITISCHE GRUNDSÄTZLICH VERSTECKEN (Sicherheits-Modus)
+            boxBlacklist.classList.add('hidden');
+            boxPflege.classList.add('hidden');
+            boxAdmin.classList.add('hidden');
+            boxElo.classList.add('hidden');
+            boxAlliChat.classList.add('hidden');
+
+            // 2. RECHTE STUFENWEISE FREISCHALTEN
+            if (r === "Allianz Gast") {
+                boxAlliChat.classList.remove('hidden');
             }
             else if (r === "Mitglied" || r === "Kampfdivision") {
-                boxPflege.classList.add('hidden');
-                boxAdmin.classList.add('hidden');
-                if (!ex.includes("ELO")) boxElo.classList.add('hidden');
+                boxBlacklist.classList.remove('hidden');
+                boxAlliChat.classList.remove('hidden');
+                if (ex.includes("ELO")) boxElo.classList.remove('hidden');
+            }
+            else if (["Admin", "Offizier", "Offi"].includes(r)) {
+                boxBlacklist.classList.remove('hidden');
+                boxPflege.classList.remove('hidden');
+                boxAdmin.classList.remove('hidden');
+                boxElo.classList.remove('hidden');
+                boxAlliChat.classList.remove('hidden');
             }
 
+            // 3. ZUSATZROLLEN EXTRA PRÜFEN
             if (ex.includes("Buchhalter") || ex.includes("Moderator")) {
                 boxPflege.classList.remove('hidden');
             }
             if (ex.includes("ELO")) {
                 boxElo.classList.remove('hidden');
             }
-            if (["Admin", "Offizier", "Offi"].includes(r)) {
-                [boxPflege, boxAdmin, boxElo].forEach(el => el.classList.remove('hidden'));
-            }
+            
+            // Wenn es ein reiner "Gast" ist, bleibt oben alles blockiert (nur "Persönlich" bleibt sichtbar)
         }
 
         function logout() {
