@@ -2,89 +2,127 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>DARK BULLS - ALLIANZ HQ CHAT</title>
+    <title>DARK BULLS - HQ FUNK COCKPIT</title>
     <script src="config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #050505; color: #fff; font-family: 'Almendra', serif; margin: 0; padding: 0; height: 100vh; display: flex; overflow: hidden; }
+        body { background-color: #050505; color: #fff; font-family: 'Almendra', serif; margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        /* Layout-Aufteilung */
-        .sidebar-l { width: 280px; background: #0f0f0f; border-right: 2px solid #ff3131; display: flex; flex-direction: column; padding: 15px; box-sizing: border-box; }
+        /* OBERE NAVIGATION */
+        .top-nav { height: 70px; background: #0f0f0f; border-bottom: 2px solid #ff3131; display: flex; align-items: center; padding: 0 20px; gap: 15px; box-sizing: border-box; z-index: 10; }
+        .nav-btn { background: #111; border: 1px solid #333; color: #fff; padding: 10px 18px; border-radius: 5px; font-family: 'Almendra'; font-size: 16px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .nav-btn:hover, .nav-btn.active { border-color: #ff3131; background: rgba(255, 49, 49, 0.1); color: #ff3131; box-shadow: 0 0 10px rgba(255,49,49,0.2); }
+        .nav-plus { background: #ff3131; color: #000; border: none; width: 22px; height: 22px; border-radius: 4px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; margin-left: 5px; }
+        .nav-plus:hover { background: #fff; }
+        
+        /* SUB-MENÜS FÜR PN / GRUPPEN (WENN AKTIV) */
+        .sub-nav { display: none; background: #0a0a0a; border-bottom: 1px solid #222; padding: 8px 20px; gap: 10px; overflow-x: auto; white-space: nowrap; }
+        .sub-item { display: inline-block; padding: 6px 12px; background: #151515; border: 1px solid #444; border-radius: 4px; font-size: 14px; cursor: pointer; margin-right: 5px; }
+        .sub-item.active { border-color: #ff3131; color: #ff3131; background: rgba(255,49,49,0.05); }
+
+        /* HAUPTBEREICH GESPALTEN */
+        .main-wrapper { flex: 1; display: flex; overflow: hidden; position: relative; }
         .chat-main { flex: 1; display: flex; flex-direction: column; background: #000; position: relative; }
-        .sidebar-r { width: 220px; background: #0f0f0f; border-left: 2px solid #ff3131; padding: 15px; box-sizing: border-box; }
+        .sidebar-r { width: 240px; background: #0f0f0f; border-left: 2px solid #ff3131; padding: 15px; box-sizing: border-box; }
 
-        h2 { color: #ff3131; text-transform: uppercase; font-size: 20px; border-bottom: 1px solid #222; padding-bottom: 8px; margin-top: 15px; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
-        
-        /* Navigations-Elemente */
-        .nav-item { padding: 10px; background: #111; border: 1px solid #333; border-radius: 5px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; }
-        .nav-item:hover, .nav-item.active { border-color: #ff3131; background: rgba(255, 49, 49, 0.1); color: #ff3131; }
-        .plus-btn { background: #ff3131; color: #000; border: none; font-size: 16px; font-weight: bold; width: 24px; height: 24px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
-        /* Chat-Verlauf */
-        .chat-header { background: #0f0f0f; padding: 15px; border-bottom: 1px solid #222; font-size: 22px; color: #ff3131; font-weight: bold; display: flex; justify-content: space-between; }
+        /* Chat Header & Footer */
+        .chat-header { background: #0f0f0f; padding: 12px 20px; border-bottom: 1px solid #222; font-size: 20px; color: #ff3131; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
         .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
         .chat-footer { padding: 15px; background: #0f0f0f; border-top: 1px solid #222; display: flex; gap: 10px; align-items: center; }
         
-        input[type="text"] { flex: 1; background: #050505; border: 1px solid #444; color: #39d353; padding: 12px; font-family: 'Almendra'; font-size: 16px; border-radius: 5px; outline: none; }
-        input:focus { border-color: #ff3131; }
+        input[type="text"], select { background: #050505; border: 1px solid #444; color: #39d353; padding: 12px; font-family: 'Almendra'; font-size: 16px; border-radius: 5px; outline: none; box-sizing: border-box; }
+        input[type="text"]:focus { border-color: #ff3131; }
         .send-btn { background: #ff3131; color: #000; border: none; padding: 12px 25px; font-family: 'Almendra'; font-weight: bold; font-size: 16px; border-radius: 5px; cursor: pointer; text-transform: uppercase; }
 
-        /* Nachrichten-Stile */
+        /* Admin-Tools im Gruppenchat */
+        .group-admin-btn { background: #222; border: 1px solid #666; color: #aaa; font-family: 'Almendra'; font-size: 13px; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-left: 8px; }
+        .group-admin-btn:hover { border-color: #ff3131; color: #ff3131; }
+
+        /* Nachrichten */
         .msg { font-size: 16px; line-height: 1.4; }
         .msg .time { color: #555; margin-right: 8px; font-size: 14px; }
         .msg .sender { font-weight: bold; margin-right: 5px; }
         .role-admin { color: #ff3131; } .role-offi { color: #ffd600; } .role-member { color: #39d353; }
         
-        /* Online & Status Punkte */
-        .user-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 16px; }
-        .status-dot { width: 100%; height: 8px; width: 8px; background: #39d353; border-radius: 50%; box-shadow: 0 0 8px #39d353; }
-        #typingDisplay { color: #888; font-style: italic; font-size: 14px; position: absolute; bottom: 65px; left: 20px; }
-
-        /* Support Ampel-Karten */
+        /* Support Karten */
         .support-card { padding: 12px; border-radius: 5px; margin-bottom: 10px; text-align: left; font-size: 15px; color: #000; font-weight: bold; }
         .sup-green { background: #39d353; box-shadow: 0 0 10px #39d353; }
         .sup-red { background: #ff3131; color: #fff; box-shadow: 0 0 10px #ff3131; }
         .sup-yellow { background: #ffd600; box-shadow: 0 0 10px #ffd600; }
-        
+
+        /* Sidebar Listen */
+        h2 { color: #ff3131; text-transform: uppercase; font-size: 18px; margin-top: 0; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        .user-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 16px; }
+        .status-dot { width: 8px; height: 8px; background: #39d353; border-radius: 50%; box-shadow: 0 0 8px #39d353; }
+        #typingDisplay { color: #888; font-style: italic; font-size: 14px; position: absolute; bottom: 65px; left: 20px; }
+
+        /* INTERNE MODALS (FENSTER FÜR + KLICKS) */
+        .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:1000; justify-content:center; align-items:center; font-family:'Almendra'; }
+        .modal-box { background:#0f0f0f; border:2px solid #ff3131; padding:30px; border-radius:12px; width:450px; max-width:90%; text-align:center; box-shadow:0 0 30px rgba(255,0,0,0.3); }
+        .user-scroll-list { background:#000; border:1px solid #333; height:200px; overflow-y:auto; margin:15px 0; text-align:left; padding:10px; border-radius:5px; }
+        .check-row { display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid #111; cursor:pointer; }
+        .check-row input { width:18px; height:18px; accent-color:#ff3131; }
+
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div class="sidebar-l">
-        <h1 style="color:#ff3131; font-size:24px; text-align:center; margin-top:0; letter-spacing:2px;">HQ FUNK</h1>
-        <button class="nav-item active" onclick="switchChannel('global', 'Globaler Allianz Funk')">📢 Globaler Allianz Funk</button>
-        
-        <h2>Privat (PN) <button class="plus-btn" onclick="openNewPNModal()">+</button></h2>
-        <div id="pnNavList"></div>
-        
-        <h2>Gruppen <button class="plus-btn" id="addGroupBtn" onclick="openGroupModal()">+</button></h2>
-        <div id="groupNavList"></div>
-
-        <h2>Zentrale</h2>
-        <button class="nav-item" onclick="switchChannel('support', 'Support Ticket Center')">📬 Support Center</button>
-        <button class="nav-item" style="margin-top:auto; background:#222;" onclick="window.location.href='dashboard.html'"> Zurück zum HQ</button>
+    <div class="top-nav">
+        <button class="nav-btn active" id="tab-global" onclick="activateMainMode('global')">📢 Globaler Funk</button>
+        <button class="nav-btn" id="tab-pn" onclick="activateMainMode('pn')">👤 Privat (PN) <span class="nav-plus" onclick="openPNModal(event)">+</span></button>
+        <button class="nav-btn" id="tab-group" onclick="activateMainMode('group')">🪖 Gruppen <span class="nav-plus" id="groupPlusBtn" onclick="openGroupModal(event)">+</span></button>
+        <button class="nav-btn" id="tab-support" onclick="activateMainMode('support')">📬 Support</button>
+        <button class="nav-btn" style="margin-left:auto; background:#222; border-color:#555;" onclick="window.location.href='dashboard.html'"> Zurück zum HQ</button>
     </div>
 
-    <div class="chat-main">
-        <div class="chat-header">
-            <span id="currentChannelTitle">Globaler Allianz Funk</span>
-            <span id="dcLinkWrapper" style="font-size:14px;"></span>
+    <div class="sub-nav" id="pnSubBar"></div>
+    <div class="sub-nav" id="groupSubBar"></div>
+
+    <div class="main-wrapper">
+        
+        <div class="chat-main">
+            <div class="chat-header">
+                <span id="currentChannelTitle">Globaler Allianz Funk</span>
+                <div id="channelAdminTools"></div> </div>
+            
+            <div class="chat-body" id="chatBox"></div>
+            <div id="typingDisplay"></div>
+            
+            <div class="chat-footer" id="chatFooterArea">
+                <input type="text" id="msgInput" placeholder="Sende verschlüsselten Funkspruch..." oninput="handleTyping()">
+                <button class="send-btn" onclick="sendMessage()">Senden</button>
+            </div>
         </div>
-        
-        <div class="chat-body" id="chatBox"></div>
-        
-        <div id="typingDisplay"></div>
-        
-        <div class="chat-footer" id="chatFooterArea">
-            <input type="text" id="msgInput" placeholder="Sende verschlüsselten Funkspruch..." oninput="handleTyping()">
-            <button class="send-btn" onclick="sendMessage()">Senden</button>
+
+        <div class="sidebar-r">
+            <h2 id="rightSidebarTitle">Online im HQ</h2>
+            <div id="rightUserList"></div>
         </div>
     </div>
 
-    <div class="sidebar-r">
-        <h2 id="rightSidebarTitle">Online im HQ</h2>
-        <div id="rightUserList"></div>
+    <div id="modalPN" class="modal-overlay">
+        <div class="modal-box">
+            <h2 style="margin-top:0;">Neuen PN Chat öffnen</h2>
+            <p style="color:#888; font-size:14px; margin-top:-10px;">Wähle einen Spieler aus der Allianzliste aus:</p>
+            <select id="pnUserSelect" style="width:100%;"></select>
+            <button class="send-btn" style="width:100%; margin-top:20px;" onclick="startPNFromModal()">Chat starten</button>
+            <p onclick="closeModals()" style="color:#555; cursor:pointer; margin-top:15px; margin-bottom:0;">Abbrechen</p>
+        </div>
+    </div>
+
+    <div id="modalGroup" class="modal-overlay">
+        <div class="modal-box">
+            <h2 style="margin-top:0;">Einsatzgruppe gründen</h2>
+            <input type="text" id="newGroupName" placeholder="Name der Gruppe..." style="width:100%; margin-bottom:10px;">
+            <input type="text" id="newGroupDC" placeholder="Discord Link (Optional)..." style="width:100%;">
+            
+            <p style="text-align:left; margin:15px 0 5px 0; color:#5dade2; font-style:italic;">Teilnehmer auswählen:</p>
+            <div class="user-scroll-list" id="groupUserChecklist"></div>
+            
+            <button class="send-btn" style="width:100%;" onclick="createGroupFromModal()">Gruppe versiegeln</button>
+            <p onclick="closeModals()" style="color:#555; cursor:pointer; margin-top:15px; margin-bottom:0;">Abbrechen</p>
+        </div>
     </div>
 
 <script>
@@ -94,55 +132,146 @@
     const MY_EXTRA = localStorage.getItem('bulls_extra') || "";
 
     let currentMode = 'global'; // global, pn, group, support
-    let currentTarget = '';     // Partner-Name oder Gruppen-Name
+    let currentTarget = '';     // Aktiver Chatpartner oder aktive Gruppe
     let chatDataCache = {};
+    let globalUserList = [];    // Speichert alle geladenen Member aus der DB
     let typingTimeout;
 
-    // Berechtigungen für Gruppenbau prüfen
+    // Sicherheits-Schranke für das Gruppen-+ (Nur Admins & Moderatoren)
     if (!["Admin"].includes(MY_ROLE) && !MY_EXTRA.includes("Moderator")) {
-        document.getElementById("addGroupBtn").classList.add("hidden");
+        document.getElementById("groupPlusBtn").classList.add("hidden");
     }
 
+    // LÄDT UNTERSCHIEDLICHE DATEN AUS DER DATENBANK
+    async function initHQ() {
+        try {
+            // 1. Spielerliste aus den Dropdowndaten für die Modals absaugen
+            const dropRes = await fetch(API + "?action=getDropdownData");
+            const dropData = await dropRes.json();
+            globalUserList = dropData.user || [];
+            
+            buildModalSelectionLists();
+        } catch(e) { console.log("Dropdown-Abruf fehlgeschlagen."); }
+        
+        // 2. Chat-Schleife zünden
+        setInterval(updateLoop, 4000);
+        updateLoop();
+    }
+
+    // BAUT DIE AUSWAHLLISTEN IN DEN + POPUPS
+    function buildModalSelectionLists() {
+        // PN-Dropdown füllen
+        const pnSelect = document.getElementById("pnUserSelect");
+        pnSelect.innerHTML = '<option value="" disabled selected>-- Member wählen --</option>';
+        globalUserList.sort().forEach(u => {
+            if(u !== MY_NAME) {
+                pnSelect.innerHTML += `<option value="${u}">${u}</option>`;
+            }
+        });
+
+        // Gruppen-Checkboxen füllen
+        const checkList = document.getElementById("groupUserChecklist");
+        checkList.innerHTML = "";
+        globalUserList.sort().forEach(u => {
+            if(u !== MY_NAME) {
+                checkList.innerHTML += `
+                    <label class="check-row">
+                        <input type="checkbox" name="groupMembers" value="${u}">
+                        <span>${u}</span>
+                    </label>
+                `;
+            }
+        });
+    }
+
+    // UPDATE-LOOP (LÄUFT ALLE 4 SEKUNDEN)
     async function updateLoop() {
         try {
             const res = await fetch(API + "?action=getChatData&user=" + MY_NAME);
             chatDataCache = await res.json();
             
-            renderNavigation();
+            renderSubBars();
             renderChatContent();
             renderRightSidebar();
-        } catch(e) { console.log("Verbindungsfehler im Funkkreis."); }
+        } catch(e) { console.log("Funkstörung im Empfang."); }
     }
 
-    function renderNavigation() {
-        // PNs auflisten
-        const pnList = document.getElementById("pnNavList");
-        pnList.innerHTML = "";
-        Object.keys(chatDataCache.pns || {}).forEach(partner => {
-            var div = document.createElement("div");
-            div.className = `nav-item ${currentMode==='pn'&&currentTarget===partner?'active':''}`;
-            div.innerText = "👤 " + partner;
-            div.onclick = () => switchChannel('pn', 'PN: ' + partner, partner);
-            pnList.appendChild(div);
-        });
+    // SCHALTET DIE OBEREN REIHEN (GLOBAL, PN, GROUP, SUPPORT) UM
+    function activateMainMode(mode) {
+        currentMode = mode;
+        currentTarget = '';
+        
+        document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+        document.getElementById("tab-" + mode).classList.add("active");
 
-        // Gruppen auflisten
-        const gList = document.getElementById("groupNavList");
-        gList.innerHTML = "";
-        (chatDataCache.groups || []).forEach(g => {
-            var div = document.createElement("div");
-            div.className = `nav-item ${currentMode==='group'&&currentTarget===g.name?'active':''}`;
-            div.innerText = "🪖 " + g.name;
-            div.onclick = () => switchChannel('group', 'Gruppe: ' + g.name, g.name, g.dcLink);
-            gList.appendChild(div);
-        });
+        document.getElementById("pnSubBar").style.display = mode === 'pn' ? 'flex' : 'none';
+        document.getElementById("groupSubBar").style.display = mode === 'group' ? 'flex' : 'none';
+
+        if(mode === 'global') switchChannel('global', 'Globaler Allianz Funk');
+        else if(mode === 'support') switchChannel('support', 'Support Ticket Center');
+        else {
+            // Wenn man auf PN/Gruppe geht, automatisch den ersten Unterkanal öffnen falls da
+            renderSubBars(true);
+        }
     }
 
+    // ZEICHNET DIE UNTERCHATS (PN-PARTNER ODER GRUPPEN) ALS ZWEITE REIHE
+    function renderSubBars(autoSelectFirst = false) {
+        const pnBar = document.getElementById("pnSubBar");
+        const gBar = document.getElementById("groupSubBar");
+
+        if (currentMode === 'pn') {
+            pnBar.innerHTML = "";
+            const keys = Object.keys(chatDataCache.pns || {});
+            keys.forEach(p => {
+                pnBar.innerHTML += `<div class="sub-item ${currentTarget===p?'active':''}" onclick="switchChannel('pn', 'PN: '+ '${p}', '${p}')">👤 ${p}</div>`;
+            });
+            if(autoSelectFirst && keys.length > 0 && !currentTarget) {
+                switchChannel('pn', 'PN: ' + keys[0], keys[0]);
+            }
+        } 
+        else if (currentMode === 'group') {
+            gBar.innerHTML = "";
+            const groups = chatDataCache.groups || [];
+            groups.forEach(g => {
+                gBar.innerHTML += `<div class="sub-item ${currentTarget===g.name?'active':''}" onclick="switchChannel('group', 'Gruppe: '+ '${g.name}', '${g.name}', '${g.dcLink}')">🪖 ${g.name}</div>`;
+            });
+            if(autoSelectFirst && groups.length > 0 && !currentTarget) {
+                switchChannel('group', 'Gruppe: ' + groups[0].name, groups[0].name, groups[0].dcLink);
+            }
+        }
+    }
+
+    // WECHSELT DEN AKTUELL ANGEMELDETEN INHALT
+    function switchChannel(mode, title, target = '', dc = '') {
+        currentMode = mode; currentTarget = target;
+        document.getElementById("currentChannelTitle").innerText = title;
+        
+        const adminTools = document.getElementById("channelAdminTools");
+        adminTools.innerHTML = "";
+
+        // Discord Link einblenden falls Gruppenchat
+        if(dc) {
+            adminTools.innerHTML += `<a href="${dc}" target="_blank" style="color:#00cfd1; text-decoration:none; margin-right:15px; font-size:15px;">🔗 Discord</a>`;
+        }
+
+        // GRUPPEN ADMIN OPERATOREN (Nur für Admins & Moderatoren im Gruppen-Modus)
+        if (mode === 'group' && (["Admin"].includes(MY_ROLE) || MY_EXTRA.includes("Moderator"))) {
+            adminTools.innerHTML += `
+                <button class="group-admin-btn" onclick="adminGroupAction('mute')">🔇 Mute</button>
+                <button class="group-admin-btn" onclick="adminGroupAction('archive')">📦 Archiv</button>
+                <button class="group-admin-btn" style="color:#ff3131; border-color:#ff3131;" onclick="adminGroupAction('delete')">❌ Löschen</button>
+            `;
+        }
+
+        updateLoop();
+    }
+
+    // RENDERT DEN CHAT-TEXT IN DIE BOX
     function renderChatContent() {
         const box = document.getElementById("chatBox");
         const footer = document.getElementById("chatFooterArea");
         footer.classList.remove("hidden");
-        
         let html = "";
 
         if (currentMode === 'global') {
@@ -150,14 +279,14 @@
                 html += `<div class="msg"><span class="time">[${m[0]}]</span><span class="sender role-${getRoleClass(m[2])}">${m[1]}:</span><span>${m[3]}</span></div>`;
             });
         } 
-        else if (currentMode === 'pn') {
+        else if (currentMode === 'pn' && currentTarget) {
             const msgs = chatDataCache.pns[currentTarget] || [];
             msgs.forEach(m => {
                 html += `<div class="msg"><span class="time">[${m[0]}]</span><span class="sender">${m[1]}:</span><span>${m[3]}</span></div>`;
             });
         } 
-        else if (currentMode === 'group') {
-            const g = chatDataCache.groups.find(x => x.name === currentTarget);
+        else if (currentMode === 'group' && currentTarget) {
+            const g = (chatDataCache.groups || []).find(x => x.name === currentTarget);
             if (g) {
                 g.messages.forEach(m => {
                     html += `<div class="msg"><span class="time">[${m[0]}]</span><span class="sender role-${getRoleClass(m[2])}">${m[1]}:</span><span>${m[3]}</span></div>`;
@@ -165,38 +294,40 @@
             }
         } 
         else if (currentMode === 'support') {
-            footer.classList.add("hidden"); // Support ist Read-Only für Admins/Buchhalter
+            footer.classList.add("hidden");
             (chatDataCache.support || []).forEach(m => {
                 let colorClass = 'sup-green';
                 if(m[1] === 'SUPPORT') colorClass = 'sup-red';
                 if(m[1] === 'BUCHHALTER') colorClass = 'sup-yellow';
                 
-                // Rechte-Sperre für Support-Ansicht
                 if (["Admin"].includes(MY_ROLE) || (m[1]==='BUCHHALTER' && MY_EXTRA.includes("Buchhalter"))) {
                     html += `<div class="support-card ${colorClass}">[${m[0]}] ${m[2]} (${m[1]}):<br>${m[3]}</div>`;
                 }
             });
         }
 
+        if(!html && (currentMode==='pn' || currentMode==='group') && !currentTarget) {
+            html = `<p style="text-align:center; color:#444; margin-top:100px;">Klicke oben auf das "+" um einen neuen Funkkreis zu eröffnen.</p>`;
+        }
+
         box.innerHTML = html;
-        
-        // "schreibt..." Anzeige auswerten
+
+        // Schreibt-Status ermitteln
         const typingDiv = document.getElementById("typingDisplay");
         let typers = [];
-        Object.keys(chatDataCache.typing || {}).forEach(t => {
-            if(t !== MY_NAME) typers.push(t);
-        });
-        typingDiv.innerText = typers.length > 0 ? typers.join(", ") + " schreibt gerade..." : "";
+        Object.keys(chatDataCache.typing || {}).forEach(t => { if(t !== MY_NAME) typers.push(t); });
+        typingDiv.innerText = typers.length > 0 ? typers.join(", ") + " schreibt..." : "";
     }
 
+    // RECHTE LEISTE (REIN DYNAMISCH)
     function renderRightSidebar() {
         const title = document.getElementById("rightSidebarTitle");
         const container = document.getElementById("rightUserList");
         container.innerHTML = "";
 
-        if (currentMode === 'group') {
-            title.innerText = "In der Gruppe";
-            const g = chatDataCache.groups.find(x => x.name === currentTarget);
+        if (currentMode === 'group' && currentTarget) {
+            title.innerText = "Im Trupp";
+            const g = (chatDataCache.groups || []).find(x => x.name === currentTarget);
             if (g) {
                 g.members.forEach(m => {
                     container.innerHTML += `<div class="user-row"><span class="status-dot" style="background:#555; box-shadow:none;"></span> ${m}</div>`;
@@ -210,21 +341,14 @@
         }
     }
 
-    function switchChannel(mode, title, target = '', dc = '') {
-        currentMode = mode; currentTarget = target;
-        document.getElementById("currentChannelTitle").innerText = title;
-        document.getElementById("dcLinkWrapper").innerHTML = dc ? `<a href="${dc}" target="_blank" style="color:#00cfd1; text-decoration:none;">🔗 Discord Link</a>` : "";
-        document.querySelectorAll(".nav-item").forEach(btn => btn.classList.remove("active"));
-        renderChatContent(); renderRightSidebar();
-    }
-
+    // NACHRICHT ABSENDEN
     async function sendMessage() {
         const text = document.getElementById("msgInput").value.trim();
         if(!text) return;
+        if((currentMode==='pn' || currentMode==='group') && !currentTarget) return;
         
         let targetSheet = "Chat";
         if(currentMode === 'pn') {
-            // PN Tabellenname sortieren: Immer PN_Name1_Name2 (alphabetisch)
             let sorted = [MY_NAME, currentTarget].sort();
             targetSheet = "PN_" + sorted[0] + "_" + sorted[1];
         } else if(currentMode === 'group') {
@@ -240,44 +364,48 @@
         updateLoop();
     }
 
-    function handleTyping() {
-        fetch(API, { method: "POST", body: JSON.stringify({ action: "setTyping", user: MY_NAME, isTyping: true }) });
-        clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(() => {
-            fetch(API, { method: "POST", body: JSON.stringify({ action: "setTyping", user: MY_NAME, isTyping: false }) });
-        }, 3000);
+    // HÄNDELT DAS MODAL FÜR PN
+    function openPNModal(e) {
+        e.stopPropagation();
+        document.getElementById("modalPN").style.display = "flex";
     }
 
-    function openNewPNModal() {
-        var p = prompt("Gib den exakten Namen des Empfängers ein:");
-        if(p) switchChannel('pn', 'PN: ' + p, p);
+    function startPNFromModal() {
+        const selectedUser = document.getElementById("pnUserSelect").value;
+        if(!selectedUser) return alert("Wähle zuerst einen Kampfgefährten!");
+        closeModals();
+        activateMainMode('pn');
+        switchChannel('pn', 'PN: ' + selectedUser, selectedUser);
     }
 
-    async function openGroupModal() {
-        var gName = prompt("Name der neuen Gruppe:");
-        if(!gName) return;
-        var members = prompt("Mitglieder mit Komma trennen (z.B. Julian,User2,User3):");
-        if(!members) return;
-        var dc = prompt("Discord Link eintragen (Optional):");
+    // HÄNDELT DAS MODAL FÜR GRUPPEN
+    function openGroupModal(e) {
+        e.stopPropagation();
+        document.getElementById("modalGroup").style.display = "flex";
+    }
+
+    async function createGroupFromModal() {
+        const gName = document.getElementById("newGroupName").value.trim();
+        const dcLink = document.getElementById("newGroupDC").value.trim();
         
-        var mList = members.split(",").map(x => x.trim());
-        mList.push(MY_NAME); // Du selbst bist natürlich drin
+        if(!gName) return alert("Die Gruppe benötigt ein Rufzeichen (Name)!");
+        
+        // Checkboxen auslesen
+        const checkboxes = document.querySelectorAll('input[name="groupMembers"]:checked');
+        let selectedMembers = [MY_NAME]; // Du selbst bist immer der Gründer
+        checkboxes.forEach(cb => selectedMembers.push(cb.value));
 
+        if(selectedMembers.length === 1) return alert("Wähle mindestens einen weiteren Teilnehmer aus!");
+
+        closeModals();
+        
         await fetch(API, {
             method: "POST",
-            body: JSON.stringify({ action: "createGroup", groupName: gName, members: mList, dcLink: dc })
+            body: JSON.stringify({ action: "createGroup", groupName: gName, members: selectedMembers, dcLink: dcLink })
         });
-        alert("Gruppe beantragt und einsatzbereit!");
-        updateLoop();
-    }
 
-    function getRoleClass(r) {
-        if(r === "Admin") return "admin";
-        if(["Offizier", "Offi"].includes(r)) return "offi";
-        return "member";
-    }
-
-    window.onload = () => { setInterval(updateLoop, 4000); updateLoop(); };
-</script>
-</body>
-</html>
+        alert(`Einsatzgruppe '${gName}' wurde im Sheet angelegt.`);
+        document.getElementById("newGroupName").value = "";
+        document.getElementById("newGroupDC").value = "";
+        
+        activateMainMode('group');
