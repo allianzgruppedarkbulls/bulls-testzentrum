@@ -14,9 +14,8 @@
         .server-icon:hover, .server-icon.active { border-radius: 15px; background: #ff3131; color: #000; box-shadow: 0 0 15px #ff3131; }
         .server-icon::before { content: ''; position: absolute; left: -12px; width: 8px; height: 0; background: #fff; border-radius: 0 4px 4px 0; transition: 0.2s; }
         .server-icon.active::before { height: 40px; }
-        .server-icon:hover::before { height: 20px; }
 
-        /* 2. DISCORD KANAL/SUB-LEISTE (DANEBEN) */
+        /* 2. DISCORD KANAL/SUB-LEISTE */
         .discord-channels { width: 240px; background: #2b2d31; display: flex; flex-direction: column; padding: 10px; box-sizing: border-box; }
         .channel-header { font-size: 14px; font-weight: bold; color: #949ba4; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 5px; display: flex; justify-content: space-between; align-items: center; }
         .channel-btn { padding: 8px 12px; background: transparent; border: none; color: #949ba4; font-family: 'Almendra'; font-size: 16px; border-radius: 4px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 8px; margin-bottom: 2px; width: 100%; transition: 0.1s; }
@@ -30,54 +29,44 @@
         .chat-top-bar { height: 48px; background: #313338; border-bottom: 1px solid #1f2023; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; font-size: 18px; font-weight: bold; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
         .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         
-        /* Discord Message Style */
+        /* Nachrichten */
         .d-msg { display: flex; flex-direction: column; gap: 2px; padding: 2px 5px; border-radius: 4px; }
         .d-msg:hover { background: rgba(255, 255, 255, 0.02); }
         .d-msg-meta { display: flex; align-items: center; gap: 8px; }
-        .d-msg-sender { font-weight: bold; font-size: 16px; cursor: pointer; }
-        .d-msg-sender:hover { text-decoration: underline; }
+        .d-msg-sender { font-weight: bold; font-size: 16px; }
         .d-msg-time { color: #949ba4; font-size: 12px; }
-        .d-msg-text { color: #dbdee1; font-size: 15px; line-height: 1.4; white-space: pre-wrap; padding-left: 2px; }
+        .d-msg-text { color: #dbdee1; font-size: 15px; line-height: 1.4; white-space: pre-wrap; }
+        .read-status { font-size: 11px; color: #23a55a; align-self: flex-end; margin-top: -5px; padding-right: 10px; font-style: italic; }
 
-        /* Discord Input Bereich */
+        /* Input */
         .chat-footer { padding: 0 20px 24px 20px; background: #313338; }
         .input-wrapper { background: #383a40; border-radius: 8px; padding: 10px 15px; display: flex; align-items: center; gap: 10px; }
         input[type="text"] { flex: 1; background: transparent; border: none; color: #dbdee1; font-family: 'Almendra'; font-size: 16px; outline: none; }
         .send-btn { background: #39d353; color: #000; border: none; padding: 8px 16px; font-family: 'Almendra'; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
 
         /* 4. DISCORD MEMBER LEISTE (RECHTS) */
-        .discord-members { width: 240px; background: #2b2d31; padding: 20px 10px; box-sizing: border-box; }
-        .member-group-title { font-size: 12px; font-weight: bold; color: #949ba4; text-transform: uppercase; letter-spacing: 0.5px; padding-left: 8px; margin-bottom: 8px; }
-        .user-row { display: flex; align-items: center; gap: 12px; padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 16px; color: #949ba4; }
-        .user-row:hover { background: #35373c; color: #dbdee1; }
+        .discord-members { width: 240px; background: #2b2d31; padding: 20px 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
+        .member-section { display: flex; flex-direction: column; gap: 2px; }
+        .member-group-title { font-size: 12px; font-weight: bold; color: #949ba4; text-transform: uppercase; letter-spacing: 0.5px; padding-left: 8px; margin-bottom: 4px; }
+        .user-row { display: flex; align-items: center; gap: 12px; padding: 6px 8px; border-radius: 4px; font-size: 16px; color: #949ba4; }
+        .user-row.offline { opacity: 0.4; }
         .avatar-stub { width: 32px; height: 32px; background: #1e1f22; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #ff3131; position: relative; border: 1px solid #444; }
         .status-dot { width: 10px; height: 10px; background: #23a55a; border-radius: 50%; position: absolute; bottom: -2px; right: -2px; border: 2px solid #2b2d31; }
-        .status-offline { background: #80848e; }
+        .user-row.offline .status-dot { background: #80848e; }
 
-        /* Ampel-Karten für Support */
-        .support-card { padding: 14px; border-radius: 8px; margin-bottom: 12px; border-left: 5px solid #fff; background: #2b2d31; color: #dbdee1; }
-        .sup-green { border-color: #23a55a; }
-        .sup-red { border-color: #f23f43; }
-        .sup-yellow { border-color: #f0b232; }
-
-        /* Rollenfarben wie auf dem Server */
-        .role-admin { color: #f23f43 !important; text-shadow: 0 0 5px rgba(242,63,67,0.3); } 
+        .role-admin { color: #f23f43 !important; } 
         .role-offi { color: #f0b232 !important; } 
         .role-member { color: #23a55a !important; }
 
-        /* MODALS (POPUPS) */
+        /* MODALS */
         .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; justify-content:center; align-items:center; }
-        .modal-box { background:#313338; border: 1px solid #444; padding: 25px; border-radius: 8px; width: 400px; text-align: center; color: #dbdee1; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
-        .modal-box h2 { margin-top: 0; color: #fff; }
-        .modal-box select, .modal-box input { width: 100%; padding: 10px; background: #1e1f22; border: 1px solid #111; color: #fff; font-family: 'Almendra'; border-radius: 4px; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; outline: none; }
-        .user-scroll-list { background:#1e1f22; border:1px solid #111; height:180px; overflow-y:auto; margin-bottom:15px; text-align:left; padding:8px; border-radius:4px; }
-        .check-row { display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid #2b2d31; cursor:pointer; }
-        .check-row input { width:18px; height:18px; accent-color:#ff3131; }
+        .modal-box { background:#313338; border: 1px solid #444; padding: 25px; border-radius: 8px; width: 400px; text-align: center; color: #dbdee1; }
+        .modal-box select, .modal-box input { width: 100%; padding: 10px; background: #1e1f22; border: 1px solid #111; color: #fff; font-family: 'Almendra'; border-radius: 4px; margin-bottom: 15px; box-sizing: border-box; }
+        .user-scroll-list { background:#1e1f22; border:1px solid #111; height:180px; overflow-y:auto; margin-bottom:15px; text-align:left; padding:8px; }
+        .check-row { display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid #2b2d31; }
 
         #typingDisplay { color: #949ba4; font-style: italic; font-size: 13px; position: absolute; bottom: 68px; left: 25px; }
         .group-admin-btn { background: #2b2d31; border: 1px solid #3f4248; color: #b5bac1; font-family: 'Almendra'; padding: 4px 10px; border-radius: 3px; cursor: pointer; margin-left: 5px; font-size: 13px; }
-        .group-admin-btn:hover { background: #35373c; color: #fff; }
-
         .hidden { display: none !important; }
     </style>
 </head>
@@ -116,10 +105,7 @@
         </div>
     </div>
 
-    <div class="discord-members">
-        <div class="member-group-title" id="rightSidebarTitle">Online</div>
-        <div id="rightUserList"></div>
-    </div>
+    <div class="discord-members" id="rightRosterContainer"></div>
 
     <div id="modalPN" class="modal-overlay">
         <div class="modal-box">
@@ -147,13 +133,19 @@
     const MY_ROLE = localStorage.getItem('bulls_role') || "Gast";
     const MY_EXTRA = localStorage.getItem('bulls_extra') || "";
 
-    let currentServer = 'global'; // global, pn, group, support
+    let currentServer = 'global'; 
     let currentTarget = '';
     let chatDataCache = {};
     let globalUserList = [];
+    let lastMessageCount = 0; // Für Push Notification Trigger
     let typingTimeout;
 
     async function initDiscordFunk() {
+        // Push-Berechtigung beim Start anfordern
+        if ("Notification" in window && Notification.permission === "default") {
+            Notification.requestPermission();
+        }
+
         try {
             const dropRes = await fetch(API + "?action=getDropdownData");
             const dropData = await dropRes.json();
@@ -187,24 +179,19 @@
             renderChannelList();
             renderChatContent();
             renderRightSidebar();
+            checkNewMessagesForPush();
         } catch(e) { console.log("Funkkreis-Unterbrechung."); }
     }
 
     function activateServerMode(server) {
-        currentServer = server;
-        currentTarget = '';
-        
+        currentServer = server; currentTarget = '';
         document.querySelectorAll(".server-icon").forEach(s => s.classList.remove("active"));
         document.getElementById("srv-" + server).classList.add("active");
 
         const plusBtn = document.getElementById("addChannelPlusBtn");
-        if(server === 'group' && (["Admin"].includes(MY_ROLE) || MY_EXTRA.includes("Moderator"))) {
+        if((server === 'group' && (["Admin"].includes(MY_ROLE) || MY_EXTRA.includes("Moderator"))) || server === 'pn') {
             plusBtn.classList.remove("hidden");
-        } else if(server === 'pn') {
-            plusBtn.classList.remove("hidden");
-        } else {
-            plusBtn.classList.add("hidden");
-        }
+        } else { plusBtn.classList.add("hidden"); }
 
         if(server === 'global') {
             document.getElementById("channelSectionTitle").innerText = "Textkanäle";
@@ -225,9 +212,7 @@
         const container = document.getElementById("channelSubList");
         container.innerHTML = "";
 
-        if(currentServer === 'global') {
-            container.innerHTML = `<button class="channel-btn active"># globaler-funk</button>`;
-        }
+        if(currentServer === 'global') container.innerHTML = `<button class="channel-btn active"># globaler-funk</button>`;
         else if(currentServer === 'pn') {
             const keys = Object.keys(chatDataCache.pns || {});
             keys.forEach(p => {
@@ -244,9 +229,7 @@
             });
             if(autoSelect && groups.length > 0 && !currentTarget) switchChannel('group', '🪖 ' + groups[0].name, groups[0].name, groups[0].dcLink);
         }
-        else if(currentServer === 'support') {
-            container.innerHTML = `<button class="channel-btn active"># ticket-center</button>`;
-        }
+        else if(currentServer === 'support') container.innerHTML = `<button class="channel-btn active"># ticket-center</button>`;
     }
 
     function switchChannel(server, title, target = '', dc = '') {
@@ -256,7 +239,6 @@
         
         const tools = document.getElementById("channelAdminTools");
         tools.innerHTML = "";
-
         if(dc) tools.innerHTML += `<a href="${dc}" target="_blank" style="color:#5865f2; text-decoration:none; margin-right:10px; font-size:15px;">🔗 Discord Server</a>`;
         
         if (server === 'group' && (["Admin"].includes(MY_ROLE) || MY_EXTRA.includes("Moderator"))) {
@@ -266,6 +248,7 @@
                 <button class="group-admin-btn" style="color:#f23f43;" onclick="adminAction('delete')">Löschen</button>
             `;
         }
+        lastMessageCount = 0; // Reset für Push bei Kanalwechsel
         updateLoop();
     }
 
@@ -274,6 +257,7 @@
         const footer = document.getElementById("chatFooterArea");
         footer.classList.remove("hidden");
         let html = "";
+        let showReadStatus = false;
 
         if (currentServer === 'global') {
             (chatDataCache.globalChat || []).forEach(m => {
@@ -285,6 +269,10 @@
             msgs.forEach(m => {
                 html += `<div class="d-msg"><div class="d-msg-meta"><span class="d-msg-sender" style="color:#fff;">${m[1]}</span><span class="d-msg-time">${m[0]}</span></div><div class="d-msg-text">${m[3]}</div></div>`;
             });
+            // Lesebestätigung-Logik: Ist Partner online?
+            if(chatDataCache.onlineUsers && chatDataCache.onlineUsers.includes(currentTarget)) {
+                showReadStatus = true;
+            }
         }
         else if (currentServer === 'group' && currentTarget) {
             const g = (chatDataCache.groups || []).find(x => x.name === currentTarget);
@@ -297,12 +285,9 @@
         else if (currentServer === 'support') {
             footer.classList.add("hidden");
             (chatDataCache.support || []).forEach(m => {
-                let col = 'sup-green';
-                if(m[1] === 'SUPPORT') col = 'sup-red';
-                if(m[1] === 'BUCHHALTER') col = 'sup-yellow';
-                
+                let col = 'sup-green'; if(m[1] === 'SUPPORT') col = 'sup-red'; if(m[1] === 'BUCHHALTER') col = 'sup-yellow';
                 if (["Admin"].includes(MY_ROLE) || (m[1]==='BUCHHALTER' && MY_EXTRA.includes("Buchhalter"))) {
-                    html += `<div class="support-card ${col}"><strong>[${m[0]}] ${m[2]}</strong> (${m[1]}):<br style="margin-bottom:5px;">${m[3]}</div>`;
+                    html += `<div class="support-card ${col}"><strong>[${m[0]}] ${m[2]}</strong> (${m[1]}):<br>${m[3]}</div>`;
                 }
             });
         }
@@ -311,31 +296,99 @@
             html = `<p style="text-align:center; color:#4e5058; margin-top:100px; font-size:18px;">Klicke links auf das "+" um eine Übertragung zu starten.</p>`;
         }
 
+        if(showReadStatus && html !== "") {
+            html += `<div class="read-status">✓✓ Gelesen</div>`;
+        }
+
         box.innerHTML = html;
         
         const typingDiv = document.getElementById("typingDisplay");
-        let typers = [];
-        Object.keys(chatDataCache.typing || {}).forEach(t => { if(t !== MY_NAME) typers.push(t); });
+        let typers = []; Object.keys(chatDataCache.typing || {}).forEach(t => { if(t !== MY_NAME) typers.push(t); });
         typingDiv.innerText = typers.length > 0 ? typers.join(", ") + " schreibt..." : "";
     }
 
+    // DIE NEUE DYNAMISCHE DISCORD-MITGLIEDERLISTE
     function renderRightSidebar() {
-        const title = document.getElementById("rightSidebarTitle");
-        const container = document.getElementById("rightUserList");
+        const container = document.getElementById("rightRosterContainer");
         container.innerHTML = "";
 
+        const onlineList = chatDataCache.onlineUsers || [];
+
+        // FALL A: WIR SIND IN EINEM GRUPPENCHAT -> Nur Gruppenmitglieder filtern!
         if (currentServer === 'group' && currentTarget) {
-            title.innerText = `Trupp-Member`;
+            const activeGroup = (chatDataCache.groups || []).find(x => x.name === currentTarget);
+            if (!activeGroup) return;
+
+            let groupMembers = activeGroup.members || [];
+            let onTrupp = [];
+            let offTrupp = [];
+
+            groupMembers.forEach(m => {
+                if (onlineList.includes(m)) onTrupp.push(m);
+                else offTrupp.push(m);
+            });
+
+            // Online im Trupp rendern
+            let html = `<div class="member-section"><div class="member-group-title">Online im Trupp — ${onTrupp.length}</div>`;
+            onTrupp.forEach(m => { html += `<div class="user-row"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; });
+            html += `</div>`;
+
+            // Offline im Trupp rendern
+            html += `<div class="member-section"><div class="member-group-title">Offline im Trupp — ${offTrupp.length}</div>`;
+            offTrupp.forEach(m => { html += `<div class="user-row offline"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; });
+            html += `</div>`;
+
+            container.innerHTML = html;
+        } 
+        // FALL B: GLOBAL, PN ODER SUPPORT -> Immer die gesamte Allianzliste ausgeben!
+        else {
+            let allianzOnline = [];
+            let allianzOffline = [];
+
+            globalUserList.forEach(u => {
+                if (onlineList.includes(u)) allianzOnline.push(u);
+                else allianzOffline.push(u);
+            });
+
+            // Online Allianz rendern
+            let html = `<div class="member-section"><div class="member-group-title">Online im HQ — ${allianzOnline.length}</div>`;
+            allianzOnline.forEach(u => { html += `<div class="user-row"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; });
+            html += `</div>`;
+
+            // Offline Allianz rendern
+            html += `<div class="member-section"><div class="member-group-title">Offline — ${allianzOffline.length}</div>`;
+            allianzOffline.forEach(u => { html += `<div class="user-row offline"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; });
+            html += `</div>`;
+
+            container.innerHTML = html;
+        }
+    }
+
+    // PUSH NOTIFICATION SYSTEM FÜR DESKTOP / HANDY
+    function checkNewMessagesForPush() {
+        let currentMessages = [];
+        if (currentServer === 'global') currentMessages = chatDataCache.globalChat || [];
+        else if (currentServer === 'pn' && currentTarget) currentMessages = chatDataCache.pns[currentTarget] || [];
+        else if (currentServer === 'group' && currentTarget) {
             const g = (chatDataCache.groups || []).find(x => x.name === currentTarget);
-            if (g) {
-                g.members.forEach(m => {
-                    container.innerHTML += `<div class="user-row"><div class="avatar-stub">${m.charAt(0).toUpperCase()}</div><span>${m}</span></div>`;
-                });
+            if(g) currentMessages = g.messages || [];
+        }
+
+        if(lastMessageCount > 0 && currentMessages.length > lastMessageCount) {
+            let lastMsg = currentMessages[currentMessages.length - 1];
+            // Nur benachrichtigen, wenn die Nachricht NICHT von dir selbst kommt
+            if(lastMsg[1] !== MY_NAME && lastMsg[3]) {
+                triggerDesktopPush(lastMsg[1], lastMsg[3]);
             }
-        } else {
-            title.innerText = `Online — ${chatDataCache.onlineUsers ? chatDataCache.onlineUsers.length : 0}`;
-            (chatDataCache.onlineUsers || []).forEach(u => {
-                container.innerHTML += `<div class="user-row"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`;
+        }
+        lastMessageCount = currentMessages.length;
+    }
+
+    function triggerDesktopPush(sender, text) {
+        if ("Notification" in window && Notification.permission === "granted") {
+            new Notification(`BULLS HQ Funk von ${sender}`, {
+                body: text,
+                icon: 'https://cdn-icons-png.flaticon.com/512/5865/5865171.png' // Optionales Kampf-Icon
             });
         }
     }
@@ -363,26 +416,18 @@
     }
 
     function startPNFromModal() {
-        const user = document.getElementById("pnUserSelect").value;
-        if(!user) return;
-        closeModals();
-        switchChannel('pn', '👤 ' + user, user);
+        const user = document.getElementById("pnUserSelect").value; if(!user) return;
+        closeModals(); activateServerMode('pn'); switchChannel('pn', '👤 ' + user, user);
     }
 
     async function createGroupFromModal() {
         const name = document.getElementById("newGroupName").value.trim();
-        const dc = document.getElementById("newGroupDC").value.trim();
-        if(!name) return;
-
+        const dc = document.getElementById("newGroupDC").value.trim(); if(!name) return;
         const boxes = document.querySelectorAll('input[name="groupMembers"]:checked');
-        let members = [MY_NAME];
-        boxes.forEach(b => members.push(b.value));
+        let members = [MY_NAME]; boxes.forEach(b => members.push(b.value));
 
         closeModals();
         await fetch(API, { method: "POST", body: JSON.stringify({ action: "createGroup", groupName: name, members: members, dcLink: dc }) });
-        
-        document.getElementById("newGroupName").value = "";
-        document.getElementById("newGroupDC").value = "";
         switchChannel('group', '🪖 ' + name, name, dc);
     }
 
