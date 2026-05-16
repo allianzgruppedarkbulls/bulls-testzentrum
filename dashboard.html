@@ -126,26 +126,38 @@
             checkNews(); 
         }
 
-        async function checkNews() {
-            try {
-                const res = await fetch(window.BULLS_CONFIG.SCRIPT_URL + "?action=getGlobalSettings");
-                const s = await res.json();
-                
-                if (s.newsActive && s.newsMsg) {
-                    const newsDiv = document.createElement("div");
-                    newsDiv.id = "newsOverlay";
-                    newsDiv.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10000; display:flex; justify-content:center; align-items:center; padding:20px; font-family:'Almendra';";
-                    newsDiv.innerHTML = `
-                        <div style="background:#111; border:2px solid #ff3131; padding:40px; border-radius:15px; text-align:center; max-width:500px; box-shadow:0 0 40px rgba(255,49,49,0.5);">
-                            <h2 style="color:#ff3131; text-transform:uppercase; margin-top:0; letter-spacing:2px;">⚠️ System-Meldung</h2>
-                            <p style="color:#fff; font-size:22px; margin:20px 0; line-height:1.4;">${s.newsMsg}</p>
-                            <button onclick="document.getElementById('newsOverlay').remove()" style="background:#ff3131; color:#fff; border:none; padding:12px 40px; font-family:'Almendra'; font-weight:bold; cursor:pointer; border-radius:5px; text-transform:uppercase; font-size:18px; box-shadow:0 0 15px red;">Verstanden</button>
-                        </div>
-                    `;
-                    document.body.appendChild(newsDiv);
-                }
-            } catch(e) { console.log("Ankündigungs-Fehler."); }
+      async function checkNews() {
+    // PRÜFUNG: Haben wir die News in dieser Sitzung schon weggeklickt?
+    if (sessionStorage.getItem('bulls_news_seen') === 'true') {
+        return; // Wenn ja, brechen wir hier sofort ab -> Kein Pop-up!
+    }
+
+    try {
+        const res = await fetch(window.BULLS_CONFIG.SCRIPT_URL + "?action=getGlobalSettings");
+        const s = await res.json();
+        
+        if (s.newsActive && s.newsMsg) {
+            const newsDiv = document.createElement("div");
+            newsDiv.id = "newsOverlay";
+            newsDiv.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10000; display:flex; justify-content:center; align-items:center; padding:20px; font-family:'Almendra';";
+            newsDiv.innerHTML = `
+                <div style="background:#111; border:2px solid #ff3131; padding:40px; border-radius:15px; text-align:center; max-width:500px; box-shadow:0 0 40px rgba(255,49,49,0.5);">
+                    <h2 style="color:#ff3131; text-transform:uppercase; margin-top:0; letter-spacing:2px;">⚠️ System-Meldung</h2>
+                    <p style="color:#fff; font-size:22px; margin:20px 0; line-height:1.4;">${s.newsMsg}</p>
+                    <button onclick="confirmNews()" style="background:#ff3131; color:#fff; border:none; padding:12px 40px; font-family:'Almendra'; font-weight:bold; cursor:pointer; border-radius:5px; text-transform:uppercase; font-size:18px; box-shadow:0 0 15px red;">Verstanden</button>
+                </div>
+            `;
+            document.body.appendChild(newsDiv);
         }
+    } catch(e) { console.log("Ankündigungs-Fehler."); }
+}
+
+// Hilfsfunktion: Speichert das "Gesehen" ab und löscht das Overlay
+function confirmNews() {
+    sessionStorage.setItem('bulls_news_seen', 'true'); // Merken für diese Session
+    const overlay = document.getElementById('newsOverlay');
+    if (overlay) overlay.remove();
+}
 
         function applyPermissions(r, ex) {
             const boxPerso = document.getElementById('box-perso');
