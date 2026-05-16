@@ -13,7 +13,6 @@
             box-sizing: border-box;
         }
         
-        /* Das große, breite originale Akten-Fenster */
         .modal-box { 
             width: 1000px; max-width: 95vw; background-color: #0f0f0f; border: 2px solid #ff3131; 
             border-radius: 12px; padding: 30px; box-shadow: 0 0 40px rgba(255, 0, 0, 0.4); 
@@ -24,7 +23,6 @@
 
         .section-title { color: #5dade2; font-size: 18px; font-style: italic; border-bottom: 1px solid #333; padding-bottom: 5px; margin-top: 20px; margin-bottom: 15px; }
         
-        /* Das originale 3-Spalten-Raster für die Daten */
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 15px; }
         
         .form-group { display: flex; flex-direction: column; text-align: left; }
@@ -36,12 +34,10 @@
         }
         input:focus, select:focus, textarea:focus { border-color: #ff3131; }
         
-        /* Große Textbox für die Beschreibung */
         .desc-label { color: #ffd600; font-size: 18px; font-weight: bold; margin-bottom: 5px; display: block; text-align: left;}
         .info-box-text { color: #888; font-size: 14px; font-style: italic; text-align: left; margin-bottom: 8px; }
         textarea { width: 100%; height: 140px; resize: none; background: #000; border: 1px solid #444; color: #39d353; padding: 15px; font-size: 16px; border-radius: 5px; box-sizing: border-box; }
 
-        /* Die 3 Buttons unten nebeneinander */
         .button-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 30px; }
         
         .btn-action { 
@@ -113,8 +109,8 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Datum der Meldung</label>
-                <input type="text" id="reportDate" readonly>
+                <label>Spielnummer</label>
+                <input type="text" id="gameNumber" placeholder="Z.B. Game-ID 837462...">
             </div>
         </div>
 
@@ -142,7 +138,8 @@
         </div>
         <div class="grid-3">
             <div class="form-group">
-                <label>&nbsp;</label>
+                <label>Datum der Meldung</label>
+                <input type="text" id="reportDate" readonly>
             </div>
             <div class="form-group">
                 <label>Zeuge 2</label>
@@ -166,25 +163,18 @@
 <script>
     const API = window.BULLS_CONFIG.SCRIPT_URL;
 
-    // Setzt automatische Daten beim Laden
     function setMeta() {
-        // Setzt den angemeldeten User direkt als Melder fest
         document.getElementById("reporterName").value = localStorage.getItem("bulls_user") || "Unbekannt";
-        
-        // Generiert das aktuelle Datum für das Melde-Feld
         const heute = new Date();
         document.getElementById("reportDate").value = heute.toLocaleDateString("de-DE");
-        
         loadDropdowns();
     }
 
-    // Lädt die Vorgaben aus dem Google Script
     async function loadDropdowns() {
         try {
             const res = await fetch(API + "?action=getDropdownData");
             const data = await res.json();
             
-            // Allianzen
             const alliSel = document.getElementById("targetAlli");
             if(data.allianzen) {
                 data.allianzen.sort().forEach(a => {
@@ -192,7 +182,6 @@
                 });
             }
             
-            // Maps
             const mapSel = document.getElementById("playerMap");
             if(data.maps) {
                 data.maps.sort().forEach(m => {
@@ -200,7 +189,6 @@
                 });
             }
 
-            // Verstöße / Anschuldigungen
             const reasonSel = document.getElementById("reason");
             if(data.vorwuerfe) {
                 data.vorwuerfe.sort().forEach(v => {
@@ -210,7 +198,6 @@
         } catch(e) { console.log("Fehler beim Abruf der Dropdown-Strukturen."); }
     }
 
-    // Sendet die ausgefüllte Akte ab
     async function submitReport(e) {
         e.preventDefault();
         const btn = document.getElementById("submitBtn");
@@ -227,6 +214,7 @@
             playerMap: document.getElementById("playerMap").value,
             reason: document.getElementById("reason").value,
             proof: document.getElementById("proof").value,
+            gameNumber: document.getElementById("gameNumber").value.trim(), // NEU IM PAYLOAD
             reportDate: document.getElementById("reportDate").value,
             description: document.getElementById("description").value.trim(),
             reporter: document.getElementById("reporterName").value,
@@ -240,7 +228,7 @@
             await fetch(API, { method: "POST", body: JSON.stringify(payload) });
             alert("✓ AKTE ERFOLGREICH AN DIE ZENTRALE ÜBERMITTELT!");
             document.getElementById("reportForm").reset();
-            setMeta(); // Setzt Datum und Melder wieder neu
+            setMeta();
         } catch(e) {
             alert("Fehler beim Übertragen der Akte!");
         } finally {
