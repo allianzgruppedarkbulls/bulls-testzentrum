@@ -99,7 +99,7 @@
             </div>
         </div>
 
-        <div class="chat-btn-container" id="box-allichat">
+      <div class="chat-btn-container" id="box-allichat">
             <button class="chat-btn" onclick="window.location.href='Chat.html'">ALLIANZ CHAT</button>
         </div>
     </div>
@@ -117,6 +117,34 @@
             if(extra) displayRole += " | " + extra;
             document.getElementById('userDisplay').innerText = user + " (" + displayRole + ")";
             applyPermissions(role, extra);
+            
+            // HIER NEU: Startet den Check für die Dashboard-Meldung sofort nach dem Login-Check
+            checkNews(); 
+        }
+
+        // NEU: Holt die Einstellungen und baut das Pop-up bei Bedarf vollautomatisch
+        async function checkNews() {
+            try {
+                const res = await fetch(window.BULLS_CONFIG.SCRIPT_URL + "?action=getGlobalSettings");
+                const s = await res.json();
+                
+                // Nur aufploppen, wenn der News-Schalter AN ist und ein Text drinsteht
+                if (s.newsActive && s.newsMsg) {
+                    const newsDiv = document.createElement("div");
+                    newsDiv.id = "newsOverlay";
+                    newsDiv.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10000; display:flex; justify-content:center; align-items:center; padding:20px; font-family:'Almendra';";
+                    newsDiv.innerHTML = `
+                        <div style="background:#111; border:2px solid #ff3131; padding:40px; border-radius:15px; text-align:center; max-width:500px; box-shadow:0 0 40px rgba(255,49,49,0.5);">
+                            <h2 style="color:#ff3131; text-transform:uppercase; margin-top:0; letter-spacing:2px;">⚠️ System-Meldung</h2>
+                            <p style="color:#fff; font-size:22px; margin:20px 0; line-height:1.4;">${s.newsMsg}</p>
+                            <button onclick="document.getElementById('newsOverlay').remove()" style="background:#ff3131; color:#fff; border:none; padding:12px 40px; font-family:'Almendra'; font-weight:bold; cursor:pointer; border-radius:5px; text-transform:uppercase; font-size:18px; box-shadow:0 0 15px red; transition: 0.2s;">Verstanden</button>
+                        </div>
+                    `;
+                    document.body.appendChild(newsDiv);
+                }
+            } catch(e) { 
+                console.log("Ankündigungs-Fehler: Verbindung zum Google Script fehlgeschlagen."); 
+            }
         }
 
         function applyPermissions(r, ex) {
