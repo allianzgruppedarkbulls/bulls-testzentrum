@@ -8,14 +8,14 @@
     <style>
         body { background-color: #0c0c0e; color: #dbdee1; font-family: 'Almendra', serif; margin: 0; padding: 0; height: 100vh; display: flex; overflow: hidden; }
         
-        /* 1. DISCORD SERVER LEISTE (GANZ LINKS) */
+        /* SERVER LEISTE (LINKS) */
         .discord-servers { width: 70px; background: #1e1f22; display: flex; flex-direction: column; align-items: center; padding-top: 15px; gap: 8px; border-right: 1px solid #111; }
         .server-icon { width: 48px; height: 48px; background: #2b2d31; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; transition: 0.2s; position: relative; color: #ff3131; border: 1px solid #333; }
         .server-icon:hover, .server-icon.active { border-radius: 15px; background: #ff3131; color: #000; box-shadow: 0 0 15px #ff3131; }
         .server-icon::before { content: ''; position: absolute; left: -12px; width: 8px; height: 0; background: #fff; border-radius: 0 4px 4px 0; transition: 0.2s; }
         .server-icon.active::before { height: 40px; }
 
-        /* 2. DISCORD KANAL/SUB-LEISTE */
+        /* KANAL LEISTE */
         .discord-channels { width: 240px; background: #2b2d31; display: flex; flex-direction: column; padding: 10px; box-sizing: border-box; }
         .channel-header { font-size: 14px; font-weight: bold; color: #949ba4; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 5px; display: flex; justify-content: space-between; align-items: center; }
         .channel-btn { padding: 8px 12px; background: transparent; border: none; color: #949ba4; font-family: 'Almendra'; font-size: 16px; border-radius: 4px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 8px; margin-bottom: 2px; width: 100%; transition: 0.1s; }
@@ -24,12 +24,11 @@
         .channel-plus { font-size: 18px; cursor: pointer; color: #949ba4; padding: 0 5px; }
         .channel-plus:hover { color: #fff; }
 
-        /* 3. DISCORD CHATBEREICH (MITTE) */
+        /* CHATBEREICH (MITTE) */
         .discord-chat-container { flex: 1; display: flex; flex-direction: column; background: #313338; position: relative; }
         .chat-top-bar { height: 48px; background: #313338; border-bottom: 1px solid #1f2023; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; font-size: 18px; font-weight: bold; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
         .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         
-        /* Nachrichten */
         .d-msg { display: flex; flex-direction: column; gap: 2px; padding: 2px 5px; border-radius: 4px; }
         .d-msg:hover { background: rgba(255, 255, 255, 0.02); }
         .d-msg-meta { display: flex; align-items: center; gap: 8px; }
@@ -44,11 +43,13 @@
         input[type="text"] { flex: 1; background: transparent; border: none; color: #dbdee1; font-family: 'Almendra'; font-size: 16px; outline: none; }
         .send-btn { background: #39d353; color: #000; border: none; padding: 8px 16px; font-family: 'Almendra'; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
 
-        /* 4. DISCORD MEMBER LEISTE (RECHTS) */
+        /* MEMBER LEISTE (RECHTS) */
         .discord-members { width: 240px; background: #2b2d31; padding: 20px 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .member-section { display: flex; flex-direction: column; gap: 2px; }
         .member-group-title { font-size: 12px; font-weight: bold; color: #949ba4; text-transform: uppercase; letter-spacing: 0.5px; padding-left: 8px; margin-bottom: 4px; }
         .user-row { display: flex; align-items: center; gap: 12px; padding: 6px 8px; border-radius: 4px; font-size: 16px; color: #949ba4; }
+        .user-row.mod-clickable { cursor: pointer; }
+        .user-row.mod-clickable:hover { background: #35373c; color: #fff; }
         .user-row.offline { opacity: 0.4; }
         .avatar-stub { width: 32px; height: 32px; background: #1e1f22; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #ff3131; position: relative; border: 1px solid #444; }
         .status-dot { width: 10px; height: 10px; background: #23a55a; border-radius: 50%; position: absolute; bottom: -2px; right: -2px; border: 2px solid #2b2d31; }
@@ -58,15 +59,20 @@
         .role-offi { color: #f0b232 !important; } 
         .role-member { color: #23a55a !important; }
 
+        /* Support Ampel */
+        .support-card { padding: 14px; border-radius: 8px; margin-bottom: 12px; border-left: 5px solid #fff; background: #2b2d31; color: #dbdee1; }
+        .sup-green { border-color: #23a55a; } .sup-red { border-color: #f23f43; } .sup-yellow { border-color: #f0b232; }
+
         /* MODALS */
         .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; justify-content:center; align-items:center; }
         .modal-box { background:#313338; border: 1px solid #444; padding: 25px; border-radius: 8px; width: 400px; text-align: center; color: #dbdee1; }
-        .modal-box select, .modal-box input { width: 100%; padding: 10px; background: #1e1f22; border: 1px solid #111; color: #fff; font-family: 'Almendra'; border-radius: 4px; margin-bottom: 15px; box-sizing: border-box; }
+        .modal-box select, .modal-box input { width: 100%; padding: 10px; background: #1e1f22; border: 1px solid #111; color: #fff; font-family: 'Almendra'; border-radius: 4px; margin-bottom: 15px; box-sizing: border-box; outline: none; }
         .user-scroll-list { background:#1e1f22; border:1px solid #111; height:180px; overflow-y:auto; margin-bottom:15px; text-align:left; padding:8px; }
         .check-row { display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid #2b2d31; }
 
         #typingDisplay { color: #949ba4; font-style: italic; font-size: 13px; position: absolute; bottom: 68px; left: 25px; }
         .group-admin-btn { background: #2b2d31; border: 1px solid #3f4248; color: #b5bac1; font-family: 'Almendra'; padding: 4px 10px; border-radius: 3px; cursor: pointer; margin-left: 5px; font-size: 13px; }
+        .report-btn { background: #f23f43; color: #fff; border: none; padding: 5px 12px; font-family: 'Almendra'; border-radius: 3px; cursor: pointer; font-size: 13px; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -137,15 +143,16 @@
     let currentTarget = '';
     let chatDataCache = {};
     let globalUserList = [];
-    let lastMessageCount = 0; // Für Push Notification Trigger
+    let lastMessageCount = 0; 
     let typingTimeout;
 
+    // Moderator Recht prüfen (Admin oder Zusatzrolle Moderator)
+    const IS_MODERATOR = ["Admin"].includes(MY_ROLE) || MY_EXTRA.includes("Moderator");
+
     async function initDiscordFunk() {
-        // Push-Berechtigung beim Start anfordern
         if ("Notification" in window && Notification.permission === "default") {
             Notification.requestPermission();
         }
-
         try {
             const dropRes = await fetch(API + "?action=getDropdownData");
             const dropData = await dropRes.json();
@@ -189,7 +196,7 @@
         document.getElementById("srv-" + server).classList.add("active");
 
         const plusBtn = document.getElementById("addChannelPlusBtn");
-        if((server === 'group' && (["Admin"].includes(MY_ROLE) || MY_EXTRA.includes("Moderator"))) || server === 'pn') {
+        if((server === 'group' && IS_MODERATOR) || server === 'pn') {
             plusBtn.classList.remove("hidden");
         } else { plusBtn.classList.add("hidden"); }
 
@@ -214,7 +221,7 @@
 
         if(currentServer === 'global') container.innerHTML = `<button class="channel-btn active"># globaler-funk</button>`;
         else if(currentServer === 'pn') {
-            const keys = Object.keys(chatDataCache.pns || {});
+            const keys = Object.keys(chatDataCache.pns || {}).sort(); // Alphabetisch sortieren
             keys.forEach(p => {
                 let act = currentTarget === p ? 'active' : '';
                 container.innerHTML += `<button class="channel-btn ${act}" onclick="switchChannel('pn', '👤 ' + '${p}', '${p}')"># ${p.toLowerCase()}</button>`;
@@ -222,7 +229,7 @@
             if(autoSelect && keys.length > 0 && !currentTarget) switchChannel('pn', '👤 ' + keys[0], keys[0]);
         }
         else if(currentServer === 'group') {
-            const groups = chatDataCache.groups || [];
+            const groups = (chatDataCache.groups || []).sort((a,b) => a.name.localeCompare(b.name)); // Alphabetisch sortieren
             groups.forEach(g => {
                 let act = currentTarget === g.name ? 'active' : '';
                 container.innerHTML += `<button class="channel-btn ${act}" onclick="switchChannel('group', '🪖 ' + '${g.name}', '${g.name}', '${g.dcLink}')"># ${g.name.toLowerCase()}</button>`;
@@ -239,16 +246,22 @@
         
         const tools = document.getElementById("channelAdminTools");
         tools.innerHTML = "";
+        
         if(dc) tools.innerHTML += `<a href="${dc}" target="_blank" style="color:#5865f2; text-decoration:none; margin-right:10px; font-size:15px;">🔗 Discord Server</a>`;
         
-        if (server === 'group' && (["Admin"].includes(MY_ROLE) || MY_EXTRA.includes("Moderator"))) {
+        // NEU: "Chat melden" Button bei PN-Chats einfügen
+        if(server === 'pn' && target) {
+            tools.innerHTML += `<button class="report-btn" onclick="reportCurrentPNChat()">Chat melden 🚨</button>`;
+        }
+
+        if (server === 'group' && IS_MODERATOR) {
             tools.innerHTML += `
                 <button class="group-admin-btn" onclick="adminAction('mute')">Mute</button>
                 <button class="group-admin-btn" onclick="adminAction('archive')">Archiv</button>
                 <button class="group-admin-btn" style="color:#f23f43;" onclick="adminAction('delete')">Löschen</button>
             `;
         }
-        lastMessageCount = 0; // Reset für Push bei Kanalwechsel
+        lastMessageCount = 0; 
         updateLoop();
     }
 
@@ -269,10 +282,7 @@
             msgs.forEach(m => {
                 html += `<div class="d-msg"><div class="d-msg-meta"><span class="d-msg-sender" style="color:#fff;">${m[1]}</span><span class="d-msg-time">${m[0]}</span></div><div class="d-msg-text">${m[3]}</div></div>`;
             });
-            // Lesebestätigung-Logik: Ist Partner online?
-            if(chatDataCache.onlineUsers && chatDataCache.onlineUsers.includes(currentTarget)) {
-                showReadStatus = true;
-            }
+            if(chatDataCache.onlineUsers && chatDataCache.onlineUsers.includes(currentTarget)) showReadStatus = true;
         }
         else if (currentServer === 'group' && currentTarget) {
             const g = (chatDataCache.groups || []).find(x => x.name === currentTarget);
@@ -296,10 +306,7 @@
             html = `<p style="text-align:center; color:#4e5058; margin-top:100px; font-size:18px;">Klicke links auf das "+" um eine Übertragung zu starten.</p>`;
         }
 
-        if(showReadStatus && html !== "") {
-            html += `<div class="read-status">✓✓ Gelesen</div>`;
-        }
-
+        if(showReadStatus && html !== "") html += `<div class="read-status">✓✓ Gelesen</div>`;
         box.innerHTML = html;
         
         const typingDiv = document.getElementById("typingDisplay");
@@ -307,64 +314,88 @@
         typingDiv.innerText = typers.length > 0 ? typers.join(", ") + " schreibt..." : "";
     }
 
-    // DIE NEUE DYNAMISCHE DISCORD-MITGLIEDERLISTE
+    // ALPHABETISCH SORTIERTE MITGLIEDERLISTE MIT TIMEOUT-FUNKTION
     function renderRightSidebar() {
         const container = document.getElementById("rightRosterContainer");
         container.innerHTML = "";
-
         const onlineList = chatDataCache.onlineUsers || [];
+        const isModClass = IS_MODERATOR ? "mod-clickable" : "";
 
-        // FALL A: WIR SIND IN EINEM GRUPPENCHAT -> Nur Gruppenmitglieder filtern!
+        // FALL A: WIR SIND IN EINEM GRUPPENCHAT -> Nur Gruppenmitglieder (A-Z sortiert)
         if (currentServer === 'group' && currentTarget) {
             const activeGroup = (chatDataCache.groups || []).find(x => x.name === currentTarget);
             if (!activeGroup) return;
 
-            let groupMembers = activeGroup.members || [];
-            let onTrupp = [];
-            let offTrupp = [];
+            let groupMembers = (activeGroup.members || []).sort();
+            let onTrupp = [], offTrupp = [];
 
             groupMembers.forEach(m => {
-                if (onlineList.includes(m)) onTrupp.push(m);
-                else offTrupp.push(m);
+                if (onlineList.includes(m)) onTrupp.push(m); else offTrupp.push(m);
             });
 
-            // Online im Trupp rendern
             let html = `<div class="member-section"><div class="member-group-title">Online im Trupp — ${onTrupp.length}</div>`;
-            onTrupp.forEach(m => { html += `<div class="user-row"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; });
+            onTrupp.forEach(m => { html += `<div class="user-row ${isModClass}" onclick="openTimeoutManager('${m}')"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; });
             html += `</div>`;
 
-            // Offline im Trupp rendern
             html += `<div class="member-section"><div class="member-group-title">Offline im Trupp — ${offTrupp.length}</div>`;
-            offTrupp.forEach(m => { html += `<div class="user-row offline"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; });
+            offTrupp.forEach(m => { html += `<div class="user-row offline ${isModClass}" onclick="openTimeoutManager('${m}')"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; });
             html += `</div>`;
 
             container.innerHTML = html;
         } 
-        // FALL B: GLOBAL, PN ODER SUPPORT -> Immer die gesamte Allianzliste ausgeben!
+        // FALL B: ALLE ANDEREN CHATS -> Immer die gesamte Allianzliste (A-Z sortiert)
         else {
-            let allianzOnline = [];
-            let allianzOffline = [];
+            let allianzOnline = [], allianzOffline = [];
+            let sortedAllianz = [...globalUserList].sort();
 
-            globalUserList.forEach(u => {
-                if (onlineList.includes(u)) allianzOnline.push(u);
-                else allianzOffline.push(u);
+            sortedAllianz.forEach(u => {
+                if (onlineList.includes(u)) allianzOnline.push(u); else allianzOffline.push(u);
             });
 
-            // Online Allianz rendern
             let html = `<div class="member-section"><div class="member-group-title">Online im HQ — ${allianzOnline.length}</div>`;
-            allianzOnline.forEach(u => { html += `<div class="user-row"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; });
+            allianzOnline.forEach(u => { html += `<div class="user-row ${isModClass}" onclick="openTimeoutManager('${u}')"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; });
             html += `</div>`;
 
-            // Offline Allianz rendern
             html += `<div class="member-section"><div class="member-group-title">Offline — ${allianzOffline.length}</div>`;
-            allianzOffline.forEach(u => { html += `<div class="user-row offline"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; });
+            allianzOffline.forEach(u => { html += `<div class="user-row offline ${isModClass}" onclick="openTimeoutManager('${u}')"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; });
             html += `</div>`;
 
             container.innerHTML = html;
         }
     }
 
-    // PUSH NOTIFICATION SYSTEM FÜR DESKTOP / HANDY
+    // MODERATIONS-TIMEOUT (ZEITAUFNAHME)
+    function openTimeoutManager(targetUser) {
+        if (!IS_MODERATOR) return; // Nur Admins/Moderatoren dürfen klicken
+        if (targetUser === MY_NAME) return; // Sich selbst muten bringt nix
+
+        let mins = prompt(`🚨 KOMMANDO-ZENTRALE: Spieler '${targetUser}' ins Timeout schicken.\nFür wie viele Minuten soll der Funk für diesen User gesperrt werden? (0 zum Entmuten):`);
+        if (mins === null || mins === "") return;
+        
+        let m = parseInt(mins);
+        if (isNaN(m)) return alert("Bitte eine gültige Minutenzahl eingeben!");
+
+        fetch(API, {
+            method: "POST",
+            body: JSON.stringify({ action: "muteUser", user: targetUser, minuten: m })
+        });
+        alert(`Befehl übermittelt: '${targetUser}' für ${m} Minuten kaltgestellt.`);
+    }
+
+    // PN-CHAT AUTOMATISCH PROTOKOLLIEREN UND ALS ALARM SENDEN
+    async function reportCurrentPNChat() {
+        if(!confirm(`Möchtest du den aktuellen PN-Verlauf mit '${currentTarget}' wirklich wegen eines Verstoßes an den Support melden?`)) return;
+        
+        let sorted = [MY_NAME, currentTarget].sort();
+        let targetSheet = "PN_" + sorted[0] + "_" + sorted[1];
+
+        await fetch(API, {
+            method: "POST",
+            body: JSON.stringify({ action: "reportPNChat", targetSheet: targetSheet, reporter: MY_NAME, gemaßregelt: currentTarget })
+        });
+        alert("✓ CHATVERLAUF ERFOLGREICH AN DIE CENTRAL-SUPPORTABTEILUNG ÜBERMITTELT!");
+    }
+
     function checkNewMessagesForPush() {
         let currentMessages = [];
         if (currentServer === 'global') currentMessages = chatDataCache.globalChat || [];
@@ -376,20 +407,14 @@
 
         if(lastMessageCount > 0 && currentMessages.length > lastMessageCount) {
             let lastMsg = currentMessages[currentMessages.length - 1];
-            // Nur benachrichtigen, wenn die Nachricht NICHT von dir selbst kommt
-            if(lastMsg[1] !== MY_NAME && lastMsg[3]) {
-                triggerDesktopPush(lastMsg[1], lastMsg[3]);
-            }
+            if(lastMsg[1] !== MY_NAME && lastMsg[3]) triggerDesktopPush(lastMsg[1], lastMsg[3]);
         }
         lastMessageCount = currentMessages.length;
     }
 
     function triggerDesktopPush(sender, text) {
         if ("Notification" in window && Notification.permission === "granted") {
-            new Notification(`BULLS HQ Funk von ${sender}`, {
-                body: text,
-                icon: 'https://cdn-icons-png.flaticon.com/512/5865/5865171.png' // Optionales Kampf-Icon
-            });
+            new Notification(`BULLS HQ Funk von ${sender}`, { body: text });
         }
     }
 
@@ -397,6 +422,14 @@
         const text = document.getElementById("msgInput").value.trim();
         if(!text) return;
         
+        // ZUERST PRÜFEN OB USER IM TIMEOUT IST
+        const muteCheckRes = await fetch(API + "?action=checkMute&user=" + MY_NAME);
+        const muteStatus = await muteCheckRes.json();
+        if(muteStatus.muted) {
+            alert(`❌ FUNKSPERRE AKTIV! Du wurdest von der Leitung mundtot gemacht.\nRestliche Strafzeit: ${muteStatus.rest} Minuten.`);
+            return;
+        }
+
         let sheet = "Chat";
         if(currentServer === 'pn') sheet = "PN_" + [MY_NAME, currentTarget].sort().join("_");
         else if(currentServer === 'group') sheet = "GROUP_" + currentTarget;
@@ -423,32 +456,4 @@
     async function createGroupFromModal() {
         const name = document.getElementById("newGroupName").value.trim();
         const dc = document.getElementById("newGroupDC").value.trim(); if(!name) return;
-        const boxes = document.querySelectorAll('input[name="groupMembers"]:checked');
-        let members = [MY_NAME]; boxes.forEach(b => members.push(b.value));
-
-        closeModals();
-        await fetch(API, { method: "POST", body: JSON.stringify({ action: "createGroup", groupName: name, members: members, dcLink: dc }) });
-        switchChannel('group', '🪖 ' + name, name, dc);
-    }
-
-    async function adminAction(mode) {
-        if(!confirm("Befehl wirklich ausführen?")) return;
-        await fetch(API, { method: "POST", body: JSON.stringify({ action: "fullUpdate", type: mode + "Group", groupName: currentTarget }) });
-        activateServerMode('group');
-    }
-
-    function handleTyping() {
-        fetch(API, { method: "POST", body: JSON.stringify({ action: "setTyping", user: MY_NAME, isTyping: true }) });
-        clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(() => {
-            fetch(API, { method: "POST", body: JSON.stringify({ action: "setTyping", user: MY_NAME, isTyping: false }) });
-        }, 3000);
-    }
-
-    function closeModals() { document.querySelectorAll(".modal-overlay").forEach(m => m.style.display = "none"); }
-    function getRoleClass(r) { return r === "Admin" ? "admin" : (["Offizier", "Offi"].includes(r) ? "offi" : "member"); }
-
-    window.onload = initDiscordFunk;
-</script>
-</body>
-</html>
+        const boxes = document.querySelectorAll('input
