@@ -202,10 +202,11 @@ function confirmNews() {
             // Wenn es ein reiner "Gast" ist, bleibt oben alles blockiert (nur "Persönlich" bleibt sichtbar)
         }
 
-        function logout() {
-            localStorage.clear();
-            window.location.href = "index.html";
-        }
+       function logout() {
+    localStorage.clear();
+    sessionStorage.clear(); // Löscht auch den "News gesehen"-Speicher für den nächsten Login!
+    window.location.href = "index.html";
+}
     </script>
 </body>
 </html>
