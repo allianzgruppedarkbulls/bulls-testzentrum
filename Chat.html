@@ -409,3 +409,35 @@
         document.getElementById("newGroupDC").value = "";
         
         activateMainMode('group');
+        switchChannel('group', 'Gruppe: ' + gName, gName, dcLink);
+    }
+
+    // BEDIENUNG DER GRUPPEN-BEFEHLE (MUTE, ARCHIVE, DELETE)
+    async function adminGroupAction(mode) {
+        if(!confirm(`Befehl ausführen: Möchtest du diese Gruppe wirklich ${mode === 'delete' ? 'LÖSCHEN' : mode === 'archive' ? 'ARCHIVIEREN' : 'MUTEN'}?`)) return;
+        
+        // Schickt den Lösch- oder Archivierungsbefehl an das fullUpdate_ System deiner GS
+        await fetch(API, {
+            method: "POST",
+            body: JSON.stringify({ action: "fullUpdate", type: mode + "Group", groupName: currentTarget })
+        });
+
+        alert("Befehl ausgeführt.");
+        activateMainMode('group');
+    }
+
+    function handleTyping() {
+        fetch(API, { method: "POST", body: JSON.stringify({ action: "setTyping", user: MY_NAME, isTyping: true }) });
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+            fetch(API, { method: "POST", body: JSON.stringify({ action: "setTyping", user: MY_NAME, isTyping: false }) });
+        }, 3000);
+    }
+
+    function closeModals() { document.querySelectorAll(".modal-overlay").forEach(m => m.style.display = "none"); }
+    function getRoleClass(r) { return r === "Admin" ? "admin" : (["Offizier", "Offi"].includes(r) ? "offi" : "member"); }
+
+    window.onload = initHQ;
+</script>
+</body>
+</html>
