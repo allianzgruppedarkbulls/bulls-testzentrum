@@ -8,22 +8,20 @@
     <style>
         body { 
             background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; 
-            margin: 0; padding: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh;
+            margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
         .container { 
-            width: 1100px; max-width: 95vw; background-color: #0f0f0f; border: 2px solid #333; 
+            width: 500px; background-color: #0f0f0f; border: 2px solid #333; 
             border-radius: 15px; padding: 40px; box-shadow: 0 0 60px 15px rgba(255, 49, 49, 0.2); 
-            text-align: center; margin-bottom: 20px;
+            text-align: center;
         }
         h1 { color: #ff3131; text-transform: uppercase; margin-bottom: 40px; letter-spacing: 3px; font-size: 32px; text-shadow: 0 0 15px rgba(255, 49, 49, 0.5); }
 
-        /* Button-Grid für die obere Navigation */
-        .top-nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 40px; }
-
-        /* Große Navigations-Buttons in Rot-Schimmer */
+        /* Große Navigations-Buttons */
         .nav-btn {
             width: 100%;
             padding: 25px;
+            margin-bottom: 20px;
             background: #111;
             border: 1px solid #ff3131;
             color: #ff3131;
@@ -49,53 +47,62 @@
         }
 
         .icon { font-size: 28px; }
-
-        .btn-back { display: block; margin-top: 30px; color: #666; text-decoration: none; text-transform: uppercase; font-size: 16px; transition: 0.3s; }
+        .btn-back { display: block; margin-top: 40px; color: #666; text-decoration: none; text-transform: uppercase; font-size: 16px; transition: 0.3s; }
         .btn-back:hover { color: #fff; }
 
-        /* MATRIX-ELEMENTE STYLES */
-        .matrix-box { background: #111214; border: 1px solid #f23f43; border-radius: 8px; padding: 25px; text-align: left; margin-top: 20px; }
-        .matrix-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 15px; background: #070708; }
-        .matrix-table th { background: #0c0c0e; color: #ff3131; padding: 12px; border-bottom: 2px solid #ff3131; }
-        .matrix-table td { padding: 12px; border-bottom: 1px solid #2b2d31; color: #dbdee1; }
+        /* NEU: GROßES VOLLBILD-OVERLAY FÜR DIE MATRIX */
+        .matrix-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.95); z-index: 9999; justify-content: center; align-items: center;
+        }
+        .matrix-content-box {
+            width: 1300px; max-width: 95vw; background: #0f0f0f; border: 2px solid #ff3131;
+            border-radius: 15px; padding: 30px; box-shadow: 0 0 50px rgba(255, 49, 49, 0.4);
+            text-align: left; box-sizing: border-box;
+        }
+        .matrix-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #050505; font-size: 15px; }
+        .matrix-table th { background: #111; color: #ff3131; padding: 12px; border-bottom: 2px solid #ff3131; text-transform: uppercase; }
+        .matrix-table td { padding: 12px; border-bottom: 1px solid #222; color: #fff; }
         .matrix-cb { width: 20px; height: 20px; accent-color: #ff3131; cursor: pointer; }
-        
+
         .save-matrix-btn { 
             background: #39d353; color: black; border: none; padding: 15px 40px; 
             font-size: 18px; font-weight: bold; font-family: 'Almendra'; border-radius: 6px; 
             cursor: pointer; text-transform: uppercase; transition: 0.2s;
-            box-shadow: 0 0 15px rgba(57, 211, 83, 0.2);
         }
-        .save-matrix-btn:hover { background: #2fb145; transform: scale(1.02); box-shadow: 0 0 25px rgba(57, 211, 83, 0.5); }
+        .save-matrix-btn:hover { background: #2fb145; transform: scale(1.02); box-shadow: 0 0 20px rgba(57, 211, 83, 0.4); }
     </style>
 </head>
 <body>
+
 <div class="container">
     <h1>System Zentrale</h1>
 
-    <div class="top-nav-grid">
-        <button class="nav-btn" onclick="window.location.href='Ad_Wartung.html'">
-            <span class="icon">⚠️</span> Wartungsarbeiten
-        </button>
+    <button class="nav-btn" onclick="window.location.href='Ad_Wartung.html'">
+        <span class="icon">⚠️</span> Wartungsarbeiten
+    </button>
 
-        <button class="nav-btn" onclick="window.location.href='Ad_VorVer.html'">
-            <span class="icon">⚙️</span> Dropdown Pflege
-        </button>
-    </div>
+    <button class="nav-btn" onclick="openMatrixModal()">
+        <span class="icon">🎛️</span> Dashboard Rechte
+    </button>
 
-    <div class="matrix-box">
-        <h2 style="font-family: 'Almendra'; color: #ff3131; margin-top: 0; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #333; padding-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-            <span>🎛️</span> Dashboard-Zentralsteuerung & Berechtigungen
+    <a href="dashboard.html" class="btn-back">Zurück zum Hauptmenü</a>
+</div>
+
+<div id="matrixModal" class="matrix-overlay">
+    <div class="matrix-content-box">
+        <h2 style="color: #ff3131; margin-top: 0; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid #333; padding-bottom: 15px;">
+            🎛️ Dashboard-Zentralsteuerung & Berechtigungen
         </h2>
-        <p style="color: #aaa; font-size: 16px; margin-bottom: 25px;">
-            Bestimme hier per einfachem Klick, welche Rollen (Grundstatus) oder funktionalen Aufgaben (Haken-Rechte) die einzelnen Elemente auf dem Dashboard sehen dürfen. 
+        <p style="color: #aaa; font-size: 16px; margin-bottom: 20px;">
+            Bestimme per Haken, welche Rollen oder Aufgaben-Rechte die Elemente auf dem Dashboard sehen dürfen.
         </p>
 
-        <div style="overflow-x: auto; border: 1px solid #333; border-radius: 6px;">
+        <div style="overflow-x: auto; max-height: 60vh; border: 1px solid #333; border-radius: 6px;">
             <table class="matrix-table">
                 <thead>
                     <tr>
-                        <th>Dashboard-Element</th>
+                        <th style="text-align: left;">Dashboard-Element</th>
                         <th style="text-align:center; color:#fff;">Anwärter</th>
                         <th style="text-align:center; color:#fff;">Gast</th>
                         <th style="text-align:center; color:#fff;">Mitglied</th>
@@ -120,14 +127,15 @@
             </table>
         </div>
 
-        <div style="display: flex; justify-content: flex-end; margin-top: 25px;">
+        <div style="display: flex; justify-content: space-between; margin-top: 25px;">
+            <button class="nav-btn" style="width: auto; padding: 12px 30px; font-size: 16px; margin: 0; border-color: #666; color: #666;" onclick="closeMatrixModal()">
+                Schließen
+            </button>
             <button class="save-matrix-btn" onclick="saveDashboardMatrixHTML()">
                 MATRIX VERSIEGELN 💾
             </button>
         </div>
     </div>
-
-    <a href="dashboard.html" class="btn-back">Zurück zum Hauptmenü</a>
 </div>
 
 <script>
@@ -135,7 +143,15 @@
     const ALL_ROLES_LIST = ["Anwärter", "Gast", "Mitglied", "Kampfdivision", "Offizier", "Admin", "Buchhalter", "Moderator", "Statistiker", "elo", "support", "Ausbilder"];
     let localMatrixCache = [];
 
-    // 1. Matrix beim Laden der Seite abrufen
+    function openMatrixModal() {
+        document.getElementById("matrixModal").style.display = "flex";
+        loadDashboardMatrixHTML();
+    }
+
+    function closeMatrixModal() {
+        document.getElementById("matrixModal").style.display = "none";
+    }
+
     async function loadDashboardMatrixHTML() {
         try {
             const res = await fetch(API + "?action=getDashboardMatrix");
@@ -146,18 +162,19 @@
         }
     }
 
-    // 2. Die Tabelle visuell aufbauen
     function renderMatrixTable() {
         const tbody = document.getElementById("matrixTableBody");
         tbody.innerHTML = "";
 
+        if (localMatrixCache.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding:20px; color:#aaa;">Keine registrierten Elemente in 'Dashboard_Rechte' gefunden.</td></tr>`;
+            return;
+        }
+
         localMatrixCache.forEach(item => {
             let tr = document.createElement("tr");
-            
-            // Erste Spalte: Name des Buttons + ID
             let htmlRows = `<td style="padding: 12px;"><strong>${item.name}</strong><br><small style="color:#555;">ID: ${item.id}</small></td>`;
             
-            // Für jede Rolle in der Liste eine Checkbox erstellen
             ALL_ROLES_LIST.forEach(role => {
                 let isChecked = item.allowed.includes(role) ? "checked" : "";
                 htmlRows += `
@@ -172,17 +189,14 @@
         });
     }
 
-    // 3. Alle Haken sammeln und zurück ins Google Sheet jagen
     async function saveDashboardMatrixHTML() {
         const checkboxes = document.querySelectorAll(".matrix-cb");
         let groupedData = {};
 
-        // Listen für jede bekannte HTML_ID vorbereiten
         localMatrixCache.forEach(item => {
             groupedData[item.id] = [];
         });
 
-        // Haken auswerten
         checkboxes.forEach(cb => {
             if (cb.checked) {
                 let id = cb.getAttribute("data-id");
@@ -193,7 +207,6 @@
             }
         });
 
-        // Struktur für Google Apps Script Payload bauen
         let payloadMatrix = [];
         for (let id in groupedData) {
             payloadMatrix.push({
@@ -202,7 +215,6 @@
             });
         }
 
-        // Visueller Lade-Status
         document.getElementById("matrixTableBody").innerHTML = `<tr><td colspan="13" style="text-align:center; padding:30px; color:#f0b232; font-style:italic;">Versiegele neue Rechte-Matrix in der Cloud... 🔄</td></tr>`;
 
         try {
@@ -220,9 +232,6 @@
             loadDashboardMatrixHTML();
         }
     }
-
-    // Beim Laden triggern
-    window.addEventListener("DOMContentLoaded", loadDashboardMatrixHTML);
 </script>
 </body>
 </html>
