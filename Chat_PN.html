@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DARK BULLS - DIREKTFUNK</title>
+    <script src="config.js"></script>
+    <script src="funk_zentrale.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 0; background-color: #050505; color: white; font-family: 'Almendra', serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        /* NAVIGATION BAR */
+        .funk-nav { display: flex; justify-content: space-between; align-items: center; background: #0c0c0e; border-bottom: 2px solid #ff3131; padding: 10px 20px; box-shadow: 0 4px 15px rgba(255, 49, 49, 0.2); }
+        .nav-links { display: flex; gap: 15px; }
+        .nav-link-btn { background: #111; border: 1px solid #333; color: #888; font-family: 'Almendra'; padding: 10px 20px; font-size: 16px; border-radius: 6px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .nav-link-btn:hover { color: #fff; border-color: #ff3131; }
+        .nav-link-btn.active { background: #ff3131; color: #000; border-color: #ff3131; font-weight: bold; box-shadow: 0 0 15px rgba(255, 49, 49, 0.4); }
+        .logout-btn { background: #ff0000; color: #fff; border: none; padding: 8px 15px; font-family: 'Almendra'; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
+
+        /* MULTI-PANEL CHAT LAYOUT */
+        .chat-container { flex: 1; display: flex; max-width: 1400px; width: 100%; margin: 0 auto; background: rgba(10, 10, 10, 0.95); border-left: 1px solid #222; border-right: 1px solid #222; overflow: hidden; }
+        
+        /* LINKER PRIVAT-FUNK-VERTEILER */
+        .side-bar { width: 320px; background: #0b0b0c; border-right: 1px solid #222; display: flex; flex-direction: column; }
+        .search-box { padding: 15px; border-bottom: 1px solid #222; position: relative; }
+        .search-box input { width: 100%; background: #151515; border: 1px solid #333; padding: 10px; color: #fff; border-radius: 5px; box-sizing: border-box; }
+        .search-box input:focus { outline: none; border-color: #ff3131; }
+        
+        /* Dropdown für Suchergebnisse */
+        .search-results { position: absolute; top: 60px; left: 15px; right: 15px; background: #111; border: 1px solid #ff3131; border-radius: 5px; max-height: 200px; overflow-y: auto; z-index: 100; display: none; }
+        .search-result-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #222; font-family: sans-serif; font-size: 14px; }
+        .search-result-item:hover { background: #ff3131; color: #000; font-weight: bold; }
+
+        .chat-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+        .chat-item { padding: 15px 20px; border-bottom: 1px solid #1a1a1a; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+        .chat-item:hover { background: #151515; border-left: 3px solid #ff3131; }
+        .chat-item.active { background: #1c1515; border-left: 3px solid #ff3131; }
+        .chat-name { font-weight: bold; font-size: 16px; }
+        .badge { background: #ff3131; color: #fff; font-size: 12px; font-weight: bold; padding: 3px 8px; border-radius: 10px; box-shadow: 0 0 10px red; }
+
+        /* RECHTER CHAT STREAM */
+        .chat-main { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .stream-area { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .typing-box { padding: 5px 20px; color: #ff8c00; font-size: 14px; font-style: italic; min-height: 20px; }
+
+        /* INPUT AREA */
+        .input-bar { display: flex; gap: 12px; padding: 20px; background: #0c0c0e; border-top: 1px solid #222; }
+        .input-bar input { flex: 1; background: #151515; border: 1px solid #ff3131; padding: 15px; color: #fff; font-family: sans-serif; font-size: 15px; border-radius: 6px; }
+        .input-bar input:focus { outline: none; box-shadow: 0 0 10px rgba(255, 49, 49, 0.3); }
+        .send-btn { background: #ff8c00; color: #000; border: none; padding: 0 35px; font-family: 'Almendra'; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; box-shadow: 0 0 15px rgba(255, 140, 0, 0.3); }
+        .send-btn:hover { background: #e07b00; }
+
+        /* STRUCH-STYLES FÜR INTEGRATION */
+        .msg-line { display: flex; flex-direction: column; background: #111; border-left: 3px solid #ff3131; padding: 10px 15px; border-radius: 0 6px 6px 0; max-width: 85%; align-self: flex-start; }
+        .msg-line.me { border-left: none; border-right: 3px solid #39d353; border-radius: 6px 0 0 6px; background: #161a16; align-self: flex-end; }
+        .msg-meta { font-size: 13px; margin-bottom: 4px; display: flex; gap: 10px; }
+        .meta-user { color: #ff3131; font-weight: bold; }
+        .msg-line.me .meta-user { color: #39d353; }
+        .meta-time { color: #666; }
+        .msg-text { font-family: sans-serif; font-size: 15px; line-height: 1.4; color: #eee; word-break: break-word; }
+        
+        .side-bar::-webkit-scrollbar, .stream-area::-webkit-scrollbar { width: 6px; }
+        .side-bar::-webkit-scrollbar-thumb, .stream-area::-webkit-scrollbar-thumb { background: #222; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+    <div class="funk-nav">
+        <div class="nav-links">
+            <button class="nav-link-btn" onclick="window.location.href='dashboard.html'">🏠 HQ</button>
+            <button class="nav-link-btn" onclick="window.location.href='Chat_Alli.html'">📢 Allianz</button>
+            <button class="nav-link-btn active">💬 PNs</button>
+            <button class="nav-link-btn" onclick="window.location.href='Chat_Group.html'">⚔️ Gruppen</button>
+        </div>
+        <div style="color: #ff3131; font-size: 18px;" id="userDisplay">Bulls Direktfunk...</div>
+        <button class="logout-btn" onclick="logoutFunk()">X</button>
+    </div>
+
+    <div class="chat-container">
+        
+        <div class="side-bar">
+            <div class="search-box">
+                <input type="text" id="userInputSearch" placeholder="🔍 Spieler suchen..." oninput="searchAllianzUser(this.value)">
+                <div class="search-results" id="searchResultsDropdown"></div>
+            </div>
+            <div class="chat-list" id="pnChatVerteiler">
+                </div>
+        </div>
+
+        <div class="chat-main">
+            <div class="stream-area" id="pnStreamArea">
+                <div style="text-align:center; color:#ff8c00; font-style:italic; padding-top:50px;">Wähle links einen aktiven Kanal aus oder nutze die Suche, um ein neues Gespräch zu beginnen. ⚡</div>
+            </div>
+            
+            <div class="typing-box" id="typingIndicator"></div>
+
+            <div class="input-bar">
+                <input type="text" id="messageInput" placeholder="Privaten Funkspruch eingeben..." maxlength="500" autocomplete="off" disabled>
+                <button class="send-btn" id="sendButton" onclick="sendFunkMessage()" disabled>Senden</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let allianzUsersList = []; // Wird aus den Dropdown-Daten des HQ befüllt
+
+        window.addEventListener("DOMContentLoaded", async () => {
+            initFunkkreis("pn");
+            loadAllianzUserBase(); // Zieht im Hintergrund einmal alle User für die Suche
+        });
+
+        // 1. HOLT DIE BENUTZERLISTE FÜR DIE ELEMENT-SUCHE
+        async function loadAllianzUserBase() {
+            try {
+                const res = await fetch(window.BULLS_CONFIG.SCRIPT_URL + "?action=getDropdownData");
+                const data = await res.json();
+                if(data.user) allianzUsersList = data.user.map(u => u.name);
+            } catch(e) { console.log("Fehler beim Holen der User-Datenbank."); }
+        }
+
+        // 2. DIE LIVE-SUCHE IN ACTION
+        function searchAllianzUser(query) {
+            const dropdown = document.getElementById("searchResultsDropdown");
+            const myUser = localStorage.getItem('bulls_user');
+            dropdown.innerHTML = "";
+
+            if (!query.trim()) { dropdown.style.display = "none"; return; }
+
+            // Filter alle Treffer, schließe dich selbst aus
+            let matches = allianzUsersList.filter(name => name.toLowerCase().includes(query.toLowerCase()) && name !== myUser);
+            
+            if (matches.length > 0) {
+                dropdown.style.display = "block";
+                matches.forEach(name => {
+                    let div = document.createElement("div");
+                    div.className = "search-result-item";
+                    div.innerText = name;
+                    div.onclick = () => startNewPNChannel(name);
+                    dropdown.appendChild(div);
+                });
+            } else {
+                dropdown.style.display = "none";
+            }
+        }
+
+        // 3. STARTET EINEN NEUEN PRIVATEN KANAL
+        function startNewPNChannel(name) {
+            document.getElementById("userInputSearch").value = "";
+            document.getElementById("searchResultsDropdown").style.display = "none";
+            
+            currentChatTarget = name; // Tauscht das Sende-Ziel in der funk_zentrale.js
+            
+            // Textbox freischalten
+            document.getElementById('messageInput').disabled = false;
+            document.getElementById('sendButton').disabled = false;
+            
+            updateMuteStatusAndFetch(); // Triggert sofortigen Refresh
+        }
+
+        // 4. VERARBEITET DIE LIVE CHATDATEN VOM SERVER
+        function processChatData(data) {
+            const myUser = localStorage.getItem('bulls_user');
+            const verteiler = document.getElementById("pnChatVerteiler");
+            const stream = document.getElementById("pnStreamArea");
+
+            // --- TEIL A: DIE LINKER SEITE BAUEN (NUR CHATS MIT AKTIVEN NACHRICHTEN) ---
+            let activePNClients = new Set();
+            
+            // Extrahiere alle Kommunikationspartner aus dem PN-Topf
+            if (data.pns) {
+                data.pns.forEach(msg => {
+                    if (msg.user === myUser) activePNClients.add(msg.target);
+                    else activePNClients.add(msg.user);
+                });
+            }
+
+            // Wenn wir gerade ein neues Gespräch gestartet haben, muss derjenige auch rein
+            if (currentChatTarget && currentChatTarget !== "global") {
+                activePNClients.add(currentChatTarget);
+            }
+
+            let verteilerHTML = "";
+            activePNClients.forEach(clientName => {
+                let isActive = currentChatTarget === clientName ? "active" : "";
+                
+                // Berechne ungelesene (Zusatz-Feature falls gewünscht, hier als Platzhalter vorbereitet)
+                let unreadBadge = ""; 
+                
+                verteilerHTML += `
+                    <div class="chat-item ${isActive}" onclick="startNewPNChannel('${clientName}')">
+                        <span class="chat-name">👤 ${clientName}</span>
+                        ${unreadBadge}
+                    </div>
+                `;
+            });
+            verteiler.innerHTML = verteilerHTML || `<div style="padding:20px; color:#555; text-align:center; font-size:14px; font-family:sans-serif;">Keine aktiven Gespräche. Nutze das Suchfeld oben!</div>`;
+
+            // --- TEIL B: PRIVATEN MESSAGES STREAM FILTERN & ZEICHNEN ---
+            if (currentChatTarget && currentChatTarget !== "global") {
+                // Schalte die Inputs frei, falls noch nicht geschehen
+                document.getElementById('messageInput').disabled = false;
+                document.getElementById('sendButton').disabled = false;
+
+                let htmlHTML = "";
+                // Filter nur die PNs heraus, die exakt zwischen mir und dem aktuellen Target gelaufen sind
+                let filteredPNs = data.pns ? data.pns.filter(msg => 
+                    (msg.user === myUser && msg.target === currentChatTarget) || 
+                    (msg.user === currentChatTarget && msg.target === myUser)
+                ) : [];
+
+                if (filteredPNs.length > 0) {
+                    filteredPNs.forEach(msg => {
+                        let isMe = msg.user === myUser ? "me" : "";
+                        htmlHTML += `
+                            <div class="msg-line ${isMe}">
+                                <div class="msg-meta">
+                                    <span class="meta-user">${msg.user}</span>
+                                    <span class="meta-time">${formatFunkZeit(msg.time)}</span>
+                                </div>
+                                <div class="msg-text">${msg.msg}</div>
+                            </div>
+                        `;
+                    });
+                    
+                    const scrollCheck = (stream.scrollHeight - stream.scrollTop === stream.clientHeight);
+                    stream.innerHTML = htmlHTML;
+                    if (!scrollCheck) stream.scrollTop = stream.scrollHeight;
+                } else {
+                    stream.innerHTML = `<div style="text-align:center; color:#ff8c00; padding-top:50px; font-style:italic;">Sicherer 1-zu-1 Funkkanal aufgebaut. Schreib eine Nachricht, um das Gespräch zu eröffnen! 🔐</div>`;
+                }
+            }
+
+            // --- TEIL C: INDIVIDUELLEN TYPING INDICATOR PRÜFEN ---
+            const typingIndicator = document.getElementById("typingIndicator");
+            if (data.typing && data.typing.pns && data.typing.pns[currentChatTarget]) {
+                typingIndicator.innerText = `${currentChatTarget} tippt gerade... ✏/`;
+            } else {
+                typingIndicator.innerText = "";
+            }
+        }
+    </script>
+</body>
+</html>
