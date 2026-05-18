@@ -21,7 +21,13 @@
         .left-side { justify-content: space-between; } 
         .right-side { justify-content: space-between; align-items: flex-end; }
 
-        .card { background: rgba(0, 0, 0, 0.9); padding: 18px; border: 2px solid #ff3131; border-radius: 12px; box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); width: 100%; box-sizing: border-box; }
+        /* KORREKTUR: Alle Boxen und Steuerungselemente starten standardmäßig unsichtbar */
+        .card, .chat-btn-container { 
+            background: rgba(0, 0, 0, 0.9); padding: 18px; border: 2px solid #ff3131; border-radius: 12px; 
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); width: 100%; box-sizing: border-box; 
+            display: none; 
+        }
+        .chat-btn-container { display: none; width: 100%; justify-content: flex-end; border: none; background: none; box-shadow: none; padding: 0; }
         
         #box-admin { margin-top: 45px; } 
 
@@ -29,7 +35,9 @@
         .btn-stack { display: flex; flex-direction: column; gap: 10px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         
+        /* KORREKTUR: Alle Buttons starten ebenfalls unsichtbar */
         .card-btn, .admin-btn { 
+            display: none;
             background: #39d353; color: black; border: none; padding: 12px; 
             cursor: pointer; font-family: 'Almendra'; font-weight: bold; 
             border-radius: 5px; font-size: 15px; width: 100%; transition: 0.2s; 
@@ -37,11 +45,13 @@
         }
         .card-btn:hover, .admin-btn:hover { background: #2fb145; transform: scale(1.02); }
         
-        .chat-btn-container { width: 100%; display: flex; justify-content: flex-end; }
-        .chat-btn { background: #ff8c00; color: black; border: none; padding: 15px 45px; font-size: 24px; font-weight: bold; border-radius: 8px; cursor: pointer; font-family: 'Almendra'; box-shadow: 0 0 25px rgba(255, 140, 0, 0.5); }
+        .chat-btn { display: block; background: #ff8c00; color: black; border: none; padding: 15px 45px; font-size: 24px; font-weight: bold; border-radius: 8px; cursor: pointer; font-family: 'Almendra'; box-shadow: 0 0 25px rgba(255, 140, 0, 0.5); }
         
-        /* Der absolute Wichtigmacher für die Matrix-Sperren */
+        /* Macht das Element unwiderruflich unsichtbar */
         .hidden { display: none !important; }
+        /* Macht das Element sichtbar, wenn die Berechtigung erteilt wurde */
+        .visible-block { display: block !important; }
+        .visible-flex { display: flex !important; }
     </style>
 </head>
 <body>
@@ -115,7 +125,6 @@
         if (!user) {
             window.location.href = "index.html";
         } else {
-            // Rekruten-Schleuse: Wenn in Spalte D 'Anwärter' steht, geht es ohne Umwege ab in den Chat!
             if (role === "Anwärter") {
                 window.location.href = "Chat.html";
             } else {
@@ -123,7 +132,6 @@
                 if(extra) displayRole += " | " + extra;
                 document.getElementById('userDisplay').innerText = user + " (" + displayRole + ")";
                 
-                // STARTE DEN MATRIX-AUTOPILOTEN
                 applyDashboardPermissions();
                 checkNews(); 
             }
@@ -157,72 +165,66 @@
         }
 
         // ===================================================
-        // DER NEUE RECHTE-AUTOPILOT (LIVE-ABGLEICH MIT SHEET)
+        // DYNAMISCHER AUTOPILOT MIT ABSOLUTEM BLITZ-SCHUTZ
         // ===================================================
         async function applyDashboardPermissions() {
             const userRole = localStorage.getItem('bulls_role') || 'Mitglied';
             const userExtra = localStorage.getItem('bulls_extra') || ''; 
-            
-            // Privilegien-Liste des Users erstellen
             const userPrivileges = [userRole, ...userExtra.split(',').map(s => s.trim())].filter(Boolean);
-
-            // Erst einmal pauschal die Kisten verstecken, bis die Cloud antwortet
-            const cards = document.querySelectorAll('.card');
             
             try {
-                // Hole Live-Matrix aus der Excel-Tabelle Dashboard_Rechte
                 const res = await fetch(window.BULLS_CONFIG.SCRIPT_URL + "?action=getDashboardMatrix");
                 const matrix = await res.json();
 
                 matrix.forEach(item => {
                     const element = document.getElementById(item.id);
                     if (element) {
-                        // Regel 1: Wenn global auf "Deaktiviert" gestellt, fliegt das Ding bedingungslos raus!
                         if (item.status === "Deaktiviert") {
-                            element.classList.add("hidden");
+                            element.className = "card-btn hidden"; 
                             return;
                         }
 
-                        // Regel 2: Admin-Haken bricht jede Sperre, ansonsten müssen Rollen passen
                         const hasAccess = userPrivileges.includes("Admin") || item.allowed.some(role => userPrivileges.includes(role));
 
                         if (hasAccess) {
-                            element.classList.remove("hidden");
+                            // Freischalten! Element kriegt die CSS-Eigenschaft zur Sichtbarkeit zurück
+                            element.style.display = "block";
                         } else {
-                            element.classList.add("hidden");
+                            element.className = "card-btn hidden";
                         }
                     }
                 });
 
-                // ZUSATZ-SMARTNESS: Wenn in einer Box ALLE Buttons versteckt sind, blendet das Script die ganze Box aus!
+                // Prüfe die Boxen-Rahmen und schalte sie erst ein, wenn sie erlaubte Inhalte enthalten
                 checkCardVisibility('box-perso');
                 checkCardVisibility('box-blacklist');
                 checkCardVisibility('box-pflege');
                 checkCardVisibility('box-admin');
                 checkCardVisibility('box-elo');
+                
+                // Allianz-Chat Kachel am Ende aktivieren
+                document.getElementById('box-allichat').classList.add('visible-flex');
 
             } catch (e) {
                 console.error("Fehler im Dashboard-Autopiloten:", e);
-                // Sicherheits-Fallback: Zeige zumindest Allianz Chat, falls Cloud hakt
-                document.getElementById('box-allichat').classList.remove('hidden');
+                document.getElementById('box-allichat').classList.add('visible-flex');
             }
         }
 
-        // Hilfsfunktion: Schließt leere Rahmen, damit das Design nicht zerfällt
         function checkCardVisibility(cardId) {
             const card = document.getElementById(cardId);
             if (!card) return;
             const buttons = card.querySelectorAll('.card-btn, .admin-btn');
             let visibleButtons = 0;
             buttons.forEach(btn => {
-                if (!btn.classList.includes || !btn.classList.contains('hidden')) {
+                if (btn.style.display === "block") {
                     visibleButtons++;
                 }
             });
-            if (visibleButtons === 0) {
-                card.classList.add('hidden');
+            if (visibleButtons > 0) {
+                card.classList.add('visible-block');
             } else {
-                card.classList.remove('hidden');
+                card.className = "card hidden";
             }
         }
 
