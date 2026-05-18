@@ -11,66 +11,57 @@
             margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
         .container { 
-            width: 500px; background-color: #0f0f0f; border: 2px solid #333; 
+            width: 550px; background-color: #0f0f0f; border: 2px solid #333; 
             border-radius: 15px; padding: 40px; box-shadow: 0 0 60px 15px rgba(255, 49, 49, 0.2); 
             text-align: center;
         }
         h1 { color: #ff3131; text-transform: uppercase; margin-bottom: 40px; letter-spacing: 3px; font-size: 32px; text-shadow: 0 0 15px rgba(255, 49, 49, 0.5); }
 
-        /* Die 3 großen Haupt-Buttons */
         .nav-btn {
-            width: 100%;
-            padding: 25px;
-            margin-bottom: 20px;
-            background: #111;
-            border: 1px solid #ff3131;
-            color: #ff3131;
-            font-family: 'Almendra';
-            font-size: 22px;
-            font-weight: bold;
-            text-transform: uppercase;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            box-sizing: border-box;
+            width: 100%; padding: 22px; margin-bottom: 20px; background: #111; border: 1px solid #ff3131;
+            color: #ff3131; font-family: 'Almendra'; font-size: 21px; font-weight: bold;
+            text-transform: uppercase; border-radius: 10px; cursor: pointer; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 15px; box-sizing: border-box;
         }
-
-        .nav-btn:hover {
-            background: #ff3131;
-            color: #000;
-            box-shadow: 0 0 35px rgba(255, 49, 49, 0.6);
-            transform: scale(1.03);
-        }
-
-        .icon { font-size: 28px; }
+        .nav-btn:hover { background: #ff3131; color: #000; box-shadow: 0 0 35px rgba(255, 49, 49, 0.6); transform: scale(1.02); }
+        .icon { font-size: 26px; }
         .btn-back { display: block; margin-top: 40px; color: #666; text-decoration: none; text-transform: uppercase; font-size: 16px; transition: 0.3s; }
         .btn-back:hover { color: #fff; }
 
-        /* DAS GROßE POP-UP FÜR DIE RECHTE-MATRIX */
+        /* MULTI-CHECKBOX POP-UP OVERLAY (MODAL FOR EDITING) */
         .matrix-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.95); z-index: 9999; justify-content: center; align-items: center;
         }
         .matrix-content-box {
-            width: 1350px; max-width: 95vw; background: #0f0f0f; border: 2px solid #ff3131;
-            border-radius: 15px; padding: 30px; box-shadow: 0 0 50px rgba(255, 49, 49, 0.4);
-            text-align: left; box-sizing: border-box;
+            width: 750px; max-width: 95vw; background: #0f0f0f; border: 2px solid #ff3131;
+            border-radius: 15px; padding: 30px; box-shadow: 0 0 50px rgba(255, 49, 49, 0.4); box-sizing: border-box;
         }
-        .matrix-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #050505; font-size: 14px; }
-        .matrix-table th { background: #111; color: #ff3131; padding: 12px; border-bottom: 2px solid #ff3131; text-transform: uppercase; }
-        .matrix-table td { padding: 10px; border-bottom: 1px solid #222; color: #fff; }
-        .matrix-cb { width: 18px; height: 18px; accent-color: #ff3131; cursor: pointer; }
 
-        .save-matrix-btn { 
-            background: #39d353; color: black; border: none; padding: 15px 40px; 
-            font-size: 18px; font-weight: bold; font-family: 'Almendra'; border-radius: 6px; 
-            cursor: pointer; text-transform: uppercase; transition: 0.2s;
-        }
-        .save-matrix-btn:hover { background: #2fb145; transform: scale(1.02); box-shadow: 0 0 20px rgba(57, 211, 83, 0.4); }
+        /* WIE USER VERWALTUNG: LISTEN STYLES */
+        .rights-list { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; text-align: left; max-height: 50vh; overflow-y: auto; padding-right: 5px; }
+        .rights-item { display: flex; justify-content: space-between; align-items: center; background: #151515; border: 1px solid #333; padding: 15px; border-radius: 8px; }
+        .rights-info { display: flex; flex-direction: column; }
+        .rights-info strong { color: #fff; font-size: 18px; }
+        .rights-info small { color: #555; }
+        .rights-actions { display: flex; align-items: center; gap: 15px; }
+
+        /* STATUS BUTTONS (AKTIV / DEAKTIVIERT) */
+        .status-toggle { padding: 8px 15px; font-family: 'Almendra'; font-weight: bold; border-radius: 4px; border: none; cursor: pointer; text-transform: uppercase; min-width: 120px; text-align: center; font-size: 14px; }
+        .status-active { background: #2fb145; color: #000; }
+        .status-disabled { background: #ff3131; color: #fff; }
+        
+        .edit-btn { background: #333; color: #fff; border: 1px solid #555; padding: 8px 15px; font-family: 'Almendra'; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-size: 14px; }
+        .edit-btn:hover { background: #ff3131; color: #000; border-color: #ff3131; }
+
+        /* GRID FÜR HAKEN IM MODAL */
+        .roles-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin: 25px 0; }
+        .role-option { display: flex; align-items: center; gap: 10px; background: #151515; padding: 12px; border: 1px solid #333; border-radius: 6px; color: #dbdee1; cursor: pointer; }
+        .role-option:hover { border-color: #ff3131; }
+        .matrix-cb { width: 20px; height: 20px; accent-color: #ff3131; cursor: pointer; }
+
+        .save-matrix-btn { background: #39d353; color: black; border: none; padding: 15px 40px; font-size: 18px; font-weight: bold; font-family: 'Almendra'; border-radius: 6px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .save-matrix-btn:hover { background: #2fb145; transform: scale(1.02); }
     </style>
 </head>
 <body>
@@ -94,50 +85,38 @@
 </div>
 
 <div id="matrixModal" class="matrix-overlay">
-    <div class="matrix-content-box">
+    <div class="matrix-content-box" style="width: 800px;">
         <h2 style="color: #ff3131; margin-top: 0; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid #333; padding-bottom: 15px;">
             🎛️ Dashboard-Zentralsteuerung & Berechtigungen
         </h2>
-        <p style="color: #aaa; font-size: 16px; margin-bottom: 20px;">
-            Konfiguriere hier live, welche Rollen oder Aufgaben die Elemente auf dem Dashboard sehen dürfen.
+        <p style="color: #aaa; font-size: 16px;">
+            Schalte Elemente global aktiv/inaktiv oder klicke auf "Bearbeiten", um Rollenrechte festzulegen.
         </p>
 
-        <div style="overflow-x: auto; max-height: 60vh; border: 1px solid #333; border-radius: 6px;">
-            <table class="matrix-table">
-                <thead>
-                    <tr>
-                        <th style="text-align: left;">Element Name</th>
-                        <th style="text-align:center; color:#fff;">Anwärter</th>
-                        <th style="text-align:center; color:#fff;">Gast</th>
-                        <th style="text-align:center; color:#fff;">Mitglied</th>
-                        <th style="text-align:center; color:#fff;">Kampfdiv.</th>
-                        <th style="text-align:center; color:#fff;">Offizier</th>
-                        <th style="text-align:center; color:#f0b232;">Admin</th>
-                        <th style="text-align:center; color:#f0b232;">Buchhalter</th>
-                        <th style="text-align:center; color:#f0b232;">Moderator</th>
-                        <th style="text-align:center; color:#f0b232;">Statistiker</th>
-                        <th style="text-align:center; color:#f0b232;">elo</th>
-                        <th style="text-align:center; color:#f0b232;">support</th>
-                        <th style="text-align:center; color:#f0b232;">Ausbilder</th>
-                    </tr>
-                </thead>
-                <tbody id="matrixTableBody">
-                    <tr>
-                        <td colspan="13" style="text-align:center; padding:30px; color:#f0b232; font-style:italic;">
-                            Verbinde zum HQ-Server... 🔄
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="rights-list" id="rightsListContainer">
+            <div style="text-align:center; padding:30px; color:#f0b232; font-style:italic;">Verbinde zum HQ-Server... 🔄</div>
         </div>
 
-        <div style="display: flex; justify-content: space-between; margin-top: 25px;">
+        <div style="display: flex; justify-content: space-between; margin-top: 25px; border-top: 1px solid #333; padding-top: 20px;">
             <button class="nav-btn" style="width: auto; padding: 12px 30px; font-size: 16px; margin: 0; border-color: #666; color: #666;" onclick="closeMatrixModal()">
-                Abbrechen
+                Schließen
             </button>
-            <button class="save-matrix-btn" onclick="saveDashboardMatrixHTML()">
-                Änderungen versiegeln 💾
+            <button class="save-matrix-btn" onclick="saveGlobalMatrixData()">
+                ÄNDERUNGEN VERSIEGELN 💾
             </button>
+        </div>
+    </div>
+</div>
+
+<div id="editModal" class="matrix-overlay" style="z-index: 10000; background: rgba(0,0,0,0.8);">
+    <div class="matrix-content-box">
+        <h3 id="editElementName" style="color: #ff3131; margin-top:0; text-transform:uppercase;">Element bearbeiten</h3>
+        <p style="color:#666; margin-bottom: 20px;">Wähle aus, wer diesen Button auf dem Dashboard sehen darf:</p>
+        
+        <div class="roles-grid" id="rolesGridContainer"></div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 20px;">
+            <button class="edit-btn" style="background:#555;" onclick="closeEditModal()">Übernehmen</button>
         </div>
     </div>
 </div>
@@ -146,6 +125,7 @@
     const API = window.BULLS_CONFIG.SCRIPT_URL;
     const ALL_ROLES_LIST = ["Anwärter", "Gast", "Mitglied", "Kampfdivision", "Offizier", "Admin", "Buchhalter", "Moderator", "Statistiker", "elo", "support", "Ausbilder"];
     let localMatrixCache = [];
+    let currentEditingItemId = null;
 
     function openMatrixModal() {
         document.getElementById("matrixModal").style.display = "flex";
@@ -160,66 +140,101 @@
         try {
             const res = await fetch(API + "?action=getDashboardMatrix");
             localMatrixCache = await res.json();
-            renderMatrixTable();
+            renderRightsList();
         } catch (e) {
-            document.getElementById("matrixTableBody").innerHTML = `<tr><td colspan="13" style="text-align:center; color:#ff3131; padding:20px; font-weight:bold;">Fehler beim Laden der Berechtigungs-Matrix!</td></tr>`;
+            document.getElementById("rightsListContainer").innerHTML = `<div style="text-align:center; color:#ff3131; padding:20px; font-weight:bold;">Fehler beim Laden der Berechtigungen!</div>`;
         }
     }
 
-    function renderMatrixTable() {
-        const tbody = document.getElementById("matrixTableBody");
-        tbody.innerHTML = "";
+    function renderRightsList() {
+        const container = document.getElementById("rightsListContainer");
+        container.innerHTML = "";
 
         if (!localMatrixCache || localMatrixCache.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding:20px; color:#aaa;">Tabelle im Sheet ist noch leer!</td></tr>`;
+            container.innerHTML = `<div style="text-align:center; padding:20px; color:#aaa;">Keine Elemente gefunden. Initialisiere Tabelle im Sheet...</div>`;
             return;
         }
 
         localMatrixCache.forEach(item => {
-            let tr = document.createElement("tr");
-            let htmlRows = `<td style="padding: 10px;"><strong>${item.name}</strong><br><small style="color:#555;">ID: ${item.id}</small></td>`;
-            
-            ALL_ROLES_LIST.forEach(role => {
-                let isChecked = item.allowed.includes(role) ? "checked" : "";
-                htmlRows += `
-                    <td style="text-align: center; padding: 10px;">
-                        <input type="checkbox" class="matrix-cb" data-id="${item.id}" data-role="${role}" ${isChecked}>
-                    </td>
-                `;
-            });
-            
-            tr.innerHTML = htmlRows;
-            tbody.appendChild(tr);
+            let itemDiv = document.createElement("div");
+            itemDiv.className = "rights-item";
+
+            let isAktiv = item.status === "Aktiv";
+            let statusClass = isAktiv ? "status-active" : "status-disabled";
+            let statusText = isAktiv ? "Sichtbar" : "Deaktiviert";
+
+            itemDiv.innerHTML = `
+                <div class="rights-info">
+                    <strong>${item.name}</strong>
+                    <small>ID: ${item.id} | Rollen: ${item.allowed.length > 0 ? item.allowed.join(", ") : "Keine"}</small>
+                </div>
+                <div class="rights-actions">
+                    <button class="status-toggle ${statusClass}" onclick="toggleItemStatus('${item.id}')">${statusText}</button>
+                    <button class="edit-btn" onclick="openEditModal('${item.id}')">Bearbeiten</button>
+                </div>
+            `;
+            container.appendChild(itemDiv);
         });
     }
 
-    async function saveDashboardMatrixHTML() {
-        const checkboxes = document.querySelectorAll(".matrix-cb");
-        let groupedData = {};
-
-        localMatrixCache.forEach(item => {
-            groupedData[item.id] = [];
-        });
-
-        checkboxes.forEach(cb => {
-            if (cb.checked) {
-                let id = cb.getAttribute("data-id");
-                let role = cb.getAttribute("data-role");
-                if (groupedData[id]) {
-                    groupedData[id].push(role);
-                }
-            }
-        });
-
-        let payloadMatrix = [];
-        for (let id in groupedData) {
-            payloadMatrix.push({
-                id: id,
-                allowed: groupedData[id].join(", ")
-            });
+    function toggleItemStatus(id) {
+        let item = localMatrixCache.find(i => i.id === id);
+        if (item) {
+            item.status = item.status === "Aktiv" ? "Deaktiviert" : "Aktiv";
+            renderRightsList();
         }
+    }
 
-        document.getElementById("matrixTableBody").innerHTML = `<tr><td colspan="13" style="text-align:center; padding:30px; color:#f0b232; font-style:italic;">Versiegelung läuft... 🔄</td></tr>`;
+    function openEditModal(id) {
+        currentEditingItemId = id;
+        let item = localMatrixCache.find(i => i.id === id);
+        if (!item) return;
+
+        document.getElementById("editElementName").innerText = `${item.name} - Berechtigungen`;
+        const grid = document.getElementById("rolesGridContainer");
+        grid.innerHTML = "";
+
+        ALL_ROLES_LIST.forEach(role => {
+            let isChecked = item.allowed.includes(role) ? "checked" : "";
+            let label = document.createElement("label");
+            label.className = "role-option";
+            label.innerHTML = `
+                <input type="checkbox" class="matrix-cb" data-role="${role}" ${isChecked} onchange="updateLocalRoles('${id}')">
+                <span>${role}</span>
+            `;
+            grid.appendChild(label);
+        });
+
+        document.getElementById("editModal").style.display = "flex";
+    }
+
+    function updateLocalRoles(id) {
+        let item = localMatrixCache.find(i => i.id === id);
+        if (!item) return;
+
+        const checkboxes = document.querySelectorAll("#rolesGridContainer .matrix-cb");
+        let activeRoles = [];
+        checkboxes.forEach(cb => {
+            if (cb.checked) activeRoles.push(cb.getAttribute("data-role"));
+        });
+        item.allowed = activeRoles;
+    }
+
+    function closeEditModal() {
+        document.getElementById("editModal").style.display = "none";
+        renderRightsList(); // Hauptliste mit aktualisierten Rollen-Texten neu zeichnen
+    }
+
+    async function saveGlobalMatrixData() {
+        document.getElementById("rightsListContainer").innerHTML = `<div style="text-align:center; padding:30px; color:#f0b232; font-style:italic;">Versiegele Änderungen in der Cloud... 🔄</div>`;
+
+        let payloadMatrix = localMatrixCache.map(item => {
+            return {
+                id: item.id,
+                status: item.status,
+                allowed: item.allowed.join(", ")
+            };
+        });
 
         try {
             await fetch(API, {
@@ -229,7 +244,7 @@
                     matrix: payloadMatrix
                 })
             });
-            alert("Dashboard-Berechtigungen erfolgreich aktualisiert! ⚙️");
+            alert("Dashboard-Berechtigungen erfolgreich im Google Sheet versiegelt! ⚙️");
             loadDashboardMatrixHTML();
         } catch (e) {
             alert("Fehler beim Versiegeln der Matrix!");
@@ -239,5 +254,3 @@
 </script>
 </body>
 </html>
-
-Deine Präsentation zur neuen HQ-Architektur ist fertig! Viel Erfolg beim Deployen der neuen 3-Button-Steuerung. Melde dich, wenn der Autopilot auf dem Dashboard live gehen soll! 🐂🏁🦾
