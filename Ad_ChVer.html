@@ -2,107 +2,216 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DARK BULLS - CHAT VERWALTUNG</title>
     <script src="config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .container { width: 1000px; background-color: #0f0f0f; border: 2px solid #ff8c00; border-radius: 10px; padding: 30px; box-shadow: 0 0 20px rgba(255, 140, 0, 0.2); }
+        body { 
+            background-color: #0c0c0e; color: #dbdee1; font-family: 'Almendra', serif; 
+            margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            box-sizing: border-box;
+        }
         
-        h1 { color: #ff8c00; text-align: center; text-transform: uppercase; margin-bottom: 25px; }
+        .admin-box { 
+            width: 800px; max-width: 95vw; background-color: #1e1f22; border: 2px solid #ff3131; 
+            border-radius: 12px; padding: 30px; box-shadow: 0 0 30px rgba(255, 49, 49, 0.3); 
+            box-sizing: border-box; text-align: center;
+        }
         
-        .chat-controls { display: flex; gap: 15px; margin-bottom: 20px; background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #333; }
-        select, input { background: #000; border: 1px solid #444; color: #39d353; padding: 10px; font-family: 'Almendra'; font-size: 16px; }
+        h1 { color: #ff3131; text-transform: uppercase; margin-top: 0; margin-bottom: 25px; letter-spacing: 2px; font-size: 30px; }
+        
+        .section-title { color: #5dade2; font-size: 18px; font-style: italic; border-bottom: 1px solid #3f4248; padding-bottom: 5px; margin-top: 25px; margin-bottom: 15px; text-align: left; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left; }
+        
+        .control-group { display: flex; flex-direction: column; gap: 8px; }
+        label { font-weight: bold; color: #fff; font-size: 16px; }
+        
+        input[type="text"], select, textarea { 
+            width: 100%; padding: 12px; background: #2b2d31; color: #fff; border: 1px solid #111; 
+            font-family: 'Almendra'; font-size: 16px; border-radius: 5px; box-sizing: border-box; outline: none; 
+        }
+        input:focus, textarea:focus { border-color: #ff3131; }
+        
+        /* Schalter für den Chat Lock */
+        .lock-wrapper { display: flex; align-items: center; justify-content: space-between; background: #2b2d31; padding: 15px; border-radius: 6px; border: 1px solid #333; }
+        
+        /* Allianz Emojis Galerie */
+        .emoji-mgmt-box { background: #2b2d31; border: 1px solid #111; padding: 15px; border-radius: 6px; }
+        .emoji-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; min-height: 40px; background: #1e1f22; padding: 10px; border-radius: 4px; }
+        .emoji-thumb { width: 40px; height: 40px; border-radius: 4px; border: 1px solid #444; object-fit: cover; cursor: pointer; }
+        .emoji-thumb:hover { border-color: #ff3131; transform: scale(1.1); }
 
-        .log-container { height: 60vh; overflow-y: auto; background: #000; border: 1px solid #333; padding: 15px; border-radius: 5px; }
-        
-        .log-entry { border-bottom: 1px solid #222; padding: 8px 0; font-size: 14px; display: grid; grid-template-columns: 150px 120px 150px 1fr; gap: 10px; }
-        .log-header { font-weight: bold; color: #ff8c00; border-bottom: 2px solid #ff8c00; padding-bottom: 10px; margin-bottom: 10px; }
-        
-        .time { color: #888; }
-        .user { color: #39d353; font-weight: bold; }
-        .channel { color: #5dade2; }
-        .msg { color: #fff; word-break: break-all; }
-
-        .btn-refresh { background: #39d353; color: #000; border: none; padding: 10px 20px; cursor: pointer; font-family: 'Almendra'; font-weight: bold; border-radius: 4px; }
-        .btn-back { display: inline-block; background: #444; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-bottom: 15px; }
+        /* Buttons */
+        .btn-stack { display: flex; gap: 15px; margin-top: 30px; }
+        .btn-action { 
+            flex: 1; padding: 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; 
+            font-family: 'Almendra'; font-size: 18px; text-transform: uppercase; transition: 0.2s; text-align: center; text-decoration: none;
+        }
+        .btn-save { background: #39d353; color: #000; }
+        .btn-save:hover { background: #fff; transform: scale(1.02); }
+        .btn-back { background: #2b2d31; color: #dbdee1; border: 1px solid #444; }
+        .btn-back:hover { background: #35373c; color: #fff; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <a href="dashboard.html" class="btn-back">← Zurück</a>
-    <h1>Chat Protokolle & Verwaltung</h1>
+<div class="admin-box">
+    <h1>Allianz Funk - Administration</h1>
     
-    <div class="chat-controls">
-        <select id="channelFilter" onchange="loadLogs()">
-            <option value="ALL">Alle Kanäle</option>
-            <option value="Allianz">Allianz-Chat</option>
-            <option value="SUPPORT">Support-Kanäle</option>
-        </select>
-        <input type="text" id="userFilter" placeholder="Nach User filtern..." onkeyup="loadLogs()">
-        <button class="btn-refresh" onclick="loadLogs()">Aktualisieren</button>
-    </div>
+    <form id="adminChatForm" onsubmit="saveChatSettings(event)">
+        
+        <div class="section-title">Globale Funkstille & Sicherheit</div>
+        <div class="grid-2">
+            <div class="control-group">
+                <label>Hauptschalter Schreibrechte</label>
+                <div class="lock-wrapper">
+                    <span id="lockStatusText" style="font-weight: bold; color: #39d353;">FUNK FREI</span>
+                    <select id="chatLockSelect" style="width: auto; padding: 5px;" onchange="updateLockText()">
+                        <option value="FALSE">FREI</option>
+                        <option value="TRUE">STUMM</option>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group">
+                <label>Wort-Zensur (Komma-getrennt)</label>
+                <input type="text" id="censoredWordsInput" placeholder="Wort1, Wort2, Wort3...">
+            </div>
+        </div>
 
-    <div class="log-container">
-        <div class="log-entry log-header">
-            <div>Zeitstempel</div>
-            <div>Absender</div>
-            <div>Kanal</div>
-            <div>Nachricht</div>
+        <div class="section-title">Allianz Emojis verwalten (Nur Du & Ayad)</div>
+        <div class="emoji-mgmt-box">
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="newEmojiUrl" placeholder="Bild-URL des Emojis einfügen (.png, .jpg)..." style="flex: 1; margin: 0;">
+                <button type="button" class="btn-action btn-save" style="padding: 10px 20px; font-size: 14px; flex: none;" onclick="addNewAllianzEmoji()">Hinzufügen</button>
+            </div>
+            <div class="emoji-grid" id="adminEmojiGrid">
+                </div>
+            <p style="font-size: 12px; color: #666; text-align: left; margin: 5px 0 0 0;">💡 Klicke auf ein Emoji in der Übersicht, um es wieder zu löschen.</p>
         </div>
-        <div id="logBody">
-            <div style="text-align:center; padding: 20px;">Lade Chat-Daten...</div>
+
+        <div class="section-title">Aktive Timeouts (Funk-Sperren)</div>
+        <div id="timeoutListContainer" style="background:#2b2d31; padding:15px; border-radius:6px; text-align:left; max-height:150px; overflow-y:auto;">
+            <p style="color:#666; margin:0;">Keine aktiven Timeouts im HQ verzeichnet.</p>
         </div>
-    </div>
+
+        <div class="btn-stack">
+            <a href="dashboard.html" class="btn-action btn-back">Zurück zum HQ</a>
+            <button type="submit" class="btn-action btn-save" id="saveBtn">Einstellungen versiegeln</button>
+        </div>
+        
+    </form>
 </div>
 
 <script>
     const API = window.BULLS_CONFIG.SCRIPT_URL;
+    let loadedEmojis = [];
 
-    async function loadLogs() {
+    // LÄDT DIE AKTUELLEN EINSTELLUNGEN BEIM START
+    async function loadSettings() {
         try {
-            const res = await fetch(API + "?action=getMessages"); // Nutzt die getMessages Funktion im Script
-            const logs = await res.json();
-            renderLogs(logs);
-        } catch(e) { 
-            console.error("Ladefehler"); 
-            document.getElementById("logBody").innerHTML = "Fehler beim Laden der Protokolle.";
+            // 1. Globale Settings abrufen (Zensur, ChatLock)
+            const res = await fetch(API + "?action=getGlobalSettings");
+            const settings = await res.json();
+            
+            document.getElementById("chatLockSelect").value = settings.chatLock ? "TRUE" : "FALSE";
+            updateLockText();
+
+            // Fallback falls zensierte Wörter vorhanden sind
+            if(settings.censoredWords) {
+                document.getElementById("censoredWordsInput").value = settings.censoredWords;
+            }
+
+            // 2. Emojis aus dem localStorage holen (Damit sie im Browser bleiben)
+            if(localStorage.getItem("bulls_custom_emojis")) {
+                loadedEmojis = JSON.parse(localStorage.getItem("bulls_custom_emojis"));
+                renderEmojiGrid();
+            }
+
+            loadActiveTimeouts();
+        } catch(e) { console.log("Fehler beim Laden der Admin-Matrix."); }
+    }
+
+    function updateLockText() {
+        const val = document.getElementById("chatLockSelect").value;
+        const txt = document.getElementById("lockStatusText");
+        if(val === "TRUE") {
+            txt.innerText = "🚨 LOCK AKTIV";
+            txt.style.color = "#f23f43";
+        } else {
+            txt.innerText = "✓ FUNK FREI";
+            txt.style.color = "#39d353";
         }
     }
 
-    function renderLogs(data) {
-        const body = document.getElementById("logBody");
-        const chanFilter = document.getElementById("channelFilter").value;
-        const userFilter = document.getElementById("userFilter").value.toLowerCase();
-        body.innerHTML = "";
-
-        // Wir drehen die Logs um, damit das Neueste oben steht
-        const filtered = data.reverse().filter(entry => {
-            const matchUser = entry.absender.toLowerCase().includes(userFilter);
-            let matchChan = true;
-            if(chanFilter === "Allianz") matchChan = entry.kanal === "Allianz";
-            if(chanFilter === "SUPPORT") matchChan = entry.kanal.startsWith("SUPPORT-");
-            
-            return matchUser && matchChan;
-        });
-
-        filtered.forEach(entry => {
-            const div = document.createElement("div");
-            div.className = "log-entry";
-            const date = new Date(entry.zeitstempel || entry.datum || new Date()).toLocaleString('de-DE');
-            
-            div.innerHTML = `
-                <div class="time">${date}</div>
-                <div class="user">${entry.absender}</div>
-                <div class="channel">${entry.kanal}</div>
-                <div class="msg">${entry.nachricht}</div>
-            `;
-            body.appendChild(div);
+    // ERSTELLT DIE KLICKBARE EMOTICON GALERIE
+    function renderEmojiGrid() {
+        const grid = document.getElementById("adminEmojiGrid");
+        grid.innerHTML = "";
+        if(loadedEmojis.length === 0) {
+            grid.innerHTML = `<span style="color:#555; font-style:italic; font-size:14px;">Keine eigenen Allianz-Emojis registriert.</span>`;
+            return;
+        }
+        loadedEmojis.forEach((url, index) => {
+            let img = document.createElement("img");
+            img.src = url;
+            img.className = "emoji-thumb";
+            img.onclick = () => removeEmoji(index);
+            grid.appendChild(img);
         });
     }
 
-    window.onload = loadLogs;
+    function addNewAllianzEmoji() {
+        const url = document.getElementById("newEmojiUrl").value.trim();
+        if(!url) return;
+        if(!url.startsWith("http")) return alert("Bitte eine gültige Bild-URL eintragen!");
+
+        loadedEmojis.push(url);
+        localStorage.setItem("bulls_custom_emojis", JSON.stringify(loadedEmojis));
+        document.getElementById("newEmojiUrl").value = "";
+        renderEmojiGrid();
+    }
+
+    function removeEmoji(index) {
+        if(!confirm("Möchtest du dieses Allianz-Emoji wirklich löschen?")) return;
+        loadedEmojis.splice(index, 1);
+        localStorage.setItem("bulls_custom_emojis", JSON.stringify(loadedEmojis));
+        renderEmojiGrid();
+    }
+
+    // ZEIGT DIE AKTUELL STUMMGESCHALTETEN MEMBER AN
+    async function loadActiveTimeouts() {
+        // Hier simulieren wir das Roster der Timeouts aus der Datenbank für die Übersicht
+        const container = document.getElementById("timeoutListContainer");
+        // Platzhalter für den Abruf (wird beim Sync geladen)
+    }
+
+    // SPEICHERT DIE EINSTELLUNGEN INS GOOGLE SHEET
+    async function saveChatSettings(e) {
+        e.preventDefault();
+        const btn = document.getElementById("saveBtn");
+        btn.innerText = "SICHERE DATEN...";
+        btn.disabled = true;
+
+        const payload = {
+            action: "saveGlobalSettings",
+            chatLock: document.getElementById("chatLockSelect").value === "TRUE",
+            censoredWords: document.getElementById("censoredWordsInput").value.trim()
+        };
+
+        try {
+            await fetch(API, { method: "POST", body: JSON.stringify(payload) });
+            alert("✓ FUNK-SPEZIFIKATIONEN ERFOLGREICH IM SYSTEM VERSIEGELT!");
+        } catch(e) {
+            alert("Verbindungsfehler beim Speichern!");
+        } finally {
+            btn.innerText = "Einstellungen versiegeln";
+            btn.disabled = false;
+        }
+    }
+
+    window.onload = loadSettings;
 </script>
 </body>
 </html>
