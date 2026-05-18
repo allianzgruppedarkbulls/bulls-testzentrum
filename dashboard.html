@@ -41,7 +41,6 @@
         .chat-btn-container { width: 100%; display: flex; justify-content: flex-end; }
         .chat-btn { background: #ff8c00; color: black; border: none; padding: 15px 45px; font-size: 24px; font-weight: bold; border-radius: 8px; cursor: pointer; font-family: 'Almendra'; box-shadow: 0 0 25px rgba(255, 140, 0, 0.5); }
         
-        /* WICHTIG: Das hat gefehlt! Macht das Ausblenden erst wirksam */
         .hidden { display: none !important; }
     </style>
 </head>
@@ -110,28 +109,28 @@
 
     <script>
         const user = localStorage.getItem('bulls_user');
-        // trim() entfernt unsichtbare Leerzeichen aus der Tabelle
         const role = localStorage.getItem('bulls_role') ? localStorage.getItem('bulls_role').trim() : "";
         const extra = localStorage.getItem('bulls_extra') || "";
 
         if (!user) {
             window.location.href = "index.html";
         } else {
-            let displayRole = role;
-            if(extra) displayRole += " | " + extra;
-            document.getElementById('userDisplay').innerText = user + " (" + displayRole + ")";
-            applyPermissions(role, extra);
-            
-            // Startet den Check für die Dashboard-Ankündigung
-            checkNews(); 
+            // Schleusen-Logik abfeuern: Wenn der User ein Anwärter ist, blockieren wir das Dashboard komplett
+            if (role === "Anwärter") {
+                window.location.href = "Chat.html";
+            } else {
+                let displayRole = role;
+                if(extra) displayRole += " | " + extra;
+                document.getElementById('userDisplay').innerText = user + " (" + displayRole + ")";
+                applyPermissions(role, extra);
+                checkNews(); 
+            }
         }
 
         async function checkNews() {
-            // PRÜFUNG: Haben wir die News in dieser Sitzung schon weggeklickt?
             if (sessionStorage.getItem('bulls_news_seen') === 'true') {
-                return; // Wenn ja, brechen wir hier sofort ab -> Kein Pop-up!
+                return;
             }
-
             try {
                 const res = await fetch(window.BULLS_CONFIG.SCRIPT_URL + "?action=getGlobalSettings");
                 const s = await res.json();
@@ -152,73 +151,78 @@
             } catch(e) { console.log("Ankündigungs-Fehler."); }
         }
 
-        // Hilfsfunktion: Speichert das "Gesehen" ab und löscht das Overlay
         function confirmNews() {
-            sessionStorage.setItem('bulls_news_seen', 'true'); // Merken für diese Session
+            sessionStorage.setItem('bulls_news_seen', 'true');
             const overlay = document.getElementById('newsOverlay');
             if (overlay) overlay.remove();
         }
 
+        // MODIFIZIERTE 2-STUFEN-PERMISSIONS-ROUTINE
         function applyPermissions(r, ex) {
-            const boxPerso = document.getElementById('box-perso');
             const boxBlacklist = document.getElementById('box-blacklist');
             const boxPflege = document.getElementById('box-pflege');
             const boxAdmin = document.getElementById('box-admin');
             const boxElo = document.getElementById('box-elo');
             const boxAlliChat = document.getElementById('box-allichat');
-            
-            // HIER DIE SPERRE FÜR DEN STATISTIK BUTTON ABGREIFEN
             const btnStatistik = document.getElementById('btn-statistik');
 
-            // 1. ZUERST ALLES KRITISCHE GRUNDSÄTZLICH VERSTECKEN (Sicherheits-Modus)
+            // 1. ABSOLUTER GRUND-SCHUTZ: Alles Kritische erst einmal wegschließen
             boxBlacklist.classList.add('hidden');
             boxPflege.classList.add('hidden');
             boxAdmin.classList.add('hidden');
             boxElo.classList.add('hidden');
             boxAlliChat.classList.add('hidden');
-            
-            // Statistik-Button standardmäßig vor der Truppe verbergen
             if (btnStatistik) btnStatistik.classList.add('hidden');
 
-            // 2. RECHTE STUFENWEISE FREISCHALTEN
-            if (r === "Gast" || r === "Gäste") {
-                return; // Reine Gäste sehen nur PIN ändern und Support-Button. Ende!
+            // 2. STUFE A: GRUNDSTATUS AUSWERTEN (Reine Optik/Grundfreigabe nach außen)
+            if (r === "Gast") {
+                return; // Fremde Gäste sehen nur den Support-Kanal und PIN-Wechsel. Ende!
             }
             
-            if (r === "Allianz Gast") {
-                boxAlliChat.classList.remove('hidden');
-                return;
-            }
-            else if (r === "Mitglied" || r === "Kampfdivision") {
+            if (r === "Mitglied" || r === "Kampfdivision") {
                 boxBlacklist.classList.remove('hidden');
                 boxAlliChat.classList.remove('hidden');
-                if (ex.includes("ELO")) boxElo.classList.remove('hidden');
             }
-            else if (["Admin", "Offizier", "Offi"].includes(r)) {
+            
+            if (r === "Offizier") {
+                boxBlacklist.classList.remove('hidden');
+                boxAlliChat.classList.remove('hidden');
+                // Offiziere kriegen als Standard-Führungskräfte Zugriff auf Pflege, Admin-Kacheln und ELO
+                boxPflege.classList.remove('hidden');
+                boxAdmin.classList.remove('hidden');
+                boxElo.classList.remove('hidden');
+            }
+
+            // 3. STUFE B: ZUSÄTZLICHE HQ-AUFGABEN AUSWERTEN (Rechte per Haken)
+            if (ex.includes("Admin")) {
+                // Der Haken "Admin" bricht alle Sperren im System auf!
                 boxBlacklist.classList.remove('hidden');
                 boxPflege.classList.remove('hidden');
                 boxAdmin.classList.remove('hidden');
                 boxElo.classList.remove('hidden');
                 boxAlliChat.classList.remove('hidden');
-                
-                // NUR der Admin kriegt die Freischaltung für die unfertige Statistik-Akte!
-                if (r === "Admin" && btnStatistik) {
-                    btnStatistik.classList.remove('hidden');
+                if (btnStatistik) btnStatistik.classList.remove('hidden');
+            } else {
+                // Individuelle Funktions-Haken für Spezialisten prüfen
+                if (ex.includes("Buchhalter")) {
+                    boxPflege.classList.remove('hidden'); // Blacklist-Pflege freischalten
                 }
-            }
-
-            // 3. ZUSATZROLLEN EXTRA PRÜFEN
-            if (ex.includes("Buchhalter") || ex.includes("Moderator")) {
-                boxPflege.classList.remove('hidden');
-            }
-            if (ex.includes("ELO")) {
-                boxElo.classList.remove('hidden');
+                if (ex.includes("Moderator")) {
+                    boxPflege.classList.remove('hidden'); // Blacklist-Pflege freischalten
+                }
+                if (ex.includes("elo") || ex.includes("elo Buchhalter")) {
+                    boxElo.classList.remove('hidden');    // ELO-Rechner freischalten
+                }
+                if (ex.includes("support") || ex.includes("Ausbilder")) {
+                    // Falls du später spezifische Buttons für Supporter/Ausbilder auf dem Dashboard hast,
+                    // können sie hier gezielt freigeschaltet werden!
+                }
             }
         }
 
         function logout() {
             localStorage.clear();
-            sessionStorage.clear(); // Löscht auch den "News gesehen"-Speicher für den nächsten Login!
+            sessionStorage.clear();
             window.location.href = "index.html";
         }
     </script>
