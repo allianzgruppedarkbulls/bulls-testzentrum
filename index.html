@@ -188,7 +188,7 @@
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModals() { document.querySelectorAll('.overlay').forEach(m => m.style.display = 'none'); }
 
-        // LOGIN LOGIK
+       // LOGIN LOGIK KORRIGIERT FÜR NEUE MATRIX
         async function doLogin() {
             const n = document.getElementById("logName").value.trim().toLowerCase();
             const p = document.getElementById("logPin").value.trim();
@@ -202,13 +202,14 @@
                 let userFound = null;
                 rows.forEach(r => {
                     const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim());
-                    if(c[0].toLowerCase() === n && c[2] === p) { userFound = c; }
+                    // c[0] = Name, c[2] = PIN (Spalte C)
+                    if(c[0] && c[0].toLowerCase() === n && c[2] === p) { userFound = c; }
                 });
 
                 if(userFound) {
-                    localStorage.setItem('bulls_user', userFound[0]);
-                    localStorage.setItem('bulls_role', userFound[3]);
-                    localStorage.setItem('bulls_extra', userFound[5] || ""); // Zusatzrolle
+                    localStorage.setItem('bulls_user', userFound[0]);             // Spalte A (Name)
+                    localStorage.setItem('bulls_role', userFound[3]);             // Spalte D (Rolle)
+                    localStorage.setItem('bulls_extra', userFound[4] || "");      // KORREKTUR: Spalte E (Zusätzliche Rolle)
                     window.location.href = "dashboard.html";
                 } else { alert("Login fehlgeschlagen! Name oder PIN falsch."); }
             } catch(e) { alert("Serverfehler beim Anmeldevorgang!"); }
