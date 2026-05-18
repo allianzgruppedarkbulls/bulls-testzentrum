@@ -14,7 +14,7 @@
         .user-info { color: #ff3131; font-size: 20px; }
         .logout-btn { background: #ff0000; color: white; border: none; padding: 8px 15px; cursor: pointer; font-weight: bold; font-family: 'Almendra'; border-radius: 4px; text-transform: uppercase; }
         
-        /* Die Haupt-Container Logik */
+        /* Haupt-Container Logik */
         .side-container { position: absolute; width: 100%; height: 100%; display: flex; justify-content: space-between; padding: 40px; box-sizing: border-box; z-index: 10; }
         .left-side, .right-side { display: flex; flex-direction: column; width: 320px; height: 90vh; }
         
@@ -23,7 +23,6 @@
 
         .card { background: rgba(0, 0, 0, 0.9); padding: 18px; border: 2px solid #ff3131; border-radius: 12px; box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); width: 100%; box-sizing: border-box; }
         
-        /* Admin Box tiefer setzen */
         #box-admin { margin-top: 45px; } 
 
         .card h2 { color: #ff3131; margin: 0 0 12px 0; font-size: 20px; text-decoration: underline; text-align: left; }
@@ -41,6 +40,7 @@
         .chat-btn-container { width: 100%; display: flex; justify-content: flex-end; }
         .chat-btn { background: #ff8c00; color: black; border: none; padding: 15px 45px; font-size: 24px; font-weight: bold; border-radius: 8px; cursor: pointer; font-family: 'Almendra'; box-shadow: 0 0 25px rgba(255, 140, 0, 0.5); }
         
+        /* Der absolute Wichtigmacher für die Matrix-Sperren */
         .hidden { display: none !important; }
     </style>
 </head>
@@ -59,26 +59,26 @@
             <h2>Persönlich</h2>
             <div class="btn-stack">
                 <button class="card-btn" id="btn-statistik" onclick="window.location.href='Per_Statistik.html'">Eigene Statistik</button>
-                <button class="card-btn" onclick="window.location.href='Per_Pin.html'">Pin ändern</button>
-                <button class="card-btn" onclick="window.location.href='Per_Supp.html'">Support Chat</button>
+                <button class="card-btn" id="btn-pin" onclick="window.location.href='Per_Pin.html'">Pin ändern</button>
+                <button class="card-btn" id="btn-support" onclick="window.location.href='Per_Supp.html'">Support Chat</button>
             </div>
         </div>
 
         <div class="card" id="box-blacklist">
             <h2>Freundschaft +</h2>
             <div class="btn-stack">
-                <button class="card-btn" onclick="window.location.href='Freun_SpiMel.html'">Spieler Melden</button>
-                <button class="card-btn" onclick="window.location.href='Freun_Ansch.html'">Anschauen</button>
+                <button class="card-btn" id="btn-melden" onclick="window.location.href='Freun_SpiMel.html'">Spieler Melden</button>
+                <button class="card-btn" id="btn-anschauen" onclick="window.location.href='Freun_Ansch.html'">Anschauen</button>
             </div>
         </div>
 
         <div class="card" id="box-pflege">
             <h2>Freundschaft + Pflege</h2>
             <div class="grid-2">
-                <button class="card-btn" onclick="window.location.href='FreunPfl_Gemel.html'">Gemeldete</button>
-                <button class="card-btn" onclick="window.location.href='FreunPfl_Pflege.html'">Pflege</button>
-                <button class="card-btn" onclick="window.location.href='FreunPfl_Eintrag.html'">Eintragen</button>
-                <button class="card-btn" onclick="window.location.href='FreunPfl_VAnsicht.html'">Vollansicht</button>
+                <button class="card-btn" id="btn-gemeldete" onclick="window.location.href='FreunPfl_Gemel.html'">Gemeldete</button>
+                <button class="card-btn" id="btn-pflege" onclick="window.location.href='FreunPfl_Pflege.html'">Pflege</button>
+                <button class="card-btn" id="btn-eintragen" onclick="window.location.href='FreunPfl_Eintrag.html'">Eintragen</button>
+                <button class="card-btn" id="btn-vollansicht" onclick="window.location.href='FreunPfl_VAnsicht.html'">Vollansicht</button>
             </div>
         </div>
     </div>
@@ -87,22 +87,22 @@
         <div class="card" id="box-admin">
             <h2>Admin</h2>
             <div class="btn-stack">
-                <button class="card-btn" onclick="window.location.href='Ad_UsVer.html'">User-Verwaltung</button>
-                <button class="card-btn" onclick="window.location.href='Ad_ChVer.html'">Chat Verwaltung</button>
-                <button class="admin-btn" onclick="window.location.href='Ad_AllEinst.html'">Allg. Einstellungen</button>
+                <button class="card-btn" id="btn-user-ver" onclick="window.location.href='Ad_UsVer.html'">User-Verwaltung</button>
+                <button class="card-btn" id="btn-chat-ver" onclick="window.location.href='Ad_ChVer.html'">Chat Verwaltung</button>
+                <button class="admin-btn" id="btn-allg-einst" onclick="window.location.href='Ad_AllEinst.html'">Allg. Einstellungen</button>
             </div>
         </div>
 
         <div class="card" id="box-elo"> 
             <h2>Elo Bereich</h2>
             <div class="btn-stack">
-                <button class="card-btn" onclick="window.location.href='Elo_RohRech.html'">Rohstoffrechner</button>
-                <button class="card-btn" onclick="window.location.href='Elo_EinRech.html'">Einheiten Rechner</button>
+                <button class="card-btn" id="btn-rohstoffe" onclick="window.location.href='Elo_RohRech.html'">Rohstoffrechner</button>
+                <button class="card-btn" id="btn-einheiten" onclick="window.location.href='Elo_EinRech.html'">Einheiten Rechner</button>
             </div>
         </div>
 
         <div class="chat-btn-container" id="box-allichat">
-            <button class="chat-btn" onclick="window.location.href='Chat.html'">ALLIANZ CHAT</button>
+            <button class="chat-btn" id="btn-allichat" onclick="window.location.href='Chat.html'">ALLIANZ CHAT</button>
         </div>
     </div>
 </div>
@@ -115,26 +115,25 @@
         if (!user) {
             window.location.href = "index.html";
         } else {
-            // Schleusen-Logik abfeuern: Wenn der User ein Anwärter ist, blockieren wir das Dashboard komplett
+            // Rekruten-Schleuse: Wenn in Spalte D 'Anwärter' steht, geht es ohne Umwege ab in den Chat!
             if (role === "Anwärter") {
                 window.location.href = "Chat.html";
             } else {
                 let displayRole = role;
                 if(extra) displayRole += " | " + extra;
                 document.getElementById('userDisplay').innerText = user + " (" + displayRole + ")";
-                applyPermissions(role, extra);
+                
+                // STARTE DEN MATRIX-AUTOPILOTEN
+                applyDashboardPermissions();
                 checkNews(); 
             }
         }
 
         async function checkNews() {
-            if (sessionStorage.getItem('bulls_news_seen') === 'true') {
-                return;
-            }
+            if (sessionStorage.getItem('bulls_news_seen') === 'true') return;
             try {
                 const res = await fetch(window.BULLS_CONFIG.SCRIPT_URL + "?action=getGlobalSettings");
                 const s = await res.json();
-                
                 if (s.newsActive && s.newsMsg) {
                     const newsDiv = document.createElement("div");
                     newsDiv.id = "newsOverlay";
@@ -157,66 +156,73 @@
             if (overlay) overlay.remove();
         }
 
-        // MODIFIZIERTE 2-STUFEN-PERMISSIONS-ROUTINE
-        function applyPermissions(r, ex) {
-            const boxBlacklist = document.getElementById('box-blacklist');
-            const boxPflege = document.getElementById('box-pflege');
-            const boxAdmin = document.getElementById('box-admin');
-            const boxElo = document.getElementById('box-elo');
-            const boxAlliChat = document.getElementById('box-allichat');
-            const btnStatistik = document.getElementById('btn-statistik');
-
-            // 1. ABSOLUTER GRUND-SCHUTZ: Alles Kritische erst einmal wegschließen
-            boxBlacklist.classList.add('hidden');
-            boxPflege.classList.add('hidden');
-            boxAdmin.classList.add('hidden');
-            boxElo.classList.add('hidden');
-            boxAlliChat.classList.add('hidden');
-            if (btnStatistik) btnStatistik.classList.add('hidden');
-
-            // 2. STUFE A: GRUNDSTATUS AUSWERTEN (Reine Optik/Grundfreigabe nach außen)
-            if (r === "Gast") {
-                return; // Fremde Gäste sehen nur den Support-Kanal und PIN-Wechsel. Ende!
-            }
+        // ===================================================
+        // DER NEUE RECHTE-AUTOPILOT (LIVE-ABGLEICH MIT SHEET)
+        // ===================================================
+        async function applyDashboardPermissions() {
+            const userRole = localStorage.getItem('bulls_role') || 'Mitglied';
+            const userExtra = localStorage.getItem('bulls_extra') || ''; 
             
-            if (r === "Mitglied" || r === "Kampfdivision") {
-                boxBlacklist.classList.remove('hidden');
-                boxAlliChat.classList.remove('hidden');
-            }
-            
-            if (r === "Offizier") {
-                boxBlacklist.classList.remove('hidden');
-                boxAlliChat.classList.remove('hidden');
-                // Offiziere kriegen als Standard-Führungskräfte Zugriff auf Pflege, Admin-Kacheln und ELO
-                boxPflege.classList.remove('hidden');
-                boxAdmin.classList.remove('hidden');
-                boxElo.classList.remove('hidden');
-            }
+            // Privilegien-Liste des Users erstellen
+            const userPrivileges = [userRole, ...userExtra.split(',').map(s => s.trim())].filter(Boolean);
 
-            // 3. STUFE B: ZUSÄTZLICHE HQ-AUFGABEN AUSWERTEN (Rechte per Haken)
-            if (ex.includes("Admin")) {
-                // Der Haken "Admin" bricht alle Sperren im System auf!
-                boxBlacklist.classList.remove('hidden');
-                boxPflege.classList.remove('hidden');
-                boxAdmin.classList.remove('hidden');
-                boxElo.classList.remove('hidden');
-                boxAlliChat.classList.remove('hidden');
-                if (btnStatistik) btnStatistik.classList.remove('hidden');
+            // Erst einmal pauschal die Kisten verstecken, bis die Cloud antwortet
+            const cards = document.querySelectorAll('.card');
+            
+            try {
+                // Hole Live-Matrix aus der Excel-Tabelle Dashboard_Rechte
+                const res = await fetch(window.BULLS_CONFIG.SCRIPT_URL + "?action=getDashboardMatrix");
+                const matrix = await res.json();
+
+                matrix.forEach(item => {
+                    const element = document.getElementById(item.id);
+                    if (element) {
+                        // Regel 1: Wenn global auf "Deaktiviert" gestellt, fliegt das Ding bedingungslos raus!
+                        if (item.status === "Deaktiviert") {
+                            element.classList.add("hidden");
+                            return;
+                        }
+
+                        // Regel 2: Admin-Haken bricht jede Sperre, ansonsten müssen Rollen passen
+                        const hasAccess = userPrivileges.includes("Admin") || item.allowed.some(role => userPrivileges.includes(role));
+
+                        if (hasAccess) {
+                            element.classList.remove("hidden");
+                        } else {
+                            element.classList.add("hidden");
+                        }
+                    }
+                });
+
+                // ZUSATZ-SMARTNESS: Wenn in einer Box ALLE Buttons versteckt sind, blendet das Script die ganze Box aus!
+                checkCardVisibility('box-perso');
+                checkCardVisibility('box-blacklist');
+                checkCardVisibility('box-pflege');
+                checkCardVisibility('box-admin');
+                checkCardVisibility('box-elo');
+
+            } catch (e) {
+                console.error("Fehler im Dashboard-Autopiloten:", e);
+                // Sicherheits-Fallback: Zeige zumindest Allianz Chat, falls Cloud hakt
+                document.getElementById('box-allichat').classList.remove('hidden');
+            }
+        }
+
+        // Hilfsfunktion: Schließt leere Rahmen, damit das Design nicht zerfällt
+        function checkCardVisibility(cardId) {
+            const card = document.getElementById(cardId);
+            if (!card) return;
+            const buttons = card.querySelectorAll('.card-btn, .admin-btn');
+            let visibleButtons = 0;
+            buttons.forEach(btn => {
+                if (!btn.classList.includes || !btn.classList.contains('hidden')) {
+                    visibleButtons++;
+                }
+            });
+            if (visibleButtons === 0) {
+                card.classList.add('hidden');
             } else {
-                // Individuelle Funktions-Haken für Spezialisten prüfen
-                if (ex.includes("Buchhalter")) {
-                    boxPflege.classList.remove('hidden'); // Blacklist-Pflege freischalten
-                }
-                if (ex.includes("Moderator")) {
-                    boxPflege.classList.remove('hidden'); // Blacklist-Pflege freischalten
-                }
-                if (ex.includes("elo") || ex.includes("elo Buchhalter")) {
-                    boxElo.classList.remove('hidden');    // ELO-Rechner freischalten
-                }
-                if (ex.includes("support") || ex.includes("Ausbilder")) {
-                    // Falls du später spezifische Buttons für Supporter/Ausbilder auf dem Dashboard hast,
-                    // können sie hier gezielt freigeschaltet werden!
-                }
+                card.classList.remove('hidden');
             }
         }
 
