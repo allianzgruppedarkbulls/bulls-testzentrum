@@ -70,7 +70,7 @@
             <div class="btn-stack">
                 <button class="card-btn" id="btn-statistik" onclick="window.location.href='Per_Statistik.html'">Eigene Statistik</button>
                 <button class="card-btn" id="btn-pin" onclick="window.location.href='Per_Pin.html'">Pin ändern</button>
-                <button class="card-btn" id="btn-support" onclick="window.location.href='Per_Supp.html'">Support Chat</button>
+                <button class="card-btn" id="btn-support" onclick="window.location.href='Chat_Support.html'">Support Chat</button>
             </div>
         </div>
 
@@ -108,11 +108,12 @@
             <div class="btn-stack">
                 <button class="card-btn" id="btn-rohstoffe" onclick="window.location.href='Elo_RohRech.html'">Rohstoffrechner</button>
                 <button class="card-btn" id="btn-einheiten" onclick="window.location.href='Elo_EinRech.html'">Einheiten Rechner</button>
+                <button class="card-btn" id="btn-groupchat" onclick="window.location.href='Chat_Group.html'">Taktische Gruppen</button>
             </div>
         </div>
 
         <div class="chat-btn-container" id="box-allichat">
-            <button class="chat-btn" id="btn-allichat" onclick="window.location.href='Chat.html'">ALLIANZ CHAT</button>
+            <button class="chat-btn" id="btn-allichat" onclick="window.location.href='Chat_PN.html'">ALLIANZ CHAT</button>
         </div>
     </div>
 </div>
@@ -126,7 +127,7 @@
             window.location.href = "index.html";
         } else {
             if (role === "Anwärter") {
-                window.location.href = "Chat.html";
+                window.location.href = "Chat_PN.html";
             } else {
                 let displayRole = role;
                 if(extra) displayRole += " | " + extra;
@@ -187,7 +188,6 @@
                         const hasAccess = userPrivileges.includes("Admin") || item.allowed.some(role => userPrivileges.includes(role));
 
                         if (hasAccess) {
-                            // Freischalten! Element kriegt die CSS-Eigenschaft zur Sichtbarkeit zurück
                             element.style.display = "block";
                         } else {
                             element.className = "card-btn hidden";
