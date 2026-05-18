@@ -182,19 +182,52 @@
         await updateLoop(); 
     }
 
-    async function updateLoop() {
-        try {
-            const res = await fetch(API + "?action=getChatData&user=" + MY_NAME);
-            chatDataCache = await res.json();
-            globalUserList = chatDataCache.user || [];
-            
-            buildModalLists();
-            renderChannelList(); 
-            renderChatContent(); 
-            renderRightSidebar(); 
-            checkNewMessagesForPush();
-        } catch(e) { console.log("Sync verloren."); }
+   async function updateLoop() {
+    try {
+        const res = await fetch(API + "?action=getChatData&user=" + encodeURIComponent(MY_NAME));
+        chatDataCache = await res.json();
+        
+        // 1. User-Matrix aktualisieren
+        globalUserList = chatDataCache.user || [];
+        
+        // 📬 BRANDNEUE ANWÄRTER / REKRUTEN SCHLEUSEN-LOGIK (Briefkasten-Modus)
+        if (chatDataCache.myGrundstatus === "Anwärter" || chatDataCache.myGrundstatus === "Gast der Allianz") {
+            // Verstecke die Server-Icons links, die Kanalliste in der Mitte und das rechte Roster
+            document.querySelector(".discord-servers").classList.add("hidden");
+            document.querySelector(".discord-channels").classList.add("hidden");
+            document.getElementById("rightRosterContainer").classList.add("hidden");
+
+            // Zwinge den Chat-Container auf die volle Breite des Monitors
+            document.querySelector(".discord-chat-container").style.width = "100vw";
+
+            // Nagle den Fokus fest auf den isolierten Support-Kanal
+            currentServer = 'ticket_player';
+            currentTarget = "Support"; 
+
+            // Platziere den großen, unübersehbaren PIN-Button oben rechts
+            const tools = document.getElementById("channelAdminTools");
+            tools.innerHTML = `<button class="group-admin-btn" style="background:#f0b232; color:#000; font-weight:bold; font-size:16px; padding:8px 16px; border-radius:4px; border:1px solid #111;" onclick="window.location.href='personal_pin.html'">🔑 MEINEN PIN ÄNDERN</button>`;
+
+            // Titel anpassen
+            document.getElementById("currentChannelTitle").innerHTML = "<span>🐂</span> DARK BULLS - REKRUTIERUNGSZENTRALE";
+        } else {
+            // NORMALER MODUS: Wenn der Spieler vollwertig ist, wird das Discord-Layout wiederhergestellt
+            document.querySelector(".discord-servers").classList.remove("hidden");
+            document.querySelector(".discord-channels").classList.remove("hidden");
+            document.getElementById("rightRosterContainer").classList.remove("hidden");
+            document.querySelector(".discord-chat-container").style.width = "";
+        }
+
+        // 2. Deine originalen Render-Funktionen ausführen
+        buildModalLists();
+        renderChannelList(); 
+        renderChatContent(); 
+        renderRightSidebar(); 
+        checkNewMessagesForPush();
+    } catch(e) { 
+        console.log("Verbindung zum HQ-Server wackelt...", e); 
     }
+}
 
     function buildModalLists() {
         const checkList = document.getElementById("groupUserChecklist"); 
@@ -365,17 +398,24 @@
         updateLoop();
     }
 
-    async function sendMessage() {
-        const text = document.getElementById("msgInput").value.trim(); if(!text || !currentTarget) return;
-        let sheet = "GROUP_" + currentTarget;
-        if(currentServer === 'pn') sheet = "PN_" + [MY_NAME, currentTarget].sort().join("_");
-        if(currentServer === 'ticket_player') sheet = "SUP_" + currentTarget.replace(/[^a-zA-Z0-9]/g, "") + "_" + MY_NAME;
-        if(currentServer === 'support_admin') sheet = "SUP_" + currentTarget.betreff.replace(/[^a-zA-Z0-9]/g, "") + "_" + currentTarget.sender;
+   async function sendMessage() {
+    const text = document.getElementById("msgInput").value.trim(); 
+    if(!text || !currentTarget) return;
+    
+    let sheet = "GROUP_" + currentTarget;
+    if(currentServer === 'pn') sheet = "PN_" + [MY_NAME, currentTarget].sort().join("_");
+    if(currentServer === 'ticket_player') sheet = "SUP_" + currentTarget.replace(/[^a-zA-Z0-9]/g, "") + "_" + MY_NAME;
+    if(currentServer === 'support_admin') sheet = "SUP_" + currentTarget.betreff.replace(/[^a-zA-Z0-9]/g, "") + "_" + currentTarget.sender;
 
-        document.getElementById("msgInput").value = "";
-        await fetch(API, { method: "POST", body: JSON.stringify({ action: "sendChatMessage", targetSheet: sheet, sender: MY_NAME, role: MY_ROLE, text: text }) });
-        updateLoop();
+    // 🚀 AUSNAHME FÜR ANWÄRTER: Erzwinge das korrekte Support-Ticket-Protokoll
+    if (chatDataCache && (chatDataCache.myGrundstatus === "Anwärter" || chatDataCache.myGrundstatus === "Gast der Allianz")) {
+        sheet = "SUP_Support_" + MY_NAME;
     }
+
+    document.getElementById("msgInput").value = "";
+    await fetch(API, { method: "POST", body: JSON.stringify({ action: "sendChatMessage", targetSheet: sheet, sender: MY_NAME, role: MY_ROLE, text: text }) });
+    updateLoop();
+}
 
     function renderRightSidebar() { 
         const container = document.getElementById("rightRosterContainer"); container.innerHTML = ""; 
