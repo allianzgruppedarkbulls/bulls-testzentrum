@@ -37,7 +37,6 @@
         .chat-item:hover { background: #151515; border-left: 3px solid #ff3131; }
         .chat-item.active { background: #1c1515; border-left: 3px solid #ff3131; }
         .chat-name { font-weight: bold; font-size: 16px; }
-        .badge { background: #ff3131; color: #fff; font-size: 12px; font-weight: bold; padding: 3px 8px; border-radius: 10px; box-shadow: 0 0 10px red; }
 
         /* RECHTER CHAT STREAM */
         .chat-main { flex: 1; display: flex; flex-direction: column; position: relative; }
@@ -51,7 +50,7 @@
         .send-btn { background: #ff8c00; color: #000; border: none; padding: 0 35px; font-family: 'Almendra'; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; box-shadow: 0 0 15px rgba(255, 140, 0, 0.3); }
         .send-btn:hover { background: #e07b00; }
 
-        /* STRUCH-STYLES FÜR INTEGRATION */
+        /* STREAM STYLES */
         .msg-line { display: flex; flex-direction: column; background: #111; border-left: 3px solid #ff3131; padding: 10px 15px; border-radius: 0 6px 6px 0; max-width: 85%; align-self: flex-start; }
         .msg-line.me { border-left: none; border-right: 3px solid #39d353; border-radius: 6px 0 0 6px; background: #161a16; align-self: flex-end; }
         .msg-meta { font-size: 13px; margin-bottom: 4px; display: flex; gap: 10px; }
@@ -69,9 +68,9 @@
     <div class="funk-nav">
         <div class="nav-links">
             <button class="nav-link-btn" onclick="window.location.href='dashboard.html'">🏠 HQ</button>
-            <button class="nav-link-btn" onclick="window.location.href='Chat_Alli.html'">📢 Allianz</button>
             <button class="nav-link-btn active">💬 PNs</button>
             <button class="nav-link-btn" onclick="window.location.href='Chat_Group.html'">⚔️ Gruppen</button>
+            <button class="nav-link-btn" onclick="window.location.href='Chat_Support.html'">🚨 Support</button>
         </div>
         <div style="color: #ff3131; font-size: 18px;" id="userDisplay">Bulls Direktfunk...</div>
         <button class="logout-btn" onclick="logoutFunk()">X</button>
@@ -84,8 +83,7 @@
                 <input type="text" id="userInputSearch" placeholder="🔍 Spieler suchen..." oninput="searchAllianzUser(this.value)">
                 <div class="search-results" id="searchResultsDropdown"></div>
             </div>
-            <div class="chat-list" id="pnChatVerteiler">
-                </div>
+            <div class="chat-list" id="pnChatVerteiler"></div>
         </div>
 
         <div class="chat-main">
@@ -104,14 +102,13 @@
     </div>
 
     <script>
-        let allianzUsersList = []; // Wird aus den Dropdown-Daten des HQ befüllt
+        let allianzUsersList = [];
 
         window.addEventListener("DOMContentLoaded", async () => {
             initFunkkreis("pn");
-            loadAllianzUserBase(); // Zieht im Hintergrund einmal alle User für die Suche
+            loadAllianzUserBase();
         });
 
-        // 1. HOLT DIE BENUTZERLISTE FÜR DIE ELEMENT-SUCHE
         async function loadAllianzUserBase() {
             try {
                 const res = await fetch(window.BULLS_CONFIG.SCRIPT_URL + "?action=getDropdownData");
@@ -120,7 +117,6 @@
             } catch(e) { console.log("Fehler beim Holen der User-Datenbank."); }
         }
 
-        // 2. DIE LIVE-SUCHE IN ACTION
         function searchAllianzUser(query) {
             const dropdown = document.getElementById("searchResultsDropdown");
             const myUser = localStorage.getItem('bulls_user');
@@ -128,7 +124,6 @@
 
             if (!query.trim()) { dropdown.style.display = "none"; return; }
 
-            // Filter alle Treffer, schließe dich selbst aus
             let matches = allianzUsersList.filter(name => name.toLowerCase().includes(query.toLowerCase()) && name !== myUser);
             
             if (matches.length > 0) {
@@ -145,30 +140,25 @@
             }
         }
 
-        // 3. STARTET EINEN NEUEN PRIVATEN KANAL
         function startNewPNChannel(name) {
             document.getElementById("userInputSearch").value = "";
             document.getElementById("searchResultsDropdown").style.display = "none";
             
-            currentChatTarget = name; // Tauscht das Sende-Ziel in der funk_zentrale.js
+            currentChatTarget = name;
             
-            // Textbox freischalten
             document.getElementById('messageInput').disabled = false;
             document.getElementById('sendButton').disabled = false;
             
-            updateMuteStatusAndFetch(); // Triggert sofortigen Refresh
+            updateMuteStatusAndFetch();
         }
 
-        // 4. VERARBEITET DIE LIVE CHATDATEN VOM SERVER
         function processChatData(data) {
             const myUser = localStorage.getItem('bulls_user');
             const verteiler = document.getElementById("pnChatVerteiler");
             const stream = document.getElementById("pnStreamArea");
 
-            // --- TEIL A: DIE LINKER SEITE BAUEN (NUR CHATS MIT AKTIVEN NACHRICHTEN) ---
             let activePNClients = new Set();
             
-            // Extrahiere alle Kommunikationspartner aus dem PN-Topf
             if (data.pns) {
                 data.pns.forEach(msg => {
                     if (msg.user === myUser) activePNClients.add(msg.target);
@@ -176,7 +166,6 @@
                 });
             }
 
-            // Wenn wir gerade ein neues Gespräch gestartet haben, muss derjenige auch rein
             if (currentChatTarget && currentChatTarget !== "global") {
                 activePNClients.add(currentChatTarget);
             }
@@ -184,27 +173,19 @@
             let verteilerHTML = "";
             activePNClients.forEach(clientName => {
                 let isActive = currentChatTarget === clientName ? "active" : "";
-                
-                // Berechne ungelesene (Zusatz-Feature falls gewünscht, hier als Platzhalter vorbereitet)
-                let unreadBadge = ""; 
-                
                 verteilerHTML += `
                     <div class="chat-item ${isActive}" onclick="startNewPNChannel('${clientName}')">
                         <span class="chat-name">👤 ${clientName}</span>
-                        ${unreadBadge}
                     </div>
                 `;
             });
-            verteiler.innerHTML = verteilerHTML || `<div style="padding:20px; color:#555; text-align:center; font-size:14px; font-family:sans-serif;">Keine aktiven Gespräche. Nutze das Suchfeld oben!</div>`;
+            verteiler.innerHTML = verteilerHTML || `<div style="padding:20px; color:#555; text-align:center; font-size:14px; font-family:sans-serif;">Keine aktiven PNs. Nutze das Suchfeld!</div>`;
 
-            // --- TEIL B: PRIVATEN MESSAGES STREAM FILTERN & ZEICHNEN ---
             if (currentChatTarget && currentChatTarget !== "global") {
-                // Schalte die Inputs frei, falls noch nicht geschehen
                 document.getElementById('messageInput').disabled = false;
                 document.getElementById('sendButton').disabled = false;
 
                 let htmlHTML = "";
-                // Filter nur die PNs heraus, die exakt zwischen mir und dem aktuellen Target gelaufen sind
                 let filteredPNs = data.pns ? data.pns.filter(msg => 
                     (msg.user === myUser && msg.target === currentChatTarget) || 
                     (msg.user === currentChatTarget && msg.target === myUser)
@@ -228,14 +209,13 @@
                     stream.innerHTML = htmlHTML;
                     if (!scrollCheck) stream.scrollTop = stream.scrollHeight;
                 } else {
-                    stream.innerHTML = `<div style="text-align:center; color:#ff8c00; padding-top:50px; font-style:italic;">Sicherer 1-zu-1 Funkkanal aufgebaut. Schreib eine Nachricht, um das Gespräch zu eröffnen! 🔐</div>`;
+                    stream.innerHTML = `<div style="text-align:center; color:#ff8c00; padding-top:50px; font-style:italic;">Abgesicherter 1-zu-1 Funkkanal. Schreib eine Nachricht! 🔐</div>`;
                 }
             }
 
-            // --- TEIL C: INDIVIDUELLEN TYPING INDICATOR PRÜFEN ---
             const typingIndicator = document.getElementById("typingIndicator");
             if (data.typing && data.typing.pns && data.typing.pns[currentChatTarget]) {
-                typingIndicator.innerText = `${currentChatTarget} tippt gerade... ✏/`;
+                typingIndicator.innerText = `${currentChatTarget} tippt gerade... ✏️`;
             } else {
                 typingIndicator.innerText = "";
             }
