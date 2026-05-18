@@ -38,7 +38,6 @@
         .d-msg-text { color: #dbdee1; font-size: 15px; line-height: 1.4; white-space: pre-wrap; }
         .chat-img { max-width: 300px; max-height: 200px; border-radius: 6px; border: 1px solid #444; margin-top: 5px; cursor: pointer; }
         
-        /* PINADELDÄMPFUNG */
         .pin-indicator { font-size: 13px; color: #ffd600; cursor: pointer; margin-left: 8px; }
         .pin-badge { position: absolute; top: 6px; right: 10px; font-size: 12px; background: rgba(255, 214, 0, 0.15); border: 1px solid #ffd600; color: #ffd600; padding: 2px 6px; border-radius: 3px; display: none; }
         .d-msg.is-pinned-row { background: rgba(255, 214, 0, 0.03); border-left: 2px solid #ffd600; }
@@ -62,7 +61,7 @@
         .status-dot { width: 10px; height: 10px; background: #23a55a; border-radius: 50%; position: absolute; bottom: -2px; right: -2px; border: 2px solid #2b2d31; }
 
         .role-admin { color: #f23f43 !important; } .role-offi { color: #f0b232 !important; } .role-member { color: #23a55a !important; }
-        .sup-row-card { padding: 15px; border-radius: 6px; background: #2b2d31; color: #fff; cursor: pointer; border-left: 6px solid #fff; margin-bottom:8px; display:flex; justify-content:space-between; }
+        .sup-row-card { padding: 15px; border-radius: 6px; background: #2b2d31; color: #fff; cursor: pointer; border-left: 6px solid #fff; margin-bottom: 8px; display: flex; justify-content: space-between; }
         .card-green { border-color: #23a55a; } .card-red { border-color: #f23f43; } .card-yellow { border-color: #f0b232; }
 
         .user-scroll-list { background: #1e1f22; border: 1px solid #111; height: 150px; overflow-y: auto; margin-bottom: 15px; padding: 5px; }
@@ -260,19 +259,16 @@
             (chatDataCache.support || []).forEach(m => {
                 let col = 'card-green'; if(m[1] === 'SUPPORT') col = 'card-red'; if(m[1] === 'BUCHHALTER') col = 'card-yellow';
                 if (["Admin"].includes(MY_ROLE) || (m[1]==='BUCHHALTER' && MY_EXTRA.includes("Buchhalter"))) {
-                    html += `<div class="sup-row-card ${col}" onclick="alert('VON: ${m[2]}\\n\\n${m[4]}')"><div><strong>${m[2]}</strong> | Betreff: <i>${m[3]}</i></div><div style="font-size:12px; color:#aaa;">${m[0]}</div></div>`;
+                    html += `<div class="sup-row-card ${col}" onclick="alert('VON: ${m[2]}\\n\\nBetreff: ${m[3]}\\n\\n${m[4]}')"><div><strong>${m[2]}</strong> | Betreff: <i>${m[3]}</i></div><div style="font-size:12px; color:#aaa;">${m[0]}</div></div>`;
                 }
             });
             box.innerHTML = html || '<p style="text-align:center;">Keine Tickets.</p>'; return;
         }
 
-        // BERECHTIGUNGS-LOGIK FÜR DEN SCHREIB-FUNK AUSWERTEN
         if (currentServer === 'group') {
             const g = (chatDataCache.groups || []).find(x => x.name === currentTarget);
             if(g) {
-                // Schalte Büroklammer aus, wenn Rechte auf 'write' (keine Bilder) oder 'read' (nur lesen) stehen
                 if(g.rights === 'write' || g.rights === 'read') document.getElementById("paperclipBtn").classList.add("hidden");
-                // Blende das gesamte Eingabefeld für normale Member aus, wenn 'read' aktiv ist
                 if(g.rights === 'read' && !IS_MODERATOR) footer.classList.add("hidden");
 
                 g.messages.forEach(m => { html += formatMessageRow_(m[1], m[4], m[3], m[2], m[5]); });
@@ -310,7 +306,6 @@
         updateLoop();
     }
 
-    // Die restlichen Core-Funktionen (Roster, Popups, etc.) bleiben unverändert gekoppelt
     function renderRightSidebar() { const container = document.getElementById("rightRosterContainer"); container.innerHTML = ""; const onlineList = chatDataCache.onlineUsers || []; if (currentServer === 'group' && currentTarget) { const activeGroup = (chatDataCache.groups || []).find(x => x.name === currentTarget); if (!activeGroup) return; let onTrupp = [], offTrupp = []; (activeGroup.members || []).sort().forEach(m => { if (onlineList.includes(m)) onTrupp.push(m); else offTrupp.push(m); }); let html = `<div class="member-section"><div class="member-group-title">Im Trupp (Online) — ${onTrupp.length}</div>`; onTrupp.forEach(m => { html += `<div class="user-row ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${m}')"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; }); html += `</div><div class="member-section"><div class="member-group-title">Im Trupp (Offline) — ${offTrupp.length}</div>`; offTrupp.forEach(m => { html += `<div class="user-row offline ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${m}')"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; }); container.innerHTML = html + "</div>"; } else { let allianzOnline = [], allianzOffline = []; [...globalUserList].sort((a,b)=>a.name.localeCompare(b.name)).forEach(u => { if (onlineList.includes(u.name)) allianzOnline.push(u.name); else allianzOffline.push(u.name); }); let html = `<div class="member-section"><div class="member-group-title">Online im HQ — ${allianzOnline.length}</div>`; allianzOnline.forEach(u => { html += `<div class="user-row ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${u}')"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; }); html += `</div><div class="member-section"><div class="member-group-title">Offline — ${allianzOffline.length}</div>`; allianzOffline.forEach(u => { html += `<div class="user-row offline ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${u}')"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; }); container.innerHTML = html + "</div>"; } }
     function triggerImageUpload() { let url = prompt("Füge hier die URL deines Schlachtplans/Bildes ein (.jpg, .png):"); if(url) { document.getElementById("msgInput").value = url; sendMessage(); } }
     function openGroupManagementModal(groupName) { const activeGroup = chatDataCache.groups.find(x => x.name === groupName); if(!activeGroup) return; document.getElementById("manageModalTitle").innerText = `Trupp: ${groupName}`; const container = document.getElementById("manageUserChecklist"); container.innerHTML = ""; [...globalUserList].sort((a,b)=>a.name.localeCompare(b.name)).forEach(u => { if(u.name !== MY_NAME) { let isChecked = activeGroup.members.includes(u.name) ? 'checked' : ''; container.innerHTML += `<label class="check-row"><input type="checkbox" name="manageBox" value="${u.name}" ${isChecked}><span>${u.name}</span></label>`; } }); document.getElementById("modalManage").setAttribute("data-active-group", groupName); document.getElementById("modalManage").style.display = "flex"; }
