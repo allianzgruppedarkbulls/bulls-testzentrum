@@ -63,20 +63,23 @@
         .role-admin { color: #f23f43 !important; } .role-offi { color: #f0b232 !important; } .role-member { color: #23a55a !important; }
         .sup-row-card { padding: 15px; border-radius: 6px; background: #2b2d31; color: #fff; cursor: pointer; border-left: 6px solid #fff; margin-bottom: 8px; display: flex; justify-content: space-between; }
         .card-green { border-color: #23a55a; } .card-red { border-color: #f23f43; } .card-yellow { border-color: #f0b232; }
+        .ticket-badge-status { font-size:11px; padding:2px 6px; border-radius:3px; background:rgba(255,255,255,0.1); font-weight:bold; text-transform:uppercase; }
 
-        .user-scroll-list { background: #1e1f22; border: 1px solid #111; height: 180px; overflow-y: auto; margin-bottom: 15px; padding: 5px; border-radius: 4px; display: flex; flex-direction: column; gap: 2px; }
-        .check-row { display: flex; align-items: center; gap: 12px; padding: 8px 8px; border-bottom: 1px solid #2b2d31; cursor: pointer; color: #dbdee1; font-size: 16px; text-align: left; box-sizing: border-box; width: 100%; }
-        .check-row:hover { background: #2b2d31; color: #fff; }
-        .check-row input { width: 18px; height: 18px; accent-color: #39d353; margin: 0; cursor: pointer; flex-shrink: 0; }
-        
-        .quick-sel-btn { background: #2b2d31; border: 1px solid #444; color: #fff; font-family: 'Almendra'; font-size: 12px; padding: 6px 12px; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
-
+        /* NEUE XL-DESIGN KLASSEN FÜR MAXIMALE LESBARKEIT */
         .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center; }
-        .modal-box { background:#313338; border: 1px solid #444; padding: 25px; border-radius: 8px; width: 440px; text-align: center; color: #dbdee1; box-shadow: 0 8px 24px rgba(0,0,0,0.7); }
-        .modal-box select, .modal-box input { width: 100%; padding: 10px; background: #1e1f22; border: 1px solid #111; color: #fff; font-family: 'Almendra'; border-radius: 4px; font-size: 16px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
-
-        .hidden { display: none !important; }
+        .modal-box { background:#313338; border: 1px solid #444; padding: 35px; border-radius: 12px; width: 600px; max-width: 90%; text-align: center; color: #dbdee1; box-shadow: 0 12px 35px rgba(0,0,0,0.7); }
+        .modal-box h2 { font-size: 28px; margin-top: 0; margin-bottom: 20px; color: #fff; letter-spacing: 1px; }
+        .modal-box select, .modal-box input { width: 100%; padding: 14px; background: #1e1f22; border: 1px solid #111; color: #fff; font-family: 'Almendra'; border-radius: 6px; font-size: 18px; margin-bottom: 15px; box-sizing: border-box; outline: none; }
+        
+        .user-scroll-list { background: #1e1f22; border: 1px solid #111; height: 320px; overflow-y: auto; margin-bottom: 20px; padding: 10px; border-radius: 6px; display: flex; flex-direction: column; gap: 4px; }
+        .check-row { display: flex; align-items: center; gap: 15px; padding: 10px 12px; border-bottom: 1px solid #2b2d31; cursor: pointer; color: #dbdee1; font-size: 19px; text-align: left; box-sizing: border-box; width: 100%; }
+        .check-row:hover { background: #2b2d31; color: #fff; }
+        .check-row input { width: 22px; height: 22px; accent-color: #39d353; margin: 0; cursor: pointer; flex-shrink: 0; }
+        
+        .quick-sel-btn { background: #2b2d31; border: 1px solid #444; color: #fff; font-family: 'Almendra'; font-size: 14px; padding: 8px 16px; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-weight: bold; }
+        .quick-sel-btn:hover { border-color: #39d353; color: #39d353; }
         .loading-text { font-style: italic; color: #ff8c00; text-align: center; padding: 20px; font-size: 16px; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -120,15 +123,15 @@
         <div class="modal-box">
             <h2>Einsatzgruppe gründen</h2>
             <input type="text" id="newGroupName" placeholder="Militärischer Gruppenname...">
-            <input type="text" id="newGroupDC" placeholder="Discord Einladungs-Link (Optional)...">
+            <input type="text" id="newGroupDC" placeholder="Discord Webhook Link (Optional)...">
             
-            <select id="newGroupRights" style="background:#1e1f22; color:#fff; font-family:'Almendra'; width:100%; margin-bottom:12px;">
+            <select id="newGroupRights">
                 <option value="all">Berechtigung: Schreiben + Bilder senden</option>
                 <option value="write">Berechtigung: Nur Schreiben (Keine Bilder)</option>
                 <option value="read">Berechtigung: Nur Lesen (Infokanal)</option>
             </select>
 
-            <div style="margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;">
+            <div style="margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">
                 <button type="button" class="quick-sel-btn" onclick="selectGroupMembers('all')">Alle Spieler</button>
                 <button type="button" class="quick-sel-btn" onclick="selectGroupMembers('bulls')">Alle Dark Bulls</button>
                 <button type="button" class="quick-sel-btn" onclick="selectGroupMembers('kd')">Bulls & Division</button>
@@ -137,22 +140,22 @@
             <div class="user-scroll-list" id="groupUserChecklist">
                 <div class="loading-text">Synchronisiere Kampfkarte... 🔄</div>
             </div>
-            <button class="send-btn" style="width:100%; padding:12px; font-weight:bold;" onclick="createGroupFromModal()">Gruppe versiegeln</button>
-            <p onclick="closeModals()" style="color:#949ba4; cursor:pointer; margin-top:12px; margin-bottom:0;">Abbrechen</p>
+            <button class="send-btn" style="width:100%; padding:14px; font-weight:bold; font-size:18px;" onclick="createGroupFromModal()">Gruppe versiegeln</button>
+            <p onclick="closeModals()" style="color:#949ba4; cursor:pointer; margin-top:15px; margin-bottom:0; font-size:16px;">Abbrechen</p>
         </div>
     </div>
 
     <div id="modalManage" class="modal-overlay">
         <div class="modal-box">
             <h2 id="manageModalTitle">Truppmitglieder anpassen</h2>
-            <p style="font-size:14px; color:#aaa; margin-top:-8px; margin-bottom:15px;">Setze Haken um Gefährten hinzuzufügen oder zu entfernen.</p>
+            <p style="font-size:15px; color:#aaa; margin-top:-8px; margin-bottom:15px;">Setze Haken um Gefährten hinzuzufügen oder zu entfernen.</p>
             
             <div class="user-scroll-list" id="manageUserChecklist">
                 <div class="loading-text">Rufe Truppdaten ab... 🔄</div>
             </div>
             
-            <button class="send-btn" style="width:100%; padding:12px; font-weight:bold;" onclick="saveGroupMembersManagement()">Änderungen speichern</button>
-            <p onclick="closeModals()" style="color:#949ba4; cursor:pointer; margin-top:12px; margin-bottom:0;">Abbrechen</p>
+            <button class="send-btn" style="width:100%; padding:14px; font-weight:bold; font-size:18px;" onclick="saveGroupMembersManagement()">Änderungen speichern</button>
+            <p onclick="closeModals()" style="color:#949ba4; cursor:pointer; margin-top:15px; margin-bottom:0; font-size:16px;">Abbrechen</p>
         </div>
     </div>
 
@@ -183,8 +186,6 @@
         try {
             const res = await fetch(API + "?action=getChatData&user=" + MY_NAME);
             chatDataCache = await res.json();
-            
-            // Reißt die User direkt aus dem optimierten Zentral-Paket ab
             globalUserList = chatDataCache.user || [];
             
             buildModalLists();
@@ -206,7 +207,7 @@
                 checkList.innerHTML += `
                     <label class="check-row">
                         <input type="checkbox" name="groupMembers" value="${u.name}" data-role="${roleClean}">
-                        <span>${u.name} <span style="color:#777; font-size:13px; font-style:italic;">(${u.role})</span></span>
+                        <span>${u.name} <span style="color:#ff3131; font-size:15px; font-style:italic; margin-left:5px;">(${u.role})</span></span>
                     </label>`;
             }
         });
@@ -243,7 +244,7 @@
                 container.innerHTML += `
                     <div class="channel-row-wrapper ${act}">
                         <button class="channel-btn" onclick="switchChannel('group', '# ' + '${g.name}', '${g.name}', 'text', '${g.dcLink}')"># ${g.name.toLowerCase()}</button>
-                        ${IS_MODERATOR ? `<span class="gear-icon" onclick="openGroupManagementModal('${g.name}')">⚙️</span>` : ''}
+                        ${IS_MODERATOR ? `<span class="gear-icon" onclick="openGroupManagementModal('${g.name}')" title="Gruppe bearbeiten">⚙️</span>` : ''}
                     </div>
                     <div class="channel-row-wrapper"><button class="channel-btn" onclick="switchChannel('group', '🔊 ' + '${g.name}', '${g.name}', 'voice', '${g.dcLink}')">🔊 ${g.name.toLowerCase()}</button></div>`;
             });
@@ -416,7 +417,7 @@
                 container.innerHTML += `
                     <label class="check-row">
                         <input type="checkbox" name="manageBox" value="${u.name}" ${isChecked}>
-                        <span>${u.name} <span style="color:#777; font-size:13px; font-style:italic;">(${u.role})</span></span>
+                        <span>${u.name} <span style="color:#ff3131; font-size:15px; font-style:italic; margin-left:5px;">(${u.role})</span></span>
                     </label>`;
             }
         });
@@ -442,7 +443,7 @@
     function triggerPlusAction() { if(currentServer==='pn') document.getElementById("modalPN").style.display="flex"; if(currentServer==='group') document.getElementById("modalGroup").style.display="flex"; }
     function startPNFromModal() { const u = document.getElementById("pnUserSelect").value; if(u) { closeModals(); switchChannel('pn', '👤 ' + u, u, 'text'); } }
     async function createGroupFromModal() { const name = document.getElementById("newGroupName").value.trim(); const dc = document.getElementById("newGroupDC").value.trim(); const rts = document.getElementById("newGroupRights").value; if(!name) return; const boxes = document.querySelectorAll('#groupUserChecklist input[name="groupMembers"]:checked'); let members = [MY_NAME]; boxes.forEach(b => members.push(b.value)); closeModals(); await fetch(API, { method: "POST", body: JSON.stringify({ action: "createGroup", groupName: name, members: members, dcLink: dc, rights: rts }) }); switchChannel('group', '# ' + name, name, 'text', dc); }
-    function closeModals() { document.querySelectorAll(".modal-overlay").forEach(m => m.style.display = "none"); }
+    function closeModals() { document.querySelectorAll(".modal-overlay").forEach(m => "none"); document.querySelectorAll(".modal-overlay").forEach(m => m.style.display = "none"); }
     function getRoleClass(r) { return r === "Admin" ? "admin" : (["Offizier", "Offi"].includes(r) ? "offi" : "member"); }
     async function reportCurrentPNChat() { if(!confirm("Chat melden?")) return; let sorted = [MY_NAME, currentTarget].sort(); await fetch(API, { method: "POST", body: JSON.stringify({ action: "reportPNChat", targetSheet: "PN_" + sorted.join("_"), reporter: MY_NAME, gemaßregelt: currentTarget }) }); alert("Gemeldet!"); }
     function openTimeoutManager(t) { if (!IS_MODERATOR || t === MY_NAME) return; let mins = prompt(`Timeout für '${t}' in Minuten (0 = entmuten):`); if (mins) { fetch(API, { method: "POST", body: JSON.stringify({ action: "muteUser", user: t, minuten: parseInt(mins) }) }); } }
