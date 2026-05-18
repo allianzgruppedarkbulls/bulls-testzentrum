@@ -2,100 +2,91 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>DARK BULLS - HQ DISCORD FUNK</title>
+    <title>DARK BULLS - HQ COCKPIT</title>
     <script src="config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { background-color: #0c0c0e; color: #dbdee1; font-family: 'Almendra', serif; margin: 0; padding: 0; height: 100vh; display: flex; overflow: hidden; }
         
-        /* SERVER LEISTE (LINKS) */
         .discord-servers { width: 70px; background: #1e1f22; display: flex; flex-direction: column; align-items: center; padding-top: 15px; gap: 8px; border-right: 1px solid #111; }
         .server-icon { width: 48px; height: 48px; background: #2b2d31; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; transition: 0.2s; position: relative; color: #ff3131; border: 1px solid #333; }
         .server-icon:hover, .server-icon.active { border-radius: 15px; background: #ff3131; color: #000; box-shadow: 0 0 15px #ff3131; }
         .server-icon::before { content: ''; position: absolute; left: -12px; width: 8px; height: 0; background: #fff; border-radius: 0 4px 4px 0; transition: 0.2s; }
         .server-icon.active::before { height: 40px; }
 
-        /* KANAL LEISTE */
-        .discord-channels { width: 240px; background: #2b2d31; display: flex; flex-direction: column; padding: 10px; box-sizing: border-box; }
-        .channel-header { font-size: 14px; font-weight: bold; color: #949ba4; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 5px; display: flex; justify-content: space-between; align-items: center; }
-        .channel-btn { padding: 8px 12px; background: transparent; border: none; color: #949ba4; font-family: 'Almendra'; font-size: 16px; border-radius: 4px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 8px; margin-bottom: 2px; width: 100%; transition: 0.1s; }
-        .channel-btn:hover { background: #35373c; color: #dbdee1; }
-        .channel-btn.active { background: #404249; color: #fff; }
+        .discord-channels { width: 260px; background: #2b2d31; display: flex; flex-direction: column; padding: 10px; box-sizing: border-box; }
+        .channel-header { font-size: 13px; font-weight: bold; color: #949ba4; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 5px; display: flex; justify-content: space-between; align-items: center; }
+        .channel-row-wrapper { display: flex; align-items: center; justify-content: space-between; width: 100%; border-radius: 4px; margin-bottom: 2px; }
+        .channel-row-wrapper:hover { background: #35373c; }
+        .channel-btn { padding: 8px 10px; background: transparent; border: none; color: #949ba4; font-family: 'Almendra'; font-size: 16px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+        .channel-btn.active { color: #fff; font-weight: bold; }
+        .channel-row-wrapper.active { background: #404249; }
+        .gear-icon { font-size: 14px; color: #949ba4; cursor: pointer; padding: 5px 8px; }
+        .gear-icon:hover { color: #fff; transform: rotate(45deg); }
         .channel-plus { font-size: 18px; cursor: pointer; color: #949ba4; padding: 0 5px; }
         .channel-plus:hover { color: #fff; }
 
-        /* CHATBEREICH (MITTE) */
         .discord-chat-container { flex: 1; display: flex; flex-direction: column; background: #313338; position: relative; }
         .chat-top-bar { height: 48px; background: #313338; border-bottom: 1px solid #1f2023; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; font-size: 18px; font-weight: bold; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
-        .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
         
-        .d-msg { display: flex; flex-direction: column; gap: 2px; padding: 2px 5px; border-radius: 4px; }
+        .d-msg { display: flex; flex-direction: column; gap: 2px; padding: 4px 8px; border-radius: 4px; position: relative; }
         .d-msg:hover { background: rgba(255, 255, 255, 0.02); }
         .d-msg-meta { display: flex; align-items: center; gap: 8px; }
         .d-msg-sender { font-weight: bold; font-size: 16px; }
         .d-msg-time { color: #949ba4; font-size: 12px; }
         .d-msg-text { color: #dbdee1; font-size: 15px; line-height: 1.4; white-space: pre-wrap; }
-        .read-status { font-size: 11px; color: #23a55a; align-self: flex-end; margin-top: -5px; padding-right: 10px; font-style: italic; }
+        .chat-img { max-width: 300px; max-height: 200px; border-radius: 6px; border: 1px solid #444; margin-top: 5px; cursor: pointer; }
+        
+        /* PINADELDÄMPFUNG */
+        .pin-indicator { font-size: 13px; color: #ffd600; cursor: pointer; margin-left: 8px; }
+        .pin-badge { position: absolute; top: 6px; right: 10px; font-size: 12px; background: rgba(255, 214, 0, 0.15); border: 1px solid #ffd600; color: #ffd600; padding: 2px 6px; border-radius: 3px; display: none; }
+        .d-msg.is-pinned-row { background: rgba(255, 214, 0, 0.03); border-left: 2px solid #ffd600; }
+        .d-msg.is-pinned-row .pin-badge { display: block; }
 
-        /* Input & Emojis */
         .chat-footer { padding: 0 20px 24px 20px; background: #313338; position: relative; }
         .input-wrapper { background: #383a40; border-radius: 8px; padding: 10px 15px; display: flex; align-items: center; gap: 10px; }
-        input[type="text"] { flex: 1; background: transparent; border: none; color: #dbdee1; font-family: 'Almendra'; font-size: 16px; outline: none; }
-        .emoji-trigger { font-size: 20px; cursor: pointer; user-select: none; padding: 0 5px; }
-        .emoji-trigger:hover { transform: scale(1.1); }
-        .send-btn { background: #39d353; color: #000; border: none; padding: 8px 16px; font-family: 'Almendra'; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
+        input[type="text"], select { flex: 1; background: transparent; border: none; color: #dbdee1; font-family: 'Almendra'; font-size: 16px; outline: none; }
+        .input-tool-btn { font-size: 18px; cursor: pointer; user-select: none; color: #b5bac1; }
+        .input-tool-btn:hover { color: #fff; }
+        .send-btn { background: #39d353; color: #000; border: none; padding: 8px 16px; font-family: 'Almendra'; font-weight: bold; border-radius: 4px; cursor: pointer; }
 
-        /* EMOJI BOX WINDOW */
-        .emoji-popup { display: none; position: absolute; bottom: 80px; right: 20px; background: #2b2d31; border: 1px solid #444; border-radius: 8px; padding: 10px; width: 220px; grid-template-columns: repeat(5, 1fr); gap: 5px; font-size: 22px; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .emoji-item { cursor: pointer; text-align: center; border-radius: 4px; transition: 0.1s; }
-        .emoji-item:hover { background: #35373c; transform: scale(1.1); }
-
-        /* VOICE BUTTON */
-        .voice-btn { background: #23a55a; color: white; border: none; padding: 5px 12px; font-family: 'Almendra'; border-radius: 3px; cursor: pointer; font-size: 13px; font-weight: bold; margin-left: 5px; box-shadow: 0 0 10px rgba(35,165,90,0.3); }
-        .voice-btn:hover { background: #2fb145; box-shadow: 0 0 15px #23a55a; }
-
-        /* MEMBER LEISTE (RECHTS) */
         .discord-members { width: 240px; background: #2b2d31; padding: 20px 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .member-section { display: flex; flex-direction: column; gap: 2px; }
-        .member-group-title { font-size: 12px; font-weight: bold; color: #949ba4; text-transform: uppercase; letter-spacing: 0.5px; padding-left: 8px; margin-bottom: 4px; }
+        .member-group-title { font-size: 12px; font-weight: bold; color: #949ba4; text-transform: uppercase; padding-left: 8px; margin-bottom: 4px; }
         .user-row { display: flex; align-items: center; gap: 12px; padding: 6px 8px; border-radius: 4px; font-size: 16px; color: #949ba4; }
         .user-row.mod-clickable { cursor: pointer; }
         .user-row.mod-clickable:hover { background: #35373c; color: #fff; }
         .user-row.offline { opacity: 0.4; }
         .avatar-stub { width: 32px; height: 32px; background: #1e1f22; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #ff3131; position: relative; border: 1px solid #444; }
         .status-dot { width: 10px; height: 10px; background: #23a55a; border-radius: 50%; position: absolute; bottom: -2px; right: -2px; border: 2px solid #2b2d31; }
-        .user-row.offline .status-dot { background: #80848e; }
 
         .role-admin { color: #f23f43 !important; } .role-offi { color: #f0b232 !important; } .role-member { color: #23a55a !important; }
-        .support-card { padding: 14px; border-radius: 8px; margin-bottom: 12px; border-left: 5px solid #fff; background: #2b2d31; color: #dbdee1; }
-        .sup-green { border-color: #23a55a; } .sup-red { border-color: #f23f43; } .sup-yellow { border-color: #f0b232; }
+        .sup-row-card { padding: 15px; border-radius: 6px; background: #2b2d31; color: #fff; cursor: pointer; border-left: 6px solid #fff; margin-bottom:8px; display:flex; justify-content:space-between; }
+        .card-green { border-color: #23a55a; } .card-red { border-color: #f23f43; } .card-yellow { border-color: #f0b232; }
 
-        /* MODALS */
-        .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; justify-content:center; align-items:center; }
-        .modal-box { background:#313338; border: 1px solid #444; padding: 25px; border-radius: 8px; width: 400px; text-align: center; color: #dbdee1; }
-        .modal-box select, .modal-box input { width: 100%; padding: 10px; background: #1e1f22; border: 1px solid #111; color: #fff; font-family: 'Almendra'; border-radius: 4px; margin-bottom: 15px; box-sizing: border-box; outline: none; }
-        .user-scroll-list { background:#1e1f22; border:1px solid #111; height:180px; overflow-y:auto; margin-bottom:15px; text-align:left; padding:8px; }
-        .check-row { display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid #2b2d31; }
+        .user-scroll-list { background: #1e1f22; border: 1px solid #111; height: 150px; overflow-y: auto; margin-bottom: 15px; padding: 5px; }
+        .check-row { display: flex; align-items: center; gap: 12px; padding: 8px 6px; border-bottom: 1px solid #2b2d31; cursor: pointer; color: #dbdee1; font-size: 16px; }
+        .quick-sel-btn { background: #2b2d31; border: 1px solid #444; color: #fff; font-family: 'Almendra'; font-size: 12px; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:1000; justify-content:center; align-items:center; }
+        .modal-box { background:#313338; border: 1px solid #444; padding: 25px; border-radius: 8px; width: 420px; text-align: center; color: #dbdee1; }
+        .modal-box select, .modal-box input { width: 100%; padding: 10px; background: #1e1f22; border: 1px solid #111; color: #fff; font-family: 'Almendra'; border-radius: 4px; margin-bottom: 12px; box-sizing: border-box; }
 
-        #typingDisplay { color: #949ba4; font-style: italic; font-size: 13px; position: absolute; bottom: 68px; left: 25px; }
-        .group-admin-btn { background: #2b2d31; border: 1px solid #3f4248; color: #b5bac1; font-family: 'Almendra'; padding: 4px 10px; border-radius: 3px; cursor: pointer; margin-left: 5px; font-size: 13px; }
-        .report-btn { background: #f23f43; color: #fff; border: none; padding: 5px 12px; font-family: 'Almendra'; border-radius: 3px; cursor: pointer; font-size: 13px; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <div class="discord-servers">
-        <div class="server-icon active" id="srv-global" onclick="activateServerMode('global')" title="Globaler Allianz Funk">📢</div>
+        <div class="server-icon active" id="srv-group" onclick="activateServerMode('group')" title="Einsatzgruppen">🪖</div>
         <div class="server-icon" id="srv-pn" onclick="activateServerMode('pn')" title="Direktnachrichten (PN)">👤</div>
-        <div class="server-icon" id="srv-group" onclick="activateServerMode('group')" title="Einsatzgruppen">🪖</div>
         <div class="server-icon" id="srv-support" onclick="activateServerMode('support')" title="Support Tickets">📬</div>
         <div class="server-icon" style="margin-top: auto; margin-bottom: 20px; color:#aaa; font-size:16px;" onclick="window.location.href='dashboard.html'" title="Zurück zum HQ">🔙</div>
     </div>
 
     <div class="discord-channels">
         <div class="channel-header">
-            <span id="channelSectionTitle">Textkanäle</span>
+            <span id="channelSectionTitle">Einsatzgruppen</span>
             <span class="channel-plus" id="addChannelPlusBtn" onclick="triggerPlusAction()">+</span>
         </div>
         <div id="channelSubList"></div>
@@ -103,7 +94,7 @@
 
     <div class="discord-chat-container">
         <div class="chat-top-bar">
-            <span id="currentChannelTitle"># globaler-funk</span>
+            <span id="currentChannelTitle">Wähle eine Gruppe aus</span>
             <div id="channelAdminTools"></div>
         </div>
         
@@ -111,26 +102,8 @@
         <div id="typingDisplay"></div>
         
         <div class="chat-footer" id="chatFooterArea">
-            <div class="emoji-popup" id="emojiBox">
-                <div class="emoji-item" onclick="insertEmoji('😀')">😀</div>
-                <div class="emoji-item" onclick="insertEmoji('😂')">😂</div>
-                <div class="emoji-item" onclick="insertEmoji('🔥')">🔥</div>
-                <div class="emoji-item" onclick="insertEmoji('🎯')">🎯</div>
-                <div class="emoji-item" onclick="insertEmoji('⚠️')">⚠️</div>
-                <div class="emoji-item" onclick="insertEmoji('👍')">👍</div>
-                <div class="emoji-item" onclick="insertEmoji('💥')">💥</div>
-                <div class="emoji-item" onclick="insertEmoji('👑')">👑</div>
-                <div class="emoji-item" onclick="insertEmoji('🪖')">🪖</div>
-                <div class="emoji-item" onclick="insertEmoji('🚀')">🚀</div>
-                <div class="emoji-item" onclick="insertEmoji('👀')">👀</div>
-                <div class="emoji-item" onclick="insertEmoji('💪')">💪</div>
-                <div class="emoji-item" onclick="insertEmoji('🤫')">🤫</div>
-                <div class="emoji-item" onclick="insertEmoji('🚨')">🚨</div>
-                <div class="emoji-item" onclick="insertEmoji('🛑')">🛑</div>
-            </div>
-
             <div class="input-wrapper">
-                <span class="emoji-trigger" onclick="toggleEmojiBox()">😀</span>
+                <span class="input-tool-btn" id="paperclipBtn" onclick="triggerImageUpload()" title="Schlachtplan posten">🖼️</span>
                 <input type="text" id="msgInput" placeholder="Nachricht schreiben..." oninput="handleTyping()">
                 <button class="send-btn" onclick="sendMessage()">Senden</button>
             </div>
@@ -139,23 +112,36 @@
 
     <div class="discord-members" id="rightRosterContainer"></div>
 
-    <div id="modalPN" class="modal-overlay">
-        <div class="modal-box">
-            <h2>Sitzung starten</h2>
-            <select id="pnUserSelect"></select>
-            <button class="send-btn" style="width:100%; padding:12px;" onclick="startPNFromModal()">Verbindung aufbauen</button>
-            <p onclick="closeModals()" style="color:#949ba4; cursor:pointer; margin-top:15px; margin-bottom:0;">Abbrechen</p>
-        </div>
-    </div>
-
     <div id="modalGroup" class="modal-overlay">
         <div class="modal-box">
             <h2>Einsatzgruppe gründen</h2>
             <input type="text" id="newGroupName" placeholder="Militärischer Gruppenname...">
             <input type="text" id="newGroupDC" placeholder="Discord Einladungs-Link (Optional)...">
+            
+            <select id="newGroupRights" style="background:#1e1f22; color:#fff; font-family:'Almendra'; width:100%; margin-bottom:12px;">
+                <option value="all">Berechtigung: Schreiben + Bilder senden</option>
+                <option value="write">Berechtigung: Nur Schreiben (Keine Bilder)</option>
+                <option value="read">Berechtigung: Nur Lesen (Infokanal)</option>
+            </select>
+
+            <div style="margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 5px; justify-content: center;">
+                <button type="button" class="quick-sel-btn" onclick="selectGroupMembers('all')">Alle Spieler</button>
+                <button type="button" class="quick-sel-btn" onclick="selectGroupMembers('bulls')">Alle Dark Bulls</button>
+                <button type="button" class="quick-sel-btn" onclick="selectGroupMembers('kd')">Bulls & Division</button>
+            </div>
+
             <div class="user-scroll-list" id="groupUserChecklist"></div>
             <button class="send-btn" style="width:100%; padding:12px;" onclick="createGroupFromModal()">Gruppe versiegeln</button>
-            <p onclick="closeModals()" style="color:#949ba4; cursor:pointer; margin-top:15px; margin-bottom:0;">Abbrechen</p>
+            <p onclick="closeModals()" style="color:#949ba4; cursor:pointer; margin-top:12px; margin-bottom:0;">Abbrechen</p>
+        </div>
+    </div>
+
+    <div id="modalManage" class="modal-overlay">
+        <div class="modal-box">
+            <h2 id="manageModalTitle">Mitglieder verwalten</h2>
+            <div class="user-scroll-list" id="manageUserChecklist"></div>
+            <button class="send-btn" style="width:100%; padding:12px;" onclick="saveGroupMembersManagement()">Änderungen speichern</button>
+            <p onclick="closeModals()" style="color:#949ba4; cursor:pointer; margin-top:12px; margin-bottom:0;">Abbrechen</p>
         </div>
     </div>
 
@@ -165,44 +151,45 @@
     const MY_ROLE = localStorage.getItem('bulls_role') || "Gast";
     const MY_EXTRA = localStorage.getItem('bulls_extra') || "";
 
-    let currentServer = 'global'; 
+    let currentServer = 'group'; 
     let currentTarget = '';
+    let currentGroupType = 'text';
     let chatDataCache = {};
     let globalUserList = [];
-    let lastMessageCount = 0; 
+    let lastMessageCount = 0;
     let typingTimeout;
 
-    // Discord Original Pling Sound Objekt laden
     const pingSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2357/2357-84.wav"); 
-
     const IS_MODERATOR = ["Admin"].includes(MY_ROLE) || MY_EXTRA.includes("Moderator");
 
-    async function initDiscordFunk() {
-        if ("Notification" in window && Notification.permission === "default") {
-            Notification.requestPermission();
-        }
+    async function initHQ() {
+        if ("Notification" in window && Notification.permission === "default") { Notification.requestPermission(); }
         try {
             const dropRes = await fetch(API + "?action=getDropdownData");
             const dropData = await dropRes.json();
             globalUserList = dropData.user || [];
             buildModalLists();
-        } catch(e) { console.log("Fehler beim Laden der Allianz-Struktur."); }
-        
-        setInterval(updateLoop, 4000);
-        updateLoop();
+        } catch(e) { console.log("Fehler beim Abruf der Allianz-Matrix."); }
+        setInterval(updateLoop, 4000); updateLoop();
     }
 
     function buildModalLists() {
-        const pnSel = document.getElementById("pnUserSelect");
-        pnSel.innerHTML = '<option value="" disabled selected>Wähle einen Kampfgefährten...</option>';
-        globalUserList.sort().forEach(u => { if(u !== MY_NAME) pnSel.innerHTML += `<option value="${u}">${u}</option>`; });
-
-        const checkList = document.getElementById("groupUserChecklist");
-        checkList.innerHTML = "";
-        globalUserList.sort().forEach(u => {
-            if(u !== MY_NAME) {
-                checkList.innerHTML += `<label class="check-row"><input type="checkbox" name="groupMembers" value="${u}"><span>${u}</span></label>`;
+        const checkList = document.getElementById("groupUserChecklist"); checkList.innerHTML = "";
+        [...globalUserList].sort((a,b) => a.name.localeCompare(b.name)).forEach(u => {
+            if(u.name !== MY_NAME) {
+                var roleClean = u.role ? u.role.trim().toLowerCase() : "mitglied";
+                checkList.innerHTML += `<label class="check-row"><input type="checkbox" name="groupMembers" value="${u.name}" data-role="${roleClean}"><span>${u.name} <span style="color:#777; font-size:13px;">(${u.role})</span></span></label>`;
             }
+        });
+    }
+
+    function selectGroupMembers(type) {
+        const boxes = document.querySelectorAll('#groupUserChecklist input[name="groupMembers"]');
+        boxes.forEach(b => {
+            var r = b.getAttribute("data-role");
+            if(type === 'all') b.checked = true;
+            else if(type === 'bulls') b.checked = (r !== 'kampfdivision' && !r.includes("gast"));
+            else if(type === 'kd') b.checked = (!r.includes("gast"));
         });
     }
 
@@ -210,294 +197,136 @@
         try {
             const res = await fetch(API + "?action=getChatData&user=" + MY_NAME);
             chatDataCache = await res.json();
-            
-            renderChannelList();
-            renderChatContent();
-            renderRightSidebar();
-            checkNewMessagesForPush();
-        } catch(e) { console.log("Funkkreis-Unterbrechung."); }
+            renderChannelList(); renderChatContent(); renderRightSidebar(); checkNewMessagesForPush();
+        } catch(e) { console.log("Sync verloren."); }
     }
 
     function activateServerMode(server) {
         currentServer = server; currentTarget = '';
         document.querySelectorAll(".server-icon").forEach(s => s.classList.remove("active"));
         document.getElementById("srv-" + server).classList.add("active");
-
-        const plusBtn = document.getElementById("addChannelPlusBtn");
-        if((server === 'group' && IS_MODERATOR) || server === 'pn') {
-            plusBtn.classList.remove("hidden");
-        } else { plusBtn.classList.add("hidden"); }
-
-        if(server === 'global') {
-            document.getElementById("channelSectionTitle").innerText = "Textkanäle";
-            switchChannel('global', '# globaler-funk');
-        } else if(server === 'pn') {
-            document.getElementById("channelSectionTitle").innerText = "Direktnachrichten";
-            renderChannelList(true);
-        } else if(server === 'group') {
-            document.getElementById("channelSectionTitle").innerText = "Einsatzgruppen";
-            renderChannelList(true);
-        } else if(server === 'support') {
-            document.getElementById("channelSectionTitle").innerText = "Zentrale";
-            switchChannel('support', '📬 support-tickets');
-        }
+        document.getElementById("addChannelPlusBtn").classList.toggle("hidden", !(server === 'pn' || (server === 'group' && IS_MODERATOR)));
+        
+        if(server === 'group') document.getElementById("channelSectionTitle").innerText = "Einsatzgruppen";
+        else if(server === 'pn') document.getElementById("channelSectionTitle").innerText = "Direktnachrichten";
+        else if(server === 'support') document.getElementById("channelSectionTitle").innerText = "Zentrale";
+        renderChannelList(true);
     }
 
-    function renderChannelList() {
-        const container = document.getElementById("channelSubList");
-        let activeTarget = currentTarget;
-        container.innerHTML = "";
-
-        if(currentServer === 'global') container.innerHTML = `<button class="channel-btn active"># globaler-funk</button>`;
-        else if(currentServer === 'pn') {
-            const keys = Object.keys(chatDataCache.pns || {}).sort();
-            keys.forEach(p => {
-                let act = activeTarget === p ? 'active' : '';
-                container.innerHTML += `<button class="channel-btn ${act}" onclick="switchChannel('pn', '👤 ' + '${p}', '${p}')"># ${p.toLowerCase()}</button>`;
-            });
-        }
-        else if(currentServer === 'group') {
+    function renderChannelList(autoSelect = false) {
+        const container = document.getElementById("channelSubList"); container.innerHTML = "";
+        if(currentServer === 'group') {
             const groups = (chatDataCache.groups || []).sort((a,b) => a.name.localeCompare(b.name));
             groups.forEach(g => {
-                let act = activeTarget === g.name ? 'active' : '';
-                container.innerHTML += `<button class="channel-btn ${act}" onclick="switchChannel('group', '🪖 ' + '${g.name}', '${g.name}', '${g.dcLink}')"># ${g.name.toLowerCase()}</button>`;
+                let act = currentTarget === g.name ? 'active' : '';
+                container.innerHTML += `
+                    <div class="channel-row-wrapper ${act}">
+                        <button class="channel-btn" onclick="switchChannel('group', '# ' + '${g.name}', '${g.name}', 'text', '${g.dcLink}')"># ${g.name.toLowerCase()}</button>
+                        ${IS_MODERATOR ? `<span class="gear-icon" onclick="openGroupManagementModal('${g.name}')">⚙️</span>` : ''}
+                    </div>
+                    <div class="channel-row-wrapper"><button class="channel-btn" onclick="switchChannel('group', '🔊 ' + '${g.name}', '${g.name}', 'voice', '${g.dcLink}')">🔊 ${g.name.toLowerCase()}</button></div>`;
             });
+            if(autoSelect && groups.length > 0 && !currentTarget) switchChannel('group', '# ' + groups[0].name, groups[0].name, 'text', groups[0].dcLink);
+        } else if(currentServer === 'pn') {
+            const keys = Object.keys(chatDataCache.pns || {}).sort();
+            keys.forEach(p => { let act = currentTarget === p ? 'active' : ''; container.innerHTML += `<div class="channel-row-wrapper ${act}"><button class="channel-btn" onclick="switchChannel('pn', '👤 ' + '${p}', '${p}', 'text')"># ${p.toLowerCase()}</button></div>`; });
+            if(autoSelect && keys.length > 0 && !currentTarget) switchChannel('pn', '👤 ' + keys[0], keys[0], 'text');
+        } else if(currentServer === 'support') {
+            container.innerHTML = `<div class="channel-row-wrapper active"><button class="channel-btn"># ticket-center</button></div>`;
         }
-        else if(currentServer === 'support') container.innerHTML = `<button class="channel-btn active"># ticket-center</button>`;
     }
 
-    function switchChannel(server, title, target = '', dc = '') {
-        currentServer = server; currentTarget = target;
+    function switchChannel(server, title, target, type, dc = '') {
+        currentServer = server; currentTarget = target; currentGroupType = type;
         document.getElementById("currentChannelTitle").innerText = title;
-        document.getElementById("msgInput").placeholder = `Nachricht an ${title} schreiben...`;
-        
-        const tools = document.getElementById("channelAdminTools");
-        tools.innerHTML = "";
-        
-        // NEU: Sprachkanal Button einbinden (Nutzt Jitsi Meet ohne Anmeldung)
-        let roomName = server === 'global' ? 'BullsGlobalHQ' : 'BullsGroup_' + target;
-        if(server === 'pn') roomName = 'BullsPN_' + [MY_NAME, target].sort().join('_');
-        
-        if(server !== 'support') {
-            tools.innerHTML += `<button class="voice-btn" onclick="window.open('https://meet.jit.si/${roomName}')">🎙️ Sprachkanal betreten</button>`;
-        }
+        const tools = document.getElementById("channelAdminTools"); tools.innerHTML = "";
 
-        if(server === 'pn' && target) {
-            tools.innerHTML += `<button class="report-btn" style="margin-left:5px;" onclick="reportCurrentPNChat()">Chat melden 🚨</button>`;
-        }
+        if(server === 'pn' && target) tools.innerHTML += `<button class="report-btn" onclick="reportCurrentPNChat()">Chat melden 🚨</button>`;
+        if(type === 'voice') tools.innerHTML += `<button class="voice-btn" onclick="window.open('https://meet.jit.si/BullsGroup_${target}')">🎙️ Sprachkanal</button>`;
 
         if (server === 'group' && IS_MODERATOR) {
-            tools.innerHTML += `
-                <button class="group-admin-btn" onclick="adminAction('mute')">Mute</button>
-                <button class="group-admin-btn" onclick="adminAction('archive')">Archiv</button>
-                <button class="group-admin-btn" style="color:#f23f43;" onclick="adminAction('delete')">Löschen</button>
-            `;
+            tools.innerHTML += `<button class="group-admin-btn" onclick="adminAction('mute')">Mute</button><button class="group-admin-btn" onclick="adminAction('delete')">Löschen</button>`;
         }
-        
-        // Aktiv-Klasse in Kanalliste sofort spiegeln
-        document.querySelectorAll(".channel-btn").forEach(btn => {
-            if(btn.innerText.toLowerCase().includes(target.toLowerCase())) btn.classList.add("active");
-            else btn.classList.remove("active");
-        });
-
-        lastMessageCount = 0; 
-        renderChatContent();
-        renderRightSidebar();
+        lastMessageCount = 0; updateLoop();
     }
 
     function renderChatContent() {
-        const box = document.getElementById("chatBox");
-        const footer = document.getElementById("chatFooterArea");
-        footer.classList.remove("hidden");
+        const box = document.getElementById("chatBox"); const footer = document.getElementById("chatFooterArea");
+        footer.classList.remove("hidden"); document.getElementById("paperclipBtn").classList.remove("hidden");
         let html = "";
-        let showReadStatus = false;
 
-        if (currentServer === 'global') {
-            (chatDataCache.globalChat || []).forEach(m => {
-                html += `<div class="d-msg"><div class="d-msg-meta"><span class="d-msg-sender role-${getRoleClass(m[2])}">${m[1]}</span><span class="d-msg-time">${m[0]}</span></div><div class="d-msg-text">${m[3]}</div></div>`;
-            });
-        }
-        else if (currentServer === 'pn' && currentTarget) {
-            const msgs = chatDataCache.pns[currentTarget] || [];
-            msgs.forEach(m => {
-                html += `<div class="d-msg"><div class="d-msg-meta"><span class="d-msg-sender" style="color:#fff;">${m[1]}</span><span class="d-msg-time">${m[0]}</span></div><div class="d-msg-text">${m[3]}</div></div>`;
-            });
-            if(chatDataCache.onlineUsers && chatDataCache.onlineUsers.includes(currentTarget)) showReadStatus = true;
-        }
-        else if (currentServer === 'group' && currentTarget) {
-            const g = (chatDataCache.groups || []).find(x => x.name === currentTarget);
-            if(g) {
-                g.messages.forEach(m => {
-                    html += `<div class="d-msg"><div class="d-msg-meta"><span class="d-msg-sender role-${getRoleClass(m[2])}">${m[1]}</span><span class="d-msg-time">${m[0]}</span></div><div class="d-msg-text">${m[3]}</div></div>`;
-                });
-            }
-        }
-        else if (currentServer === 'support') {
+        if (currentServer === 'support') {
             footer.classList.add("hidden");
             (chatDataCache.support || []).forEach(m => {
-                let col = 'sup-green'; if(m[1] === 'SUPPORT') col = 'sup-red'; if(m[1] === 'BUCHHALTER') col = 'sup-yellow';
+                let col = 'card-green'; if(m[1] === 'SUPPORT') col = 'card-red'; if(m[1] === 'BUCHHALTER') col = 'card-yellow';
                 if (["Admin"].includes(MY_ROLE) || (m[1]==='BUCHHALTER' && MY_EXTRA.includes("Buchhalter"))) {
-                    html += `<div class="support-card ${col}"><strong>[${m[0]}] ${m[2]}</strong> (${m[1]}):<br>${m[3]}</div>`;
+                    html += `<div class="sup-row-card ${col}" onclick="alert('VON: ${m[2]}\\n\\n${m[4]}')"><div><strong>${m[2]}</strong> | Betreff: <i>${m[3]}</i></div><div style="font-size:12px; color:#aaa;">${m[0]}</div></div>`;
                 }
             });
+            box.innerHTML = html || '<p style="text-align:center;">Keine Tickets.</p>'; return;
         }
 
-        if(!html && (currentServer==='pn' || currentServer==='group') && !currentTarget) {
-            html = `<p style="text-align:center; color:#4e5058; margin-top:100px; font-size:18px;">Klicke links auf das "+" um eine Übertragung zu starten.</p>`;
-        }
-
-        if(showReadStatus && html !== "") html += `<div class="read-status">✓✓ Gelesen</div>`;
-        box.innerHTML = html;
-        
-        const typingDiv = document.getElementById("typingDisplay");
-        let typers = []; Object.keys(chatDataCache.typing || {}).forEach(t => { if(t !== MY_NAME) typers.push(t); });
-        typingDiv.innerText = typers.length > 0 ? typers.join(", ") + " schreibt..." : "";
-    }
-
-    function renderRightSidebar() {
-        const container = document.getElementById("rightRosterContainer");
-        container.innerHTML = "";
-        const onlineList = chatDataCache.onlineUsers || [];
-        const isModClass = IS_MODERATOR ? "mod-clickable" : "";
-
-        if (currentServer === 'group' && currentTarget) {
-            const activeGroup = (chatDataCache.groups || []).find(x => x.name === currentTarget);
-            if (!activeGroup) return;
-
-            let groupMembers = (activeGroup.members || []).sort();
-            let onTrupp = [], offTrupp = [];
-
-            groupMembers.forEach(m => { if (onlineList.includes(m)) onTrupp.push(m); else offTrupp.push(m); });
-
-            let html = `<div class="member-section"><div class="member-group-title">Online im Trupp — ${onTrupp.length}</div>`;
-            onTrupp.forEach(m => { html += `<div class="user-row ${isModClass}" onclick="openTimeoutManager('${m}')"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; });
-            html += `</div>`;
-
-            html += `<div class="member-section"><div class="member-group-title">Offline im Trupp — ${offTrupp.length}</div>`;
-            offTrupp.forEach(m => { html += `<div class="user-row offline ${isModClass}" onclick="openTimeoutManager('${m}')"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; });
-            html += `</div>`;
-            container.innerHTML = html;
-        } 
-        else {
-            let allianzOnline = [], allianzOffline = [];
-            let sortedAllianz = [...globalUserList].sort();
-            sortedAllianz.forEach(u => { if (onlineList.includes(u)) allianzOnline.push(u); else allianzOffline.push(u); });
-
-            let html = `<div class="member-section"><div class="member-group-title">Online im HQ — ${allianzOnline.length}</div>`;
-            allianzOnline.forEach(u => { html += `<div class="user-row ${isModClass}" onclick="openTimeoutManager('${u}')"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; });
-            html += `</div>`;
-
-            html += `<div class="member-section"><div class="member-group-title">Offline — ${allianzOffline.length}</div>`;
-            allianzOffline.forEach(u => { html += `<div class="user-row offline ${isModClass}" onclick="openTimeoutManager('${u}')"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; });
-            html += `</div>`;
-            container.innerHTML = html;
-        }
-    }
-
-    function checkNewMessagesForPush() {
-        let currentMessages = [];
-        if (currentServer === 'global') currentMessages = chatDataCache.globalChat || [];
-        else if (currentServer === 'pn' && currentTarget) currentMessages = chatDataCache.pns[currentTarget] || [];
-        else if (currentServer === 'group' && currentTarget) {
+        // BERECHTIGUNGS-LOGIK FÜR DEN SCHREIB-FUNK AUSWERTEN
+        if (currentServer === 'group') {
             const g = (chatDataCache.groups || []).find(x => x.name === currentTarget);
-            if(g) currentMessages = g.messages || [];
-        }
+            if(g) {
+                // Schalte Büroklammer aus, wenn Rechte auf 'write' (keine Bilder) oder 'read' (nur lesen) stehen
+                if(g.rights === 'write' || g.rights === 'read') document.getElementById("paperclipBtn").classList.add("hidden");
+                // Blende das gesamte Eingabefeld für normale Member aus, wenn 'read' aktiv ist
+                if(g.rights === 'read' && !IS_MODERATOR) footer.classList.add("hidden");
 
-        if(lastMessageCount > 0 && currentMessages.length > lastMessageCount) {
-            let lastMsg = currentMessages[currentMessages.length - 1];
-            if(lastMsg[1] !== MY_NAME && lastMsg[3]) {
-                triggerDesktopPush(lastMsg[1], lastMsg[3]);
-                try { pingSound.play(); } catch(e){} // NEU: Spielt den akustischen Discord Sound ab!
+                g.messages.forEach(m => { html += formatMessageRow_(m[1], m[4], m[3], m[2], m[5]); });
             }
+        } else if (currentServer === 'pn' && currentTarget) {
+            const msgs = chatDataCache.pns[currentTarget] || [];
+            msgs.forEach(m => { html += formatMessageRow_(m[1], m[4], m[3], '', m[5]); });
         }
-        lastMessageCount = currentMessages.length;
+        box.innerHTML = html;
     }
 
-    function triggerDesktopPush(sender, text) {
-        if ("Notification" in window && Notification.permission === "granted") { new Notification(`BULLS HQ Funk von ${sender}`, { body: text }); }
+    function formatMessageRow_(sender, time, text, role = '', pinStatus = '') {
+        let isPinned = pinStatus === "PINNED";
+        let pinClass = isPinned ? "is-pinned-row" : "";
+        let pinIcon = IS_MODERATOR ? `<span class="pin-indicator" onclick="togglePin('${sender}', \`${text.replace(/"/g, '&quot;')}\`)" title="Nachricht pinnen/entpinnen">📌</span>` : (isPinned ? "📌" : "");
+        
+        let textContent = text;
+        if(text.startsWith("http") && (text.includes(".png") || text.includes(".jpg") || text.includes(".jpeg"))) {
+            textContent = `<img src="${text}" class="chat-img" onclick="window.open('${text}')">`;
+        }
+        return `<div class="d-msg ${pinClass}"><div class="d-msg-meta"><span class="d-msg-sender role-${getRoleClass(role)}">${sender}</span><span class="d-msg-time">${time || ''} ${pinIcon}</span><span class="pin-badge">ANGEPINNT</span></div><div class="d-msg-text">${textContent}</div></div>`;
+    }
+
+    async function togglePin(sender, text) {
+        let sheet = currentServer === 'pn' ? "PN_" + [MY_NAME, currentTarget].sort().join("_") : "GROUP_" + currentTarget;
+        await fetch(API, { method: "POST", body: JSON.stringify({ action: "togglePinMessage", targetSheet: sheet, sender: sender, text: text }) });
+        updateLoop();
     }
 
     async function sendMessage() {
-        const text = document.getElementById("msgInput").value.trim();
-        if(!text) return;
-        
-        const muteCheckRes = await fetch(API + "?action=checkMute&user=" + MY_NAME);
-        const muteStatus = await muteCheckRes.json();
-        if(muteStatus.muted) { alert(`❌ FUNKSPERRE AKTIV! Du bist kaltgestellt.\nRestliche Strafzeit: ${muteStatus.rest} Minuten.`); return; }
-
-        let sheet = "Chat";
-        if(currentServer === 'pn') sheet = "PN_" + [MY_NAME, currentTarget].sort().join("_");
-        else if(currentServer === 'group') sheet = "GROUP_" + currentTarget;
-
+        const text = document.getElementById("msgInput").value.trim(); if(!text || !currentTarget) return;
+        let sheet = currentServer === 'pn' ? "PN_" + [MY_NAME, currentTarget].sort().join("_") : "GROUP_" + currentTarget;
         document.getElementById("msgInput").value = "";
         await fetch(API, { method: "POST", body: JSON.stringify({ action: "sendChatMessage", targetSheet: sheet, sender: MY_NAME, role: MY_ROLE, text: text }) });
         updateLoop();
     }
 
-    // EMOJI PICKER STEUERUNG
-    function toggleEmojiBox() {
-        const box = document.getElementById("emojiBox");
-        box.style.display = box.style.display === "grid" ? "none" : "grid";
-    }
-    function insertEmoji(emoji) {
-        const input = document.getElementById("msgInput");
-        input.value += emoji;
-        document.getElementById("emojiBox").style.display = "none";
-        input.focus();
-    }
-
-    function openTimeoutManager(targetUser) {
-        if (!IS_MODERATOR || targetUser === MY_NAME) return;
-        let mins = prompt(`🚨 TIMEOUT-SYSTEM:\nWie viele Minuten soll der Funk für '${targetUser}' gesperrt werden? (0 zum Entmuten):`);
-        if (mins === null || mins === "") return;
-        let m = parseInt(mins); if (isNaN(m)) return alert("Ungültige Zahl!");
-        fetch(API, { method: "POST", body: JSON.stringify({ action: "muteUser", user: targetUser, minuten: m }) });
-        alert(`Befehl gesendet.`);
-    }
-
-    async function reportCurrentPNChat() {
-        if(!confirm(`Möchtest du den PN-Verlauf mit '${currentTarget}' dem Support melden?`)) return;
-        let sorted = [MY_NAME, currentTarget].sort();
-        await fetch(API, { method: "POST", body: JSON.stringify({ action: "reportPNChat", targetSheet: "PN_" + sorted.join("_"), reporter: MY_NAME, gemaßregelt: currentTarget }) });
-        alert("✓ GEMELDET!");
-    }
-
-    function triggerPlusAction() {
-        if(currentServer === 'pn') document.getElementById("modalPN").style.display = "flex";
-        if(currentServer === 'group') document.getElementById("modalGroup").style.display = "flex";
-    }
-
-    function startPNFromModal() {
-        const user = document.getElementById("pnUserSelect").value; if(!user) return;
-        closeModals(); activateServerMode('pn'); switchChannel('pn', '👤 ' + user, user);
-    }
-
-    async function createGroupFromModal() {
-        const name = document.getElementById("newGroupName").value.trim();
-        const dc = document.getElementById("newGroupDC").value.trim(); if(!name) return;
-        const boxes = document.querySelectorAll('input[name="groupMembers"]:checked');
-        let members = [MY_NAME]; boxes.forEach(b => members.push(b.value));
-        closeModals();
-        await fetch(API, { method: "POST", body: JSON.stringify({ action: "createGroup", groupName: name, members: members, dcLink: dc }) });
-        switchChannel('group', '🪖 ' + name, name, dc);
-    }
-
-    async function adminAction(mode) {
-        if(!confirm("Befehl ausführen?")) return;
-        await fetch(API, { method: "POST", body: JSON.stringify({ action: "fullUpdate", type: mode + "Group", groupName: currentTarget }) });
-        activateServerMode('group');
-    }
-
-    function handleTyping() {
-        fetch(API, { method: "POST", body: JSON.stringify({ action: "setTyping", user: MY_NAME, isTyping: true }) });
-        clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(() => { fetch(API, { method: "POST", body: JSON.stringify({ action: "setTyping", user: MY_NAME, isTyping: false }) }); }, 3000);
-    }
-
+    // Die restlichen Core-Funktionen (Roster, Popups, etc.) bleiben unverändert gekoppelt
+    function renderRightSidebar() { const container = document.getElementById("rightRosterContainer"); container.innerHTML = ""; const onlineList = chatDataCache.onlineUsers || []; if (currentServer === 'group' && currentTarget) { const activeGroup = (chatDataCache.groups || []).find(x => x.name === currentTarget); if (!activeGroup) return; let onTrupp = [], offTrupp = []; (activeGroup.members || []).sort().forEach(m => { if (onlineList.includes(m)) onTrupp.push(m); else offTrupp.push(m); }); let html = `<div class="member-section"><div class="member-group-title">Im Trupp (Online) — ${onTrupp.length}</div>`; onTrupp.forEach(m => { html += `<div class="user-row ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${m}')"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; }); html += `</div><div class="member-section"><div class="member-group-title">Im Trupp (Offline) — ${offTrupp.length}</div>`; offTrupp.forEach(m => { html += `<div class="user-row offline ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${m}')"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; }); container.innerHTML = html + "</div>"; } else { let allianzOnline = [], allianzOffline = []; [...globalUserList].sort((a,b)=>a.name.localeCompare(b.name)).forEach(u => { if (onlineList.includes(u.name)) allianzOnline.push(u.name); else allianzOffline.push(u.name); }); let html = `<div class="member-section"><div class="member-group-title">Online im HQ — ${allianzOnline.length}</div>`; allianzOnline.forEach(u => { html += `<div class="user-row ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${u}')"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; }); html += `</div><div class="member-section"><div class="member-group-title">Offline — ${allianzOffline.length}</div>`; allianzOffline.forEach(u => { html += `<div class="user-row offline ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${u}')"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; }); container.innerHTML = html + "</div>"; } }
+    function triggerImageUpload() { let url = prompt("Füge hier die URL deines Schlachtplans/Bildes ein (.jpg, .png):"); if(url) { document.getElementById("msgInput").value = url; sendMessage(); } }
+    function openGroupManagementModal(groupName) { const activeGroup = chatDataCache.groups.find(x => x.name === groupName); if(!activeGroup) return; document.getElementById("manageModalTitle").innerText = `Trupp: ${groupName}`; const container = document.getElementById("manageUserChecklist"); container.innerHTML = ""; [...globalUserList].sort((a,b)=>a.name.localeCompare(b.name)).forEach(u => { if(u.name !== MY_NAME) { let isChecked = activeGroup.members.includes(u.name) ? 'checked' : ''; container.innerHTML += `<label class="check-row"><input type="checkbox" name="manageBox" value="${u.name}" ${isChecked}><span>${u.name}</span></label>`; } }); document.getElementById("modalManage").setAttribute("data-active-group", groupName); document.getElementById("modalManage").style.display = "flex"; }
+    async function saveGroupMembersManagement() { const groupName = document.getElementById("modalManage").getAttribute("data-active-group"); const boxes = document.querySelectorAll('input[name="manageBox"]:checked'); let members = [MY_NAME]; boxes.forEach(b => members.push(b.value)); closeModals(); await fetch(API, { method: "POST", body: JSON.stringify({ action: "manageGroupMembers", groupName: groupName, members: members }) }); alert("Truppstärke erfolgreich angepasst!"); updateLoop(); }
+    function checkNewMessagesForPush() { let currentMessages = []; if (currentServer === 'pn' && currentTarget) currentMessages = chatDataCache.pns[currentTarget] || []; else if (currentServer === 'group' && currentTarget) { const g = (chatDataCache.groups || []).find(x => x.name === currentTarget); if(g) currentMessages = g.messages || []; } if(lastMessageCount > 0 && currentMessages.length > lastMessageCount) { let lastMsg = currentMessages[currentMessages.length - 1]; if(lastMsg[1] !== MY_NAME && lastMsg[3]) { triggerDesktopPush(lastMsg[1], lastMsg[3]); try { pingSound.play(); } catch(e){} } } lastMessageCount = currentMessages.length; }
+    function triggerDesktopPush(s, t) { if ("Notification" in window && Notification.permission === "granted") { new Notification(`Funk von ${s}`, { body: t }); } }
+    function handleTyping() { fetch(API, { method: "POST", body: JSON.stringify({ action: "setTyping", user: MY_NAME, isTyping: true }) }); clearTimeout(typingTimeout); typingTimeout = setTimeout(() => { fetch(API, { method: "POST", body: JSON.stringify({ action: "setTyping", user: MY_NAME, isTyping: false }) }); }, 3000); }
+    function triggerPlusAction() { if(currentServer==='pn') document.getElementById("modalPN").style.display="flex"; if(currentServer==='group') document.getElementById("modalGroup").style.display="flex"; }
+    function startPNFromModal() { const u = document.getElementById("pnUserSelect").value; if(u) { closeModals(); switchChannel('pn', '👤 ' + u, u, 'text'); } }
+    async function createGroupFromModal() { const name = document.getElementById("newGroupName").value.trim(); const dc = document.getElementById("newGroupDC").value.trim(); const rts = document.getElementById("newGroupRights").value; if(!name) return; const boxes = document.querySelectorAll('#groupUserChecklist input[name="groupMembers"]:checked'); let members = [MY_NAME]; boxes.forEach(b => members.push(b.value)); closeModals(); await fetch(API, { method: "POST", body: JSON.stringify({ action: "createGroup", groupName: name, members: members, dcLink: dc, rights: rts }) }); switchChannel('group', '# ' + name, name, 'text', dc); }
     function closeModals() { document.querySelectorAll(".modal-overlay").forEach(m => m.style.display = "none"); }
     function getRoleClass(r) { return r === "Admin" ? "admin" : (["Offizier", "Offi"].includes(r) ? "offi" : "member"); }
+    async function reportCurrentPNChat() { if(!confirm("Chat melden?")) return; let sorted = [MY_NAME, currentTarget].sort(); await fetch(API, { method: "POST", body: JSON.stringify({ action: "reportPNChat", targetSheet: "PN_" + sorted.join("_"), reporter: MY_NAME, gemaßregelt: currentTarget }) }); alert("Gemeldet!"); }
+    function openTimeoutManager(t) { if (!IS_MODERATOR || t === MY_NAME) return; let mins = prompt(`Timeout für '${t}' in Minuten (0 = entmuten):`); if (mins) { fetch(API, { method: "POST", body: JSON.stringify({ action: "muteUser", user: t, minuten: parseInt(mins) }) }); } }
 
-    window.onload = initDiscordFunk;
+    window.onload = initHQ;
 </script>
 </body>
 </html>
