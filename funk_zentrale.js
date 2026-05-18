@@ -5,42 +5,35 @@
 const CHAT_API = window.BULLS_CONFIG.SCRIPT_URL;
 
 // Globaler Zwischenspeicher für Daten
-let activeChatType = "allianz"; // "allianz", "pn", "gruppe"
-let currentChatTarget = "global"; // Name des PN-Partners oder Gruppen-ID
+let activeChatType = "allianz"; // "allianz", "pn", "gruppe", "support"
+let currentChatTarget = "global"; // Name des PN-Partners, Gruppen-ID oder "support"
 let chatInterval = null;
 let typingTimeout = null;
 
-// 1. INITIALISIERUNG BEIM START
+// 1. INITIALISIERUNG BEIM START (INKLUSIVE SUPPORT-KANAL-SPLIT)
 function initFunkkreis(type) {
     activeChatType = type;
-    
-    // Prüfen ob User eingeloggt ist
     const user = localStorage.getItem('bulls_user');
-    if (!user) {
-        window.location.href = "index.html";
-        return;
-    }
+    if (!user) { window.location.href = "index.html"; return; }
 
-    // Header-Daten setzen
     const role = localStorage.getItem('bulls_role') || 'Mitglied';
     const extra = localStorage.getItem('bulls_extra') || '';
-    let displayRole = role;
-    if (extra) displayRole += " | " + extra;
+    let displayRole = role; if (extra) displayRole += " | " + extra;
     
     const uDisp = document.getElementById('userDisplay');
     if (uDisp) uDisp.innerText = `${user} (${displayRole})`;
 
-    // Ersten Abruf starten & Polling aktivieren (alle 3 Sekunden)
+    // Taktischer Support-Kanal-Split: Support-Meldungen laufen immer an das Ziel "support"
+    if (type === "support") {
+        currentChatTarget = "support";
+    }
+
     updateMuteStatusAndFetch();
     chatInterval = setInterval(updateMuteStatusAndFetch, 3000);
 
-    // Enter-Taste im Textfeld abfangen
     const msgInput = document.getElementById('messageInput');
     if (msgInput) {
-        msgInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') sendFunkMessage();
-        });
-        // Typing Indicator Trigger
+        msgInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') sendFunkMessage(); });
         msgInput.addEventListener('input', triggerTypingIndicator);
     }
 }
@@ -67,15 +60,19 @@ async function updateMuteStatusAndFetch() {
                 inputField.disabled = false;
                 inputField.placeholder = "Funkspruch eingeben...";
             }
-            if (sendBtn) sendBtn.disabled = false;
+            if (sendBtn && sendBtn.disabled) {
+                sendBtn.disabled = false;
+            }
         }
 
-        // B. Chat-Daten ziehen (Verwendet das optimierte Backend)
+        // B. Chat-Daten aus der Cloud ziehen
         const chatRes = await fetch(`${CHAT_API}?action=getChatData&user=${encodeURIComponent(user)}`);
         const chatData = await chatRes.json();
         
-        // Verteilung an die jeweilige HTML-Logik
-        processChatData(chatData);
+        // Verteiler an die Logik der geöffneten HTML-Seite (PN, Gruppe oder Support)
+        if (typeof processChatData === "function") {
+            processChatData(chatData);
+        }
 
     } catch (e) {
         console.error("Fehler beim Funkkreis-Update:", e);
@@ -89,14 +86,14 @@ async function sendFunkMessage() {
     
     const user = localStorage.getItem('bulls_user');
     const messageText = inputField.value.trim();
-    inputField.value = ""; // Textfeld sofort leeren für flüssiges Schreibgefühl
+    inputField.value = ""; // Sofort leeren für flüssiges Schreibgefühl
 
     const payload = {
         action: "sendChatMessage",
         user: user,
         msg: messageText,
-        type: activeChatType, // "allianz", "pn" oder "gruppe"
-        target: currentChatTarget // "global", Username oder Gruppen-ID
+        type: activeChatType, 
+        target: currentChatTarget 
     };
 
     try {
@@ -104,7 +101,7 @@ async function sendFunkMessage() {
             method: "POST",
             body: JSON.stringify(payload)
         });
-        updateMuteStatusAndFetch(); // Sofort neu laden
+        updateMuteStatusAndFetch(); // Sofortigen Refresh erzwingen
     } catch (e) {
         console.error("Funkspruch-Übertragungsfehler:", e);
     }
@@ -115,13 +112,13 @@ function triggerTypingIndicator() {
     const user = localStorage.getItem('bulls_user');
     if (typingTimeout) clearTimeout(typingTimeout);
 
-    // Signalisiere dem Server "Ich schreibe..."
+    // Signalisiere dem HQ-Server "Ich tippe..."
     fetch(CHAT_API, {
         method: "POST",
         body: JSON.stringify({ action: "setTyping", user: user, target: currentChatTarget, status: true })
     });
 
-    // Nach 3 Sekunden Inaktivität stoppen
+    // Nach 3 Sekunden Inaktivität Zustand wieder löschen
     typingTimeout = setTimeout(() => {
         fetch(CHAT_API, {
             method: "POST",
@@ -133,13 +130,12 @@ function triggerTypingIndicator() {
 // 5. HELPER: ZEIT-FORMATIERUNG
 function formatFunkZeit(dateStr) {
     if (!dateStr) return "";
-    // Erwartet "dd.MM.yyyy HH:mm" vom Google Sheet
     const teile = dateStr.split(" ");
     if (teile.length < 2) return dateStr;
-    return teile[1]; // Gibt nur "HH:mm" zurück
+    return teile[1]; // Schneidet das Datum ab, liefert nur "HH:mm"
 }
 
-// 6. LOGOUT
+// 6. CENTRAL LOGOUT
 function logoutFunk() {
     if (chatInterval) clearInterval(chatInterval);
     localStorage.clear();
