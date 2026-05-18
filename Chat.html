@@ -21,12 +21,6 @@
         .channel-btn { padding: 8px 10px; background: transparent; border: none; color: #949ba4; font-family: 'Almendra'; font-size: 16px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
         .channel-btn.active { color: #fff; font-weight: bold; }
         .channel-row-wrapper.active { background: #404249; }
-        
-        /* 🚨 INFARBEN-STEUERUNG FÜR ROTE SUPPORT CANALS BEIM SPIELER */
-        .channel-row-wrapper.is-ticket-row .channel-btn { color: #f23f43 !important; font-weight: bold; }
-        .channel-row-wrapper.is-ticket-row { border-left: 3px solid #f23f43; background: rgba(242, 63, 67, 0.03); }
-        .channel-row-wrapper.is-ticket-row:hover { background: rgba(242, 63, 67, 0.08); }
-
         .gear-icon { font-size: 14px; color: #949ba4; cursor: pointer; padding: 5px 8px; }
         .gear-icon:hover { color: #fff; transform: rotate(45deg); }
         .channel-plus { font-size: 18px; cursor: pointer; color: #949ba4; padding: 0 5px; }
@@ -67,21 +61,22 @@
         .status-dot { width: 10px; height: 10px; background: #23a55a; border-radius: 50%; position: absolute; bottom: -2px; right: -2px; border: 2px solid #2b2d31; }
 
         .role-admin { color: #f23f43 !important; } .role-offi { color: #f0b232 !important; } .role-member { color: #23a55a !important; }
-        
-        /* AMPEL KARTEN IN DER ZENTRALE */
-        .sup-row-card { padding: 15px; border-radius: 6px; background: #2b2d31; color: #fff; cursor: pointer; border-left: 6px solid #fff; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .sup-row-card:hover { background:#35373c; transform: translateX(2px); }
+        .sup-row-card { padding: 15px; border-radius: 6px; background: #2b2d31; color: #fff; cursor: pointer; border-left: 6px solid #fff; margin-bottom: 8px; display: flex; justify-content: space-between; }
         .card-green { border-color: #23a55a; } .card-red { border-color: #f23f43; } .card-yellow { border-color: #f0b232; }
-        .ticket-badge-status { font-size:11px; padding:2px 6px; border-radius:3px; background:rgba(255,255,255,0.1); font-weight:bold; text-transform:uppercase; }
 
-        .user-scroll-list { background: #1e1f22; border: 1px solid #111; height: 150px; overflow-y: auto; margin-bottom: 15px; padding: 5px; }
-        .check-row { display: flex; align-items: center; gap: 12px; padding: 8px 6px; border-bottom: 1px solid #2b2d31; cursor: pointer; color: #dbdee1; font-size: 16px; }
-        .quick-sel-btn { background: #2b2d31; border: 1px solid #444; color: #fff; font-family: 'Almendra'; font-size: 12px; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
-        .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:1000; justify-content:center; align-items:center; }
-        .modal-box { background:#313338; border: 1px solid #444; padding: 25px; border-radius: 8px; width: 420px; text-align: center; color: #dbdee1; }
-        .modal-box select, .modal-box input { width: 100%; padding: 10px; background: #1e1f22; border: 1px solid #111; color: #fff; font-family: 'Almendra'; border-radius: 4px; margin-bottom: 12px; box-sizing: border-box; }
+        .user-scroll-list { background: #1e1f22; border: 1px solid #111; height: 180px; overflow-y: auto; margin-bottom: 15px; padding: 5px; border-radius: 4px; display: flex; flex-direction: column; gap: 2px; }
+        .check-row { display: flex; align-items: center; gap: 12px; padding: 8px 8px; border-bottom: 1px solid #2b2d31; cursor: pointer; color: #dbdee1; font-size: 16px; text-align: left; box-sizing: border-box; width: 100%; }
+        .check-row:hover { background: #2b2d31; color: #fff; }
+        .check-row input { width: 18px; height: 18px; accent-color: #39d353; margin: 0; cursor: pointer; flex-shrink: 0; }
+        
+        .quick-sel-btn { background: #2b2d31; border: 1px solid #444; color: #fff; font-family: 'Almendra'; font-size: 12px; padding: 6px 12px; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
+
+        .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center; }
+        .modal-box { background:#313338; border: 1px solid #444; padding: 25px; border-radius: 8px; width: 440px; text-align: center; color: #dbdee1; box-shadow: 0 8px 24px rgba(0,0,0,0.7); }
+        .modal-box select, .modal-box input { width: 100%; padding: 10px; background: #1e1f22; border: 1px solid #111; color: #fff; font-family: 'Almendra'; border-radius: 4px; font-size: 16px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
 
         .hidden { display: none !important; }
+        .loading-text { font-style: italic; color: #ff8c00; text-align: center; padding: 20px; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -133,23 +128,30 @@
                 <option value="read">Berechtigung: Nur Lesen (Infokanal)</option>
             </select>
 
-            <div style="margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 5px; justify-content: center;">
+            <div style="margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;">
                 <button type="button" class="quick-sel-btn" onclick="selectGroupMembers('all')">Alle Spieler</button>
                 <button type="button" class="quick-sel-btn" onclick="selectGroupMembers('bulls')">Alle Dark Bulls</button>
                 <button type="button" class="quick-sel-btn" onclick="selectGroupMembers('kd')">Bulls & Division</button>
             </div>
 
-            <div class="user-scroll-list" id="groupUserChecklist"></div>
-            <button class="send-btn" style="width:100%; padding:12px;" onclick="createGroupFromModal()">Gruppe versiegeln</button>
+            <div class="user-scroll-list" id="groupUserChecklist">
+                <div class="loading-text">Synchronisiere Kampfkarte... 🔄</div>
+            </div>
+            <button class="send-btn" style="width:100%; padding:12px; font-weight:bold;" onclick="createGroupFromModal()">Gruppe versiegeln</button>
             <p onclick="closeModals()" style="color:#949ba4; cursor:pointer; margin-top:12px; margin-bottom:0;">Abbrechen</p>
         </div>
     </div>
 
     <div id="modalManage" class="modal-overlay">
         <div class="modal-box">
-            <h2 id="manageModalTitle">Mitglieder verwalten</h2>
-            <div class="user-scroll-list" id="manageUserChecklist"></div>
-            <button class="send-btn" style="width:100%; padding:12px;" onclick="saveGroupMembersManagement()">Änderungen speichern</button>
+            <h2 id="manageModalTitle">Truppmitglieder anpassen</h2>
+            <p style="font-size:14px; color:#aaa; margin-top:-8px; margin-bottom:15px;">Setze Haken um Gefährten hinzuzufügen oder zu entfernen.</p>
+            
+            <div class="user-scroll-list" id="manageUserChecklist">
+                <div class="loading-text">Rufe Truppdaten ab... 🔄</div>
+            </div>
+            
+            <button class="send-btn" style="width:100%; padding:12px; font-weight:bold;" onclick="saveGroupMembersManagement()">Änderungen speichern</button>
             <p onclick="closeModals()" style="color:#949ba4; cursor:pointer; margin-top:12px; margin-bottom:0;">Abbrechen</p>
         </div>
     </div>
@@ -173,21 +175,39 @@
 
     async function initHQ() {
         if ("Notification" in window && Notification.permission === "default") { Notification.requestPermission(); }
+        setInterval(updateLoop, 4000); 
+        await updateLoop(); 
+    }
+
+    async function updateLoop() {
         try {
-            const dropRes = await fetch(API + "?action=getDropdownData");
-            const dropData = await dropRes.json();
-            globalUserList = dropData.user || [];
+            const res = await fetch(API + "?action=getChatData&user=" + MY_NAME);
+            chatDataCache = await res.json();
+            
+            // Reißt die User direkt aus dem optimierten Zentral-Paket ab
+            globalUserList = chatDataCache.user || [];
+            
             buildModalLists();
-        } catch(e) { console.log("Fehler beim Abruf der Allianz-Matrix."); }
-        setInterval(updateLoop, 4000); updateLoop();
+            renderChannelList(); 
+            renderChatContent(); 
+            renderRightSidebar(); 
+            checkNewMessagesForPush();
+        } catch(e) { console.log("Sync verloren."); }
     }
 
     function buildModalLists() {
-        const checkList = document.getElementById("groupUserChecklist"); checkList.innerHTML = "";
-        [...globalUserList].sort((a,b) => a.name.localeCompare(b.name)).forEach(u => {
+        const checkList = document.getElementById("groupUserChecklist"); 
+        if(!checkList || globalUserList.length === 0 || checkList.querySelector('.check-row')) return;
+        checkList.innerHTML = "";
+        
+        [...globalUserList].sort((a,b) => a.name.localeCompare(b.name, 'de', {sensitivity: 'base'})).forEach(u => {
             if(u.name !== MY_NAME) {
                 var roleClean = u.role ? u.role.trim().toLowerCase() : "mitglied";
-                checkList.innerHTML += `<label class="check-row"><input type="checkbox" name="groupMembers" value="${u.name}" data-role="${roleClean}"><span>${u.name} <span style="color:#777; font-size:13px;">(${u.role})</span></span></label>`;
+                checkList.innerHTML += `
+                    <label class="check-row">
+                        <input type="checkbox" name="groupMembers" value="${u.name}" data-role="${roleClean}">
+                        <span>${u.name} <span style="color:#777; font-size:13px; font-style:italic;">(${u.role})</span></span>
+                    </label>`;
             }
         });
     }
@@ -197,17 +217,9 @@
         boxes.forEach(b => {
             var r = b.getAttribute("data-role");
             if(type === 'all') b.checked = true;
-            else if(type === 'bulls') b.checked = (r !== 'kampfdivision' && !r.includes("gast"));
-            else if(type === 'kd') b.checked = (!r.includes("gast"));
+            else if(type === 'bulls') b.checked = (r !== 'kampfdivision' && !r.includes("gast") && !r.includes("gäste"));
+            else if(type === 'kd') b.checked = (!r.includes("gast") && !r.includes("gäste"));
         });
-    }
-
-    async function updateLoop() {
-        try {
-            const res = await fetch(API + "?action=getChatData&user=" + MY_NAME);
-            chatDataCache = await res.json();
-            renderChannelList(); renderChatContent(); renderRightSidebar(); checkNewMessagesForPush();
-        } catch(e) { console.log("Sync verloren."); }
     }
 
     function activateServerMode(server) {
@@ -243,7 +255,6 @@
                 let isTicket = p.startsWith("🚨 TICKET:");
                 let ticketClass = isTicket ? "is-ticket-row" : "";
                 
-                // Schaltet den Klick für Support-Chats scharf
                 if(isTicket) {
                     let BetreffClean = p.replace("🚨 TICKET: ", "");
                     container.innerHTML += `<div class="channel-row-wrapper ${act} ${ticketClass}"><button class="channel-btn" onclick="switchChannel('ticket_player', '${p}', '${BetreffClean}', 'text')"># ${BetreffClean.toLowerCase()}</button></div>`;
@@ -268,7 +279,6 @@
         if(server === 'pn' && target) tools.innerHTML += `<button class="report-btn" onclick="reportCurrentPNChat()">Chat melden 🚨</button>`;
         if(type === 'voice') tools.innerHTML += `<button class="voice-btn" onclick="window.open('https://meet.jit.si/BullsGroup_${target}')">🎙️ Sprachkanal</button>`;
 
-        // NEU: Wenn Admin ein Support-Ticket in der Zentrale anklickt, zünden wir die Schließen/Archiv Buttons!
         if(server === 'support_admin' && IS_MODERATOR) {
             tools.innerHTML += `
                 <button class="group-admin-btn" style="background:#23a55a; color:#fff;" onclick="ticketAction('ARCHIV')">📦 Archivieren</button>
@@ -280,7 +290,7 @@
         if (server === 'group' && IS_MODERATOR) {
             tools.innerHTML += `<button class="group-admin-btn" onclick="adminAction('mute')">Mute</button><button class="group-admin-btn" onclick="adminAction('delete')">Löschen</button>`;
         }
-        lastMessageCount = 0; updateLoop();
+        lastMessageCount = 0; renderChatContent();
     }
 
     function renderChatContent() {
@@ -288,20 +298,17 @@
         footer.classList.remove("hidden"); document.getElementById("paperclipBtn").classList.remove("hidden");
         let html = "";
 
-        // DIE NEUE DREI-FARBEN AMPEL DER ADMIN ZENTRALE
         if (currentServer === 'support') {
             footer.classList.add("hidden");
             (chatDataCache.support || []).forEach(m => {
+                if(m[5] === "CLOSED") return; 
                 let col = 'card-green'; if(m[1] === 'SUPPORT') col = 'card-red'; if(m[1] === 'BUCHHALTER') col = 'card-yellow';
-                // Filtern: Verstecke geschlossene Tickets, es sei denn man sucht gezielt danach
-                if(m[4] === "CLOSED") return; 
-
                 if (["Admin"].includes(MY_ROLE) || (m[1]==='BUCHHALTER' && MY_EXTRA.includes("Buchhalter"))) {
                     html += `
                         <div class="sup-row-card ${col}" onclick="openAdminTicketChat('${m[2]}', '${m[3]}')">
                             <div><strong>${m[2]}</strong> | Betreff: <i>${m[3]}</i></div>
                             <div style="display:flex; align-items:center; gap:8px;">
-                                <span class="ticket-badge-status">${m[4]}</span>
+                                <span class="ticket-badge-status">${m[5]}</span>
                                 <div style="font-size:12px; color:#aaa;">${m[0]}</div>
                             </div>
                         </div>`;
@@ -315,38 +322,27 @@
             if(g) {
                 if(g.rights === 'write' || g.rights === 'read') document.getElementById("paperclipBtn").classList.add("hidden");
                 if(g.rights === 'read' && !IS_MODERATOR) footer.classList.add("hidden");
-                g.messages.forEach(m => { html += formatMessageRow_(m[1], m[4], m[3], m[2], m[5]); });
+                g.messages.forEach(m => { html += formatMessageRow_(m[1], m[3], m[4], m[2], m[5]); });
             }
         } 
         else if (currentServer === 'pn' && currentTarget) {
             const msgs = chatDataCache.pns[currentTarget] || [];
-            msgs.forEach(m => { html += formatMessageRow_(m[1], m[4], m[3], '', m[5]); });
+            msgs.forEach(m => { html += formatMessageRow_(m[1], m[3], m[4], '', m[5]); });
         }
-        // Zeigt dem Spieler die Ticket-Nachrichten im roten Kanal an
         else if (currentServer === 'ticket_player' && currentTarget) {
             const msgs = chatDataCache.pns["🚨 TICKET: " + currentTarget] || [];
-            msgs.forEach(m => { html += formatMessageRow_(m[1], m[4], m[3], '', m[5]); });
-        }
-        // Zeigt dem Admin den Inhalt des angeklickten Tickets an
-        else if (currentServer === 'support_admin') {
-            let sheetName = "SUP_" + currentTarget.betreff.replace(/[^a-zA-Z0-9]/g, "") + "_" + currentTarget.sender;
-            // Da das Datenpaket dynamisch geladen wird, greifen wir hier auf ein temporäres Array oder Direktabruf zurück
-            // Hier greift die Standard-Anzeige-Logik
+            msgs.forEach(m => { html += formatMessageRow_(m[1], m[3], m[4], '', m[5]); });
         }
         box.innerHTML = html;
     }
 
     function openAdminTicketChat(sender, betreff) {
-        // Schaltet das Hauptfenster für den Admin in den dedizierten Ticket-Chatraum
         switchChannel('support_admin', `📬 TICKET: ${betreff} (${sender})`, { sender: sender, betreff: betreff }, 'text');
     }
 
     async function ticketAction(statusMode) {
         if(!confirm(`Möchtest du dieses Support-Ticket wirklich auf den Status '${statusMode}' setzen?`)) return;
-        await fetch(API, {
-            method: "POST",
-            body: JSON.stringify({ action: "updateTicketStatus", sender: currentTarget.sender, betreff: currentTarget.betreff, status: statusMode })
-        });
+        await fetch(API, { method: "POST", body: JSON.stringify({ action: "updateTicketStatus", sender: currentTarget.sender, betreff: currentTarget.betreff, status: statusMode }) });
         activateServerMode('support');
     }
 
@@ -356,7 +352,7 @@
         let pinIcon = IS_MODERATOR ? `<span class="pin-indicator" onclick="togglePin('${sender}', \`${text.replace(/"/g, '&quot;')}\`)" title="Nachricht pinnen/entpinnen">📌</span>` : (isPinned ? "📌" : "");
         
         let textContent = text;
-        if(text.startsWith("http") && (text.includes(".png") || text.includes(".jpg") || text.includes(".jpeg"))) {
+        if(text && text.startsWith("http") && (text.includes(".png") || text.includes(".jpg") || text.includes(".jpeg"))) {
             textContent = `<img src="${text}" class="chat-img" onclick="window.open('${text}')">`;
         }
         return `<div class="d-msg ${pinClass}"><div class="d-msg-meta"><span class="d-msg-sender role-${getRoleClass(role)}">${sender}</span><span class="d-msg-time">${time || ''} ${pinIcon}</span><span class="pin-badge">ANGEPINNT</span></div><div class="d-msg-text">${textContent}</div></div>`;
@@ -380,11 +376,67 @@
         updateLoop();
     }
 
-    function renderRightSidebar() { const container = document.getElementById("rightRosterContainer"); container.innerHTML = ""; const onlineList = chatDataCache.onlineUsers || []; if (currentServer === 'group' && currentTarget) { const activeGroup = (chatDataCache.groups || []).find(x => x.name === currentTarget); if (!activeGroup) return; let onTrupp = [], offTrupp = []; (activeGroup.members || []).sort().forEach(m => { if (onlineList.includes(m)) onTrupp.push(m); else offTrupp.push(m); }); let html = `<div class="member-section"><div class="member-group-title">Im Trupp (Online) — ${onTrupp.length}</div>`; onTrupp.forEach(m => { html += `<div class="user-row ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${m}')"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; }); html += `</div><div class="member-section"><div class="member-group-title">Im Trupp (Offline) — ${offTrupp.length}</div>`; offTrupp.forEach(m => { html += `<div class="user-row offline ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${m}')"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; }); container.innerHTML = html + "</div>"; } else { let allianzOnline = [], allianzOffline = []; [...globalUserList].sort((a,b)=>a.name.localeCompare(b.name)).forEach(u => { if (onlineList.includes(u.name)) allianzOnline.push(u.name); else allianzOffline.push(u.name); }); let html = `<div class="member-section"><div class="member-group-title">Online im HQ — ${allianzOnline.length}</div>`; allianzOnline.forEach(u => { html += `<div class="user-row ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${u}')"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; }); html += `</div><div class="member-section"><div class="member-group-title">Offline — ${allianzOffline.length}</div>`; allianzOffline.forEach(u => { html += `<div class="user-row offline ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${u}')"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; }); container.innerHTML = html + "</div>"; } }
+    function renderRightSidebar() { 
+        const container = document.getElementById("rightRosterContainer"); container.innerHTML = ""; 
+        const onlineList = chatDataCache.onlineUsers || []; 
+        if (currentServer === 'group' && currentTarget) { 
+            const activeGroup = (chatDataCache.groups || []).find(x => x.name === currentTarget); 
+            if (!activeGroup) return; 
+            let onTrupp = [], offTrupp = []; 
+            (activeGroup.members || []).sort().forEach(m => { if (onlineList.includes(m)) onTrupp.push(m); else offTrupp.push(m); }); 
+            let html = `<div class="member-section"><div class="member-group-title">Im Trupp (Online) — ${onTrupp.length}</div>`; 
+            onTrupp.forEach(m => { html += `<div class="user-row ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${m}')"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; }); 
+            html += `</div><div class="member-section"><div class="member-group-title">Im Trupp (Offline) — ${offTrupp.length}</div>`; 
+            offTrupp.forEach(m => { html += `<div class="user-row offline ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${m}')"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; }); 
+            container.innerHTML = html + "</div>"; 
+        } else { 
+            let allianzOnline = [], allianzOffline = []; 
+            [...globalUserList].sort((a,b)=>a.name.localeCompare(b.name)).forEach(u => { if (onlineList.includes(u.name)) allianzOnline.push(u.name); else allianzOffline.push(u.name); }); 
+            let html = `<div class="member-section"><div class="member-group-title">Online im HQ — ${allianzOnline.length}</div>`; 
+            allianzOnline.forEach(u => { html += `<div class="user-row ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${u}')"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; }); 
+            html += `</div><div class="member-section"><div class="member-group-title">Offline — ${allianzOffline.length}</div>`; 
+            allianzOffline.forEach(u => { html += `<div class="user-row offline ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${u}')"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; }); 
+            container.innerHTML = html + "</div>"; 
+        } 
+    }
+
+    function openGroupManagementModal(groupName) {
+        if(!chatDataCache.groups) return;
+        const activeGroup = chatDataCache.groups.find(x => x.name === groupName);
+        if(!activeGroup) return;
+        
+        document.getElementById("manageModalTitle").innerText = `Trupp: ${groupName}`;
+        const container = document.getElementById("manageUserChecklist");
+        if(!container) return;
+        container.innerHTML = "";
+        
+        [...globalUserList].sort((a,b)=>a.name.localeCompare(b.name)).forEach(u => {
+            if(u.name !== MY_NAME) {
+                let isChecked = activeGroup.members.includes(u.name) ? 'checked' : '';
+                container.innerHTML += `
+                    <label class="check-row">
+                        <input type="checkbox" name="manageBox" value="${u.name}" ${isChecked}>
+                        <span>${u.name} <span style="color:#777; font-size:13px; font-style:italic;">(${u.role})</span></span>
+                    </label>`;
+            }
+        });
+        document.getElementById("modalManage").setAttribute("data-active-group", groupName);
+        document.getElementById("modalManage").style.display = "flex";
+    }
+
+    async function saveGroupMembersManagement() {
+        const groupName = document.getElementById("modalManage").getAttribute("data-active-group");
+        const boxes = document.querySelectorAll('input[name="manageBox"]:checked');
+        let members = [MY_NAME]; boxes.forEach(b => members.push(b.value));
+
+        closeModals();
+        await fetch(API, { method: "POST", body: JSON.stringify({ action: "manageGroupMembers", groupName: groupName, members: members }) });
+        alert("Truppstärke erfolgreich angepasst!");
+        updateLoop();
+    }
+
     function triggerImageUpload() { let url = prompt("Füge hier die URL deines Schlachtplans/Bildes ein (.jpg, .png):"); if(url) { document.getElementById("msgInput").value = url; sendMessage(); } }
-    function openGroupManagementModal(groupName) { const activeGroup = chatDataCache.groups.find(x => x.name === groupName); if(!activeGroup) return; document.getElementById("manageModalTitle").innerText = `Trupp: ${groupName}`; const container = document.getElementById("manageUserChecklist"); container.innerHTML = ""; [...globalUserList].sort((a,b)=>a.name.localeCompare(b.name)).forEach(u => { if(u.name !== MY_NAME) { let isChecked = activeGroup.members.includes(u.name) ? 'checked' : ''; container.innerHTML += `<label class="check-row"><input type="checkbox" name="manageBox" value="${u.name}" ${isChecked}><span>${u.name}</span></label>`; } }); document.getElementById("modalManage").setAttribute("data-active-group", groupName); document.getElementById("modalManage").style.display = "flex"; }
-    async function saveGroupMembersManagement() { const groupName = document.getElementById("modalManage").getAttribute("data-active-group"); const boxes = document.querySelectorAll('input[name="manageBox"]:checked'); let members = [MY_NAME]; boxes.forEach(b => members.push(b.value)); closeModals(); await fetch(API, { method: "POST", body: JSON.stringify({ action: "manageGroupMembers", groupName: groupName, members: members }) }); alert("Truppstärke erfolgreich angepasst!"); updateLoop(); }
-    function checkNewMessagesForPush() { let currentMessages = []; if (currentServer === 'pn' && currentTarget) currentMessages = chatDataCache.pns[currentTarget] || []; else if (currentServer === 'group' && currentTarget) { const g = (chatDataCache.groups || []).find(x => x.name === currentTarget); if(g) currentMessages = g.messages || []; } if(lastMessageCount > 0 && currentMessages.length > lastMessageCount) { let lastMsg = currentMessages[currentMessages.length - 1]; if(lastMsg[1] !== MY_NAME && lastMsg[3]) { triggerDesktopPush(lastMsg[1], lastMsg[3]); try { pingSound.play(); } catch(e){} } } lastMessageCount = currentMessages.length; }
+    function checkNewMessagesForPush() { let currentMessages = []; if (currentServer === 'pn' && currentTarget) currentMessages = chatDataCache.pns[currentTarget] || []; else if (currentServer === 'group' && currentTarget) { const g = (chatDataCache.groups || []).find(x => x.name === currentTarget); if(g) currentMessages = g.messages || []; } if(lastMessageCount > 0 && currentMessages.length > lastMessageCount) { let lastMsg = currentMessages[currentMessages.length - 1]; if(lastMsg[1] !== MY_NAME && lastMsg[4]) { triggerDesktopPush(lastMsg[1], lastMsg[4]); try { pingSound.play(); } catch(e){} } } lastMessageCount = currentMessages.length; }
     function triggerDesktopPush(s, t) { if ("Notification" in window && Notification.permission === "granted") { new Notification(`Funk von ${s}`, { body: t }); } }
     function handleTyping() { fetch(API, { method: "POST", body: JSON.stringify({ action: "setTyping", user: MY_NAME, isTyping: true }) }); clearTimeout(typingTimeout); typingTimeout = setTimeout(() => { fetch(API, { method: "POST", body: JSON.stringify({ action: "setTyping", user: MY_NAME, isTyping: false }) }); }, 3000); }
     function triggerPlusAction() { if(currentServer==='pn') document.getElementById("modalPN").style.display="flex"; if(currentServer==='group') document.getElementById("modalGroup").style.display="flex"; }
