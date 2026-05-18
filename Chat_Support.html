@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DARK BULLS - ALLIANZ FUNK</title>
+    <title>DARK BULLS - SUPPORT FUNK</title>
     <script src="config.js"></script>
     <script src="funk_zentrale.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; padding: 0; background-color: #050505; color: white; font-family: 'Almendra', serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        
-        /* OBERE FUNK-NAV-BAR */
         .funk-nav { display: flex; justify-content: space-between; align-items: center; background: #0c0c0e; border-bottom: 2px solid #ff3131; padding: 10px 20px; box-shadow: 0 4px 15px rgba(255, 49, 49, 0.2); }
         .nav-links { display: flex; gap: 15px; }
         .nav-link-btn { background: #111; border: 1px solid #333; color: #888; font-family: 'Almendra'; padding: 10px 20px; font-size: 16px; border-radius: 6px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
@@ -18,21 +16,15 @@
         .nav-link-btn.active { background: #ff3131; color: #000; border-color: #ff3131; font-weight: bold; box-shadow: 0 0 15px rgba(255, 49, 49, 0.4); }
         .logout-btn { background: #ff0000; color: #fff; border: none; padding: 8px 15px; font-family: 'Almendra'; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
 
-        /* CHAT STREAM (VOLLE BREITE!) */
         .chat-main { flex: 1; display: flex; flex-direction: column; background: rgba(10, 10, 10, 0.95); max-width: 1200px; width: 100%; margin: 0 auto; box-sizing: border-box; border-left: 1px solid #222; border-right: 1px solid #222; }
         .stream-area { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        
-        /* TYPING INDICATOR LINE */
         .typing-box { padding: 5px 20px; color: #ff8c00; font-size: 14px; font-style: italic; min-height: 20px; }
 
-        /* INPUT AREA UNTEN */
         .input-bar { display: flex; gap: 12px; padding: 20px; background: #0c0c0e; border-top: 1px solid #222; }
-        .input-bar input { flex: 1; background: #151515; border: 1px solid #ff3131; padding: 15px; color: #fff; font-family: sans-serif; font-size: 15px; border-radius: 6px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+        .input-bar input { flex: 1; background: #151515; border: 1px solid #ff3131; padding: 15px; color: #fff; font-family: sans-serif; font-size: 15px; border-radius: 6px; }
         .input-bar input:focus { outline: none; box-shadow: 0 0 10px rgba(255, 49, 49, 0.3); }
-        .send-btn { background: #ff8c00; color: #000; border: none; padding: 0 35px; font-family: 'Almendra'; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; box-shadow: 0 0 15px rgba(255, 140, 0, 0.3); transition: 0.2s; }
-        .send-btn:hover { background: #e07b00; transform: scale(1.02); }
+        .send-btn { background: #ff8c00; color: #000; border: none; padding: 0 35px; font-family: 'Almendra'; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; box-shadow: 0 0 15px rgba(255, 140, 0, 0.3); }
 
-        /* TEXTSTYLES FÜR NACHRICHTEN */
         .msg-line { display: flex; flex-direction: column; background: #111; border-left: 3px solid #ff3131; padding: 10px 15px; border-radius: 0 6px 6px 0; max-width: 85%; align-self: flex-start; }
         .msg-line.me { border-left: none; border-right: 3px solid #39d353; border-radius: 6px 0 0 6px; background: #161a16; align-self: flex-end; }
         .msg-meta { font-size: 13px; margin-bottom: 4px; display: flex; gap: 10px; }
@@ -40,11 +32,8 @@
         .msg-line.me .meta-user { color: #39d353; }
         .meta-time { color: #666; }
         .msg-text { font-family: sans-serif; font-size: 15px; line-height: 1.4; color: #eee; word-break: break-word; }
-
-        /* SCROLLBARS */
         .stream-area::-webkit-scrollbar { width: 8px; }
         .stream-area::-webkit-scrollbar-thumb { background: #222; border-radius: 4px; }
-        .stream-area::-webkit-scrollbar-thumb:hover { background: #ff3131; }
     </style>
 </head>
 <body>
@@ -52,44 +41,35 @@
     <div class="funk-nav">
         <div class="nav-links">
             <button class="nav-link-btn" onclick="window.location.href='dashboard.html'">🏠 HQ</button>
-            <button class="nav-link-btn active">📢 Allianz</button>
             <button class="nav-link-btn" onclick="window.location.href='Chat_PN.html'">💬 PNs</button>
             <button class="nav-link-btn" onclick="window.location.href='Chat_Group.html'">⚔️ Gruppen</button>
+            <button class="nav-link-btn active">🚨 Support</button>
         </div>
-        <div style="color: #ff3131; font-size: 18px;" id="userDisplay">Bulls Funkleitung...</div>
+        <div style="color: #ff3131; font-size: 18px;" id="userDisplay">Bulls Support-Leitung...</div>
         <button class="logout-btn" onclick="logoutFunk()">X</button>
     </div>
 
     <div class="chat-main">
-        <div class="stream-area" id="allianzStream">
-            <div style="text-align:center; color:#ff8c00; font-style:italic; padding-top:50px;">Schalte globalen Allianz-Funkkanal frei... ⚡</div>
+        <div class="stream-area" id="supportStream">
+            <div style="text-align:center; color:#ff8c00; font-style:italic; padding-top:50px;">Öffne abgetrennten HQ-Support-Kanal... ⚡</div>
         </div>
-        
         <div class="typing-box" id="typingIndicator"></div>
-
         <div class="input-bar">
-            <input type="text" id="messageInput" placeholder="Funkspruch eingeben..." maxlength="500" autocomplete="off">
+            <input type="text" id="messageInput" placeholder="Problem oder Ticket-Meldung eingeben..." maxlength="500" autocomplete="off">
             <button class="send-btn" id="sendButton" onclick="sendFunkMessage()">Senden</button>
         </div>
     </div>
 
     <script>
-        // Starte das Gehirn im Modus "allianz"
-        window.addEventListener("DOMContentLoaded", () => {
-            initFunkkreis("allianz");
-        });
+        window.addEventListener("DOMContentLoaded", () => { initFunkkreis("support"); });
 
-        // Verarbeite die vom Gehirn gelieferten Live-Daten
         function processChatData(data) {
-            const stream = document.getElementById("allianzStream");
+            const stream = document.getElementById("supportStream");
             const myUser = localStorage.getItem('bulls_user');
-            
-            // 1. Nachrichten im Stream rendern
             let htmlHTML = "";
             
-            // data.allianz ist das Array mit allen Allianz-Nachrichten vom Server
-            if (data.allianz && data.allianz.length > 0) {
-                data.allianz.forEach(msg => {
+            if (data.support && data.support.length > 0) {
+                data.support.forEach(msg => {
                     let isMe = msg.user === myUser ? "me" : "";
                     htmlHTML += `
                         <div class="msg-line ${isMe}">
@@ -101,30 +81,20 @@
                         </div>
                     `;
                 });
-                
-                // Nur runterscrollen, wenn neue Nachrichten da sind
                 const scrollCheck = (stream.scrollHeight - stream.scrollTop === stream.clientHeight);
                 stream.innerHTML = htmlHTML;
-                if (!scrollCheck) {
-                    stream.scrollTop = stream.scrollHeight;
-                }
+                if (!scrollCheck) stream.scrollTop = stream.scrollHeight;
             } else {
-                stream.innerHTML = `<div style="text-align:center; color:#555; padding-top:50px; font-family:sans-serif;">Funkstille auf diesem Kanal.</div>`;
+                stream.innerHTML = `<div style="text-align:center; color:#555; padding-top:50px; font-family:sans-serif;">Keine aktiven Support-Tickets offen.</div>`;
             }
 
-            // 2. Schreib-Indikator auswerten
             const typingIndicator = document.getElementById("typingIndicator");
-            if (data.typing && data.typing.allianz && data.typing.allianz.length > 0) {
-                // Filtere mich selbst aus dem Indikator heraus
-                let writers = data.typing.allianz.filter(u => u !== myUser);
+            if (data.typing && data.typing.support && data.typing.support.length > 0) {
+                let writers = data.typing.support.filter(u => u !== myUser);
                 if (writers.length > 0) {
-                    typingIndicator.innerText = `${writers.join(", ")} verfasst einen Funkspruch... ✏️`;
-                } else {
-                    typingIndicator.innerText = "";
-                }
-            } else {
-                typingIndicator.innerText = "";
-            }
+                    typingIndicator.innerText = `${writers.join(", ")} tippt eine Support-Antwort... ✏️`;
+                } else { typingIndicator.innerText = ""; }
+            } else { typingIndicator.innerText = ""; }
         }
     </script>
 </body>
