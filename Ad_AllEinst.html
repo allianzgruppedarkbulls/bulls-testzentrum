@@ -17,7 +17,7 @@
         }
         h1 { color: #ff3131; text-transform: uppercase; margin-bottom: 40px; letter-spacing: 3px; font-size: 32px; text-shadow: 0 0 15px rgba(255, 49, 49, 0.5); }
 
-        /* Große Navigations-Buttons */
+        /* Die 3 großen Haupt-Buttons */
         .nav-btn {
             width: 100%;
             padding: 25px;
@@ -50,20 +50,20 @@
         .btn-back { display: block; margin-top: 40px; color: #666; text-decoration: none; text-transform: uppercase; font-size: 16px; transition: 0.3s; }
         .btn-back:hover { color: #fff; }
 
-        /* NEU: GROßES VOLLBILD-OVERLAY FÜR DIE MATRIX */
+        /* DAS GROßE POP-UP FÜR DIE RECHTE-MATRIX */
         .matrix-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.95); z-index: 9999; justify-content: center; align-items: center;
         }
         .matrix-content-box {
-            width: 1300px; max-width: 95vw; background: #0f0f0f; border: 2px solid #ff3131;
+            width: 1350px; max-width: 95vw; background: #0f0f0f; border: 2px solid #ff3131;
             border-radius: 15px; padding: 30px; box-shadow: 0 0 50px rgba(255, 49, 49, 0.4);
             text-align: left; box-sizing: border-box;
         }
-        .matrix-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #050505; font-size: 15px; }
+        .matrix-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #050505; font-size: 14px; }
         .matrix-table th { background: #111; color: #ff3131; padding: 12px; border-bottom: 2px solid #ff3131; text-transform: uppercase; }
-        .matrix-table td { padding: 12px; border-bottom: 1px solid #222; color: #fff; }
-        .matrix-cb { width: 20px; height: 20px; accent-color: #ff3131; cursor: pointer; }
+        .matrix-table td { padding: 10px; border-bottom: 1px solid #222; color: #fff; }
+        .matrix-cb { width: 18px; height: 18px; accent-color: #ff3131; cursor: pointer; }
 
         .save-matrix-btn { 
             background: #39d353; color: black; border: none; padding: 15px 40px; 
@@ -82,6 +82,10 @@
         <span class="icon">⚠️</span> Wartungsarbeiten
     </button>
 
+    <button class="nav-btn" onclick="window.location.href='Ad_VorVer.html'">
+        <span class="icon">⚙️</span> Dropdown Pflege
+    </button>
+
     <button class="nav-btn" onclick="openMatrixModal()">
         <span class="icon">🎛️</span> Dashboard Rechte
     </button>
@@ -95,14 +99,14 @@
             🎛️ Dashboard-Zentralsteuerung & Berechtigungen
         </h2>
         <p style="color: #aaa; font-size: 16px; margin-bottom: 20px;">
-            Bestimme per Haken, welche Rollen oder Aufgaben-Rechte die Elemente auf dem Dashboard sehen dürfen.
+            Konfiguriere hier live, welche Rollen oder Aufgaben die Elemente auf dem Dashboard sehen dürfen.
         </p>
 
         <div style="overflow-x: auto; max-height: 60vh; border: 1px solid #333; border-radius: 6px;">
             <table class="matrix-table">
                 <thead>
                     <tr>
-                        <th style="text-align: left;">Dashboard-Element</th>
+                        <th style="text-align: left;">Element Name</th>
                         <th style="text-align:center; color:#fff;">Anwärter</th>
                         <th style="text-align:center; color:#fff;">Gast</th>
                         <th style="text-align:center; color:#fff;">Mitglied</th>
@@ -120,7 +124,7 @@
                 <tbody id="matrixTableBody">
                     <tr>
                         <td colspan="13" style="text-align:center; padding:30px; color:#f0b232; font-style:italic;">
-                            Lade Berechtigungs-Matrix aus der Cloud... 🔄
+                            Verbinde zum HQ-Server... 🔄
                         </td>
                     </tr>
                 </tbody>
@@ -129,10 +133,10 @@
 
         <div style="display: flex; justify-content: space-between; margin-top: 25px;">
             <button class="nav-btn" style="width: auto; padding: 12px 30px; font-size: 16px; margin: 0; border-color: #666; color: #666;" onclick="closeMatrixModal()">
-                Schließen
+                Abbrechen
             </button>
             <button class="save-matrix-btn" onclick="saveDashboardMatrixHTML()">
-                MATRIX VERSIEGELN 💾
+                Änderungen versiegeln 💾
             </button>
         </div>
     </div>
@@ -166,19 +170,19 @@
         const tbody = document.getElementById("matrixTableBody");
         tbody.innerHTML = "";
 
-        if (localMatrixCache.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding:20px; color:#aaa;">Keine registrierten Elemente in 'Dashboard_Rechte' gefunden.</td></tr>`;
+        if (!localMatrixCache || localMatrixCache.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding:20px; color:#aaa;">Tabelle im Sheet ist noch leer!</td></tr>`;
             return;
         }
 
         localMatrixCache.forEach(item => {
             let tr = document.createElement("tr");
-            let htmlRows = `<td style="padding: 12px;"><strong>${item.name}</strong><br><small style="color:#555;">ID: ${item.id}</small></td>`;
+            let htmlRows = `<td style="padding: 10px;"><strong>${item.name}</strong><br><small style="color:#555;">ID: ${item.id}</small></td>`;
             
             ALL_ROLES_LIST.forEach(role => {
                 let isChecked = item.allowed.includes(role) ? "checked" : "";
                 htmlRows += `
-                    <td style="text-align: center; padding: 12px;">
+                    <td style="text-align: center; padding: 10px;">
                         <input type="checkbox" class="matrix-cb" data-id="${item.id}" data-role="${role}" ${isChecked}>
                     </td>
                 `;
@@ -215,7 +219,7 @@
             });
         }
 
-        document.getElementById("matrixTableBody").innerHTML = `<tr><td colspan="13" style="text-align:center; padding:30px; color:#f0b232; font-style:italic;">Versiegele neue Rechte-Matrix in der Cloud... 🔄</td></tr>`;
+        document.getElementById("matrixTableBody").innerHTML = `<tr><td colspan="13" style="text-align:center; padding:30px; color:#f0b232; font-style:italic;">Versiegelung läuft... 🔄</td></tr>`;
 
         try {
             await fetch(API, {
@@ -235,3 +239,5 @@
 </script>
 </body>
 </html>
+
+Deine Präsentation zur neuen HQ-Architektur ist fertig! Viel Erfolg beim Deployen der neuen 3-Button-Steuerung. Melde dich, wenn der Autopilot auf dem Dashboard live gehen soll! 🐂🏁🦾
