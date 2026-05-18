@@ -21,7 +21,7 @@
         .channel-btn { padding: 8px 10px; background: transparent; border: none; color: #949ba4; font-family: 'Almendra'; font-size: 16px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
         .channel-btn.active { color: #fff; font-weight: bold; }
         .channel-row-wrapper.active { background: #404249; }
-        .gear-icon { font-size: 14px; color: #949ba4; cursor: pointer; padding: 5px 8px; }
+        .gear-icon { font-size: 14px; color: #949ba4; cursor: pointer; padding: 5px 8px; z-index: 50; }
         .gear-icon:hover { color: #fff; transform: rotate(45deg); }
         .channel-plus { font-size: 18px; cursor: pointer; color: #949ba4; padding: 0 5px; }
         .channel-plus:hover { color: #fff; }
@@ -64,12 +64,18 @@
         .sup-row-card { padding: 15px; border-radius: 6px; background: #2b2d31; color: #fff; cursor: pointer; border-left: 6px solid #fff; margin-bottom: 8px; display: flex; justify-content: space-between; }
         .card-green { border-color: #23a55a; } .card-red { border-color: #f23f43; } .card-yellow { border-color: #f0b232; }
 
-        .user-scroll-list { background: #1e1f22; border: 1px solid #111; height: 150px; overflow-y: auto; margin-bottom: 15px; padding: 5px; }
-        .check-row { display: flex; align-items: center; gap: 12px; padding: 8px 6px; border-bottom: 1px solid #2b2d31; cursor: pointer; color: #dbdee1; font-size: 16px; }
-        .quick-sel-btn { background: #2b2d31; border: 1px solid #444; color: #fff; font-family: 'Almendra'; font-size: 12px; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
-        .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:1000; justify-content:center; align-items:center; }
-        .modal-box { background:#313338; border: 1px solid #444; padding: 25px; border-radius: 8px; width: 420px; text-align: center; color: #dbdee1; }
-        .modal-box select, .modal-box input { width: 100%; padding: 10px; background: #1e1f22; border: 1px solid #111; color: #fff; font-family: 'Almendra'; border-radius: 4px; margin-bottom: 12px; box-sizing: border-box; }
+        /* BOX FIX FÜR REINE VERTIKALE REIHUNG */
+        .user-scroll-list { background: #1e1f22; border: 1px solid #111; height: 180px; overflow-y: auto; margin-bottom: 15px; padding: 5px; border-radius: 4px; display: flex; flex-direction: column; gap: 2px; }
+        .check-row { display: flex; align-items: center; gap: 12px; padding: 8px 8px; border-bottom: 1px solid #2b2d31; cursor: pointer; color: #dbdee1; font-size: 16px; text-align: left; box-sizing: border-box; width: 100%; }
+        .check-row:hover { background: #2b2d31; color: #fff; }
+        .check-row input { width: 18px; height: 18px; accent-color: #39d353; margin: 0; cursor: pointer; flex-shrink: 0; }
+        
+        .quick-sel-btn { background: #2b2d31; border: 1px solid #444; color: #fff; font-family: 'Almendra'; font-size: 12px; padding: 6px 12px; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
+        .quick-sel-btn:hover { border-color: #ff3131; color: #ff3131; }
+
+        .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center; }
+        .modal-box { background:#313338; border: 1px solid #444; padding: 25px; border-radius: 8px; width: 440px; text-align: center; color: #dbdee1; box-shadow: 0 8px 24px rgba(0,0,0,0.7); }
+        .modal-box select, .modal-box input { width: 100%; padding: 10px; background: #1e1f22; border: 1px solid #111; color: #fff; font-family: 'Almendra'; border-radius: 4px; font-size: 16px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
 
         .hidden { display: none !important; }
     </style>
@@ -123,23 +129,26 @@
                 <option value="read">Berechtigung: Nur Lesen (Infokanal)</option>
             </select>
 
-            <div style="margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 5px; justify-content: center;">
+            <div style="margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;">
                 <button type="button" class="quick-sel-btn" onclick="selectGroupMembers('all')">Alle Spieler</button>
                 <button type="button" class="quick-sel-btn" onclick="selectGroupMembers('bulls')">Alle Dark Bulls</button>
                 <button type="button" class="quick-sel-btn" onclick="selectGroupMembers('kd')">Bulls & Division</button>
             </div>
 
             <div class="user-scroll-list" id="groupUserChecklist"></div>
-            <button class="send-btn" style="width:100%; padding:12px;" onclick="createGroupFromModal()">Gruppe versiegeln</button>
+            <button class="send-btn" style="width:100%; padding:12px; font-weight:bold;" onclick="createGroupFromModal()">Gruppe versiegeln</button>
             <p onclick="closeModals()" style="color:#949ba4; cursor:pointer; margin-top:12px; margin-bottom:0;">Abbrechen</p>
         </div>
     </div>
 
     <div id="modalManage" class="modal-overlay">
         <div class="modal-box">
-            <h2 id="manageModalTitle">Mitglieder verwalten</h2>
+            <h2 id="manageModalTitle">Truppmitglieder anpassen</h2>
+            <p style="font-size:14px; color:#aaa; margin-top:-8px; margin-bottom:15px;">Setze Haken um Gefährten hinzuzufügen oder zu entfernen.</p>
+            
             <div class="user-scroll-list" id="manageUserChecklist"></div>
-            <button class="send-btn" style="width:100%; padding:12px;" onclick="saveGroupMembersManagement()">Änderungen speichern</button>
+            
+            <button class="send-btn" style="width:100%; padding:12px; font-weight:bold;" onclick="saveGroupMembersManagement()">Änderungen speichern</button>
             <p onclick="closeModals()" style="color:#949ba4; cursor:pointer; margin-top:12px; margin-bottom:0;">Abbrechen</p>
         </div>
     </div>
@@ -172,12 +181,20 @@
         setInterval(updateLoop, 4000); updateLoop();
     }
 
+    // LISTE IM ERSTELLUNGSMODAL AUFBAUEN (A-Z sortiert, inklusive aller Rollen/Gäste!)
     function buildModalLists() {
-        const checkList = document.getElementById("groupUserChecklist"); checkList.innerHTML = "";
-        [...globalUserList].sort((a,b) => a.name.localeCompare(b.name)).forEach(u => {
+        const checkList = document.getElementById("groupUserChecklist"); 
+        if(!checkList) return;
+        checkList.innerHTML = "";
+        
+        [...globalUserList].sort((a,b) => a.name.localeCompare(b.name, 'de', {sensitivity: 'base'})).forEach(u => {
             if(u.name !== MY_NAME) {
                 var roleClean = u.role ? u.role.trim().toLowerCase() : "mitglied";
-                checkList.innerHTML += `<label class="check-row"><input type="checkbox" name="groupMembers" value="${u.name}" data-role="${roleClean}"><span>${u.name} <span style="color:#777; font-size:13px;">(${u.role})</span></span></label>`;
+                checkList.innerHTML += `
+                    <label class="check-row">
+                        <input type="checkbox" name="groupMembers" value="${u.name}" data-role="${roleClean}">
+                        <span>${u.name} <span style="color:#777; font-size:13px; font-style:italic;">(${u.role})</span></span>
+                    </label>`;
             }
         });
     }
@@ -187,8 +204,8 @@
         boxes.forEach(b => {
             var r = b.getAttribute("data-role");
             if(type === 'all') b.checked = true;
-            else if(type === 'bulls') b.checked = (r !== 'kampfdivision' && !r.includes("gast"));
-            else if(type === 'kd') b.checked = (!r.includes("gast"));
+            else if(type === 'bulls') b.checked = (r !== 'kampfdivision' && !r.includes("gast") && !r.includes("gäste"));
+            else if(type === 'kd') b.checked = (!r.includes("gast") && !r.includes("gäste"));
         });
     }
 
@@ -221,7 +238,7 @@
                 container.innerHTML += `
                     <div class="channel-row-wrapper ${act}">
                         <button class="channel-btn" onclick="switchChannel('group', '# ' + '${g.name}', '${g.name}', 'text', '${g.dcLink}')"># ${g.name.toLowerCase()}</button>
-                        ${IS_MODERATOR ? `<span class="gear-icon" onclick="openGroupManagementModal('${g.name}')">⚙️</span>` : ''}
+                        ${IS_MODERATOR ? `<span class="gear-icon" onclick="openGroupManagementModal('${g.name}')" title="Gruppe bearbeiten">⚙️</span>` : ''}
                     </div>
                     <div class="channel-row-wrapper"><button class="channel-btn" onclick="switchChannel('group', '🔊 ' + '${g.name}', '${g.name}', 'voice', '${g.dcLink}')">🔊 ${g.name.toLowerCase()}</button></div>`;
             });
@@ -306,10 +323,68 @@
         updateLoop();
     }
 
-    function renderRightSidebar() { const container = document.getElementById("rightRosterContainer"); container.innerHTML = ""; const onlineList = chatDataCache.onlineUsers || []; if (currentServer === 'group' && currentTarget) { const activeGroup = (chatDataCache.groups || []).find(x => x.name === currentTarget); if (!activeGroup) return; let onTrupp = [], offTrupp = []; (activeGroup.members || []).sort().forEach(m => { if (onlineList.includes(m)) onTrupp.push(m); else offTrupp.push(m); }); let html = `<div class="member-section"><div class="member-group-title">Im Trupp (Online) — ${onTrupp.length}</div>`; onTrupp.forEach(m => { html += `<div class="user-row ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${m}')"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; }); html += `</div><div class="member-section"><div class="member-group-title">Im Trupp (Offline) — ${offTrupp.length}</div>`; offTrupp.forEach(m => { html += `<div class="user-row offline ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${m}')"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; }); container.innerHTML = html + "</div>"; } else { let allianzOnline = [], allianzOffline = []; [...globalUserList].sort((a,b)=>a.name.localeCompare(b.name)).forEach(u => { if (onlineList.includes(u.name)) allianzOnline.push(u.name); else allianzOffline.push(u.name); }); let html = `<div class="member-section"><div class="member-group-title">Online im HQ — ${allianzOnline.length}</div>`; allianzOnline.forEach(u => { html += `<div class="user-row ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${u}')"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; }); html += `</div><div class="member-section"><div class="member-group-title">Offline — ${allianzOffline.length}</div>`; allianzOffline.forEach(u => { html += `<div class="user-row offline ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${u}')"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; }); container.innerHTML = html + "</div>"; } }
+    function renderRightSidebar() { 
+        const container = document.getElementById("rightRosterContainer"); container.innerHTML = ""; 
+        const onlineList = chatDataCache.onlineUsers || []; 
+        if (currentServer === 'group' && currentTarget) { 
+            const activeGroup = (chatDataCache.groups || []).find(x => x.name === currentTarget); 
+            if (!activeGroup) return; 
+            let onTrupp = [], offTrupp = []; 
+            (activeGroup.members || []).sort().forEach(m => { if (onlineList.includes(m)) onTrupp.push(m); else offTrupp.push(m); }); 
+            let html = `<div class="member-section"><div class="member-group-title">Im Trupp (Online) — ${onTrupp.length}</div>`; 
+            onTrupp.forEach(m => { html += `<div class="user-row ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${m}')"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; }); 
+            html += `</div><div class="member-section"><div class="member-group-title">Im Trupp (Offline) — ${offTrupp.length}</div>`; 
+            offTrupp.forEach(m => { html += `<div class="user-row offline ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${m}')"><div class="avatar-stub">${m.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${m}</span></div>`; }); 
+            container.innerHTML = html + "</div>"; 
+        } else { 
+            let allianzOnline = [], allianzOffline = []; 
+            [...globalUserList].sort((a,b)=>a.name.localeCompare(b.name)).forEach(u => { if (onlineList.includes(u.name)) allianzOnline.push(u.name); else allianzOffline.push(u.name); }); 
+            let html = `<div class="member-section"><div class="member-group-title">Online im HQ — ${allianzOnline.length}</div>`; 
+            allianzOnline.forEach(u => { html += `<div class="user-row ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${u}')"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; }); 
+            html += `</div><div class="member-section"><div class="member-group-title">Offline — ${allianzOffline.length}</div>`; 
+            allianzOffline.forEach(u => { html += `<div class="user-row offline ${IS_MODERATOR?'mod-clickable':''}" onclick="openTimeoutManager('${u}')"><div class="avatar-stub">${u.charAt(0).toUpperCase()}<div class="status-dot"></div></div><span>${u}</span></div>`; }); 
+            container.innerHTML = html + "</div>"; 
+        } 
+    }
+
+    // ZAHNRAD-MODAL REPARIERT (Lust jetzt alle User A-Z auf und hakt die aktiven Trupp-Member an!)
+    function openGroupManagementModal(groupName) {
+        if(!chatDataCache.groups) return;
+        const activeGroup = chatDataCache.groups.find(x => x.name === groupName);
+        if(!activeGroup) return;
+        
+        document.getElementById("manageModalTitle").innerText = `Trupp: ${groupName}`;
+        const container = document.getElementById("manageUserChecklist");
+        if(!container) return;
+        container.innerHTML = "";
+        
+        // Zieht ausnahmslos jeden Spieler aus der Hauptliste (Allianz + alle Gäste!)
+        [...globalUserList].sort((a,b)=>a.name.localeCompare(b.name)).forEach(u => {
+            if(u.name !== MY_NAME) {
+                let isChecked = activeGroup.members.includes(u.name) ? 'checked' : '';
+                container.innerHTML += `
+                    <label class="check-row">
+                        <input type="checkbox" name="manageBox" value="${u.name}" ${isChecked}>
+                        <span>${u.name} <span style="color:#777; font-size:13px; font-style:italic;">(${u.role})</span></span>
+                    </label>`;
+            }
+        });
+        document.getElementById("modalManage").setAttribute("data-active-group", groupName);
+        document.getElementById("modalManage").style.display = "flex";
+    }
+
+    async function saveGroupMembersManagement() {
+        const groupName = document.getElementById("modalManage").getAttribute("data-active-group");
+        const boxes = document.querySelectorAll('input[name="manageBox"]:checked');
+        let members = [MY_NAME]; boxes.forEach(b => members.push(b.value));
+
+        closeModals();
+        await fetch(API, { method: "POST", body: JSON.stringify({ action: "manageGroupMembers", groupName: groupName, members: members }) });
+        alert("Truppstärke erfolgreich angepasst!");
+        updateLoop();
+    }
+
     function triggerImageUpload() { let url = prompt("Füge hier die URL deines Schlachtplans/Bildes ein (.jpg, .png):"); if(url) { document.getElementById("msgInput").value = url; sendMessage(); } }
-    function openGroupManagementModal(groupName) { const activeGroup = chatDataCache.groups.find(x => x.name === groupName); if(!activeGroup) return; document.getElementById("manageModalTitle").innerText = `Trupp: ${groupName}`; const container = document.getElementById("manageUserChecklist"); container.innerHTML = ""; [...globalUserList].sort((a,b)=>a.name.localeCompare(b.name)).forEach(u => { if(u.name !== MY_NAME) { let isChecked = activeGroup.members.includes(u.name) ? 'checked' : ''; container.innerHTML += `<label class="check-row"><input type="checkbox" name="manageBox" value="${u.name}" ${isChecked}><span>${u.name}</span></label>`; } }); document.getElementById("modalManage").setAttribute("data-active-group", groupName); document.getElementById("modalManage").style.display = "flex"; }
-    async function saveGroupMembersManagement() { const groupName = document.getElementById("modalManage").getAttribute("data-active-group"); const boxes = document.querySelectorAll('input[name="manageBox"]:checked'); let members = [MY_NAME]; boxes.forEach(b => members.push(b.value)); closeModals(); await fetch(API, { method: "POST", body: JSON.stringify({ action: "manageGroupMembers", groupName: groupName, members: members }) }); alert("Truppstärke erfolgreich angepasst!"); updateLoop(); }
     function checkNewMessagesForPush() { let currentMessages = []; if (currentServer === 'pn' && currentTarget) currentMessages = chatDataCache.pns[currentTarget] || []; else if (currentServer === 'group' && currentTarget) { const g = (chatDataCache.groups || []).find(x => x.name === currentTarget); if(g) currentMessages = g.messages || []; } if(lastMessageCount > 0 && currentMessages.length > lastMessageCount) { let lastMsg = currentMessages[currentMessages.length - 1]; if(lastMsg[1] !== MY_NAME && lastMsg[3]) { triggerDesktopPush(lastMsg[1], lastMsg[3]); try { pingSound.play(); } catch(e){} } } lastMessageCount = currentMessages.length; }
     function triggerDesktopPush(s, t) { if ("Notification" in window && Notification.permission === "granted") { new Notification(`Funk von ${s}`, { body: t }); } }
     function handleTyping() { fetch(API, { method: "POST", body: JSON.stringify({ action: "setTyping", user: MY_NAME, isTyping: true }) }); clearTimeout(typingTimeout); typingTimeout = setTimeout(() => { fetch(API, { method: "POST", body: JSON.stringify({ action: "setTyping", user: MY_NAME, isTyping: false }) }); }, 3000); }
