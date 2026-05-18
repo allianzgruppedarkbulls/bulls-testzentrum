@@ -99,7 +99,7 @@
             </table>
         </div>
 
-        <div class="action-tray">
+     <div class="action-tray">
             <button id="editBtn" class="action-btn" disabled onclick="openEditMask()">Akte bearbeiten 🛠></button>
         </div>
     </div>
@@ -125,9 +125,19 @@
                     <label>Registrierungs-Datum</label>
                     <input type="text" id="formRegDatum" placeholder="z.B. 14.05.2024">
                 </div>
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Grundstatus (Anzeige nach außen im Chat)</label>
+                    <select id="formRolle">
+                        <option value="Anwärter">Anwärter (Neu registriert / Postkasten-Modus)</option>
+                        <option value="Gast">Gast (Fremde Spieler / Verbündete)</option>
+                        <option value="Mitglied">Mitglied (Treuer Bulle)</option>
+                        <option value="Kampfdivision">Kampfdivision (Front-Kämpfer)</option>
+                        <option value="Offizier">Offizier (Führungsebene)</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="tasks-section-title">Aufgabenbereiche & Dienst-Freigaben</div>
+            <div class="tasks-section-title">Aufgabenbereiche & Dienst-Freigaben (Interne Rechte)</div>
             <div class="tasks-grid">
                 <label class="task-check-row">
                     <input type="checkbox" name="adminTasks" value="Buchhalter">
