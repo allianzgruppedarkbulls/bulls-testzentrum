@@ -19,15 +19,13 @@
         .logout-btn { background: #ff0000; color: #fff; border: none; padding: 8px 15px; font-family: 'Almendra'; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
 
         /* MULTI-PANEL GROUP LAYOUT */
-        .chat-container { flex: 1; display: flex; max-width: 1400px; width: 100%; margin: 0 auto; background: rgba(10, 10, 10, 0.95); border-left: 1px solid #222; border-right: 1px solid #222; overflow: hidden; }
+        .chat-container { flex: 1; display: flex; max-width: 1400px; width: 100%; margin: 0 guarded auto; background: rgba(10, 10, 10, 0.95); border-left: 1px solid #222; border-right: 1px solid #222; overflow: hidden; }
         
-        /* LINKER GRUPPEN-VERTEILER Mit (+) */
+        /* LINKER GRUPPEN-VERTEILER */
         .side-bar { width: 320px; background: #0b0b0c; border-right: 1px solid #222; display: flex; flex-direction: column; }
         .bar-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #222; background: #080809; }
         .bar-title { font-size: 18px; font-weight: bold; color: #ff3131; letter-spacing: 1px; }
-        
-        /* Das neue Gruppen-Plus */
-        .add-group-btn { background: #ff3131; color: black; border: none; width: 32px; height: 32px; border-radius: 5px; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: sans-serif; box-shadow: 0 0 10px rgba(255, 49, 49, 0.4); transition: 0.2s; }
+        .add-group-btn { background: #ff3131; color: black; border: none; width: 32px; height: 32px; border-radius: 5px; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: sans-serif; box-shadow: 0 0 10px rgba(255, 49, 49, 0.4); }
         .add-group-btn:hover { transform: scale(1.1); box-shadow: 0 0 15px red; }
 
         .chat-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
@@ -48,7 +46,7 @@
         .input-bar input:focus { outline: none; box-shadow: 0 0 10px rgba(255, 49, 49, 0.3); }
         .send-btn { background: #ff8c00; color: #000; border: none; padding: 0 35px; font-family: 'Almendra'; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; box-shadow: 0 0 15px rgba(255, 140, 0, 0.3); }
 
-        /* STREAM MESSAGES */
+        /* MESSAGE LOGIC */
         .msg-line { display: flex; flex-direction: column; background: #111; border-left: 3px solid #ff3131; padding: 10px 15px; border-radius: 0 6px 6px 0; max-width: 85%; align-self: flex-start; }
         .msg-line.me { border-left: none; border-right: 3px solid #39d353; border-radius: 6px 0 0 6px; background: #161a16; align-self: flex-end; }
         .msg-meta { font-size: 13px; margin-bottom: 4px; display: flex; gap: 10px; }
@@ -57,27 +55,22 @@
         .meta-time { color: #666; }
         .msg-text { font-family: sans-serif; font-size: 15px; line-height: 1.4; color: #eee; word-break: break-word; }
 
-        /* GRUPPEN ERSTELLEN MODAL (POPUP-FENSTER) */
+        /* CREATION MODAL */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 5000; }
         .modal-content { background: #0f0f11; border: 2px solid #ff3131; padding: 30px; border-radius: 12px; width: 400px; max-width: 90vw; box-shadow: 0 0 40px rgba(255,0,0,0.4); }
         .modal-content h2 { color: #ff3131; margin-top: 0; font-size: 24px; text-transform: uppercase; text-align: center; }
         .modal-input { width: 100%; background: #151515; border: 1px solid #333; padding: 12px; color: #fff; border-radius: 6px; font-family: sans-serif; font-size: 15px; margin-bottom: 15px; box-sizing: border-box; }
-        .modal-input:focus { border-color: #ff3131; outline: none; }
         
-        /* User-Liste mit Haken */
         .user-checkbox-list { max-height: 180px; overflow-y: auto; background: #151515; border: 1px solid #222; padding: 10px; border-radius: 6px; margin-bottom: 20px; }
         .checkbox-item { display: flex; align-items: center; gap: 10px; padding: 6px 5px; font-family: sans-serif; font-size: 14px; color: #ccc; cursor: pointer; }
-        .checkbox-item:hover { background: #222; color: #fff; }
-        .checkbox-item input { accent-color: #ff3131; cursor: pointer; transform: scale(1.2); }
+        .checkbox-item input { accent-color: #ff3131; transform: scale(1.2); }
 
-        /* BUTTONS IM POPUP */
         .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
         .modal-btn { padding: 10px 20px; font-family: 'Almendra'; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; text-transform: uppercase; border: none; }
         .modal-btn.cancel { background: #333; color: #aaa; }
-        .modal-btn.confirm { background: #ff3131; color: #fff; box-shadow: 0 0 15px rgba(255,49,49,0.4); }
+        .modal-btn.confirm { background: #ff3131; color: #fff; }
         
-        /* DER NEUE BLITZ-KNOPF ZUM ABWÄHLEN */
-        .deselect-btn { background: #39d353; color: #000; font-family: 'Almendra'; font-weight: bold; padding: 6px 12px; font-size: 13px; border-radius: 4px; border: none; cursor: pointer; text-transform: uppercase; width: 100%; margin-bottom: 8px; text-align: center; transition: 0.2s; }
+        .deselect-btn { background: #39d353; color: #000; font-family: 'Almendra'; font-weight: bold; padding: 8px 12px; font-size: 13px; border-radius: 4px; border: none; cursor: pointer; text-transform: uppercase; width: 100%; margin-bottom: 10px; text-align: center; }
         .deselect-btn:hover { background: #2fb145; }
 
         .side-bar::-webkit-scrollbar, .stream-area::-webkit-scrollbar, .user-checkbox-list::-webkit-scrollbar { width: 6px; }
@@ -89,9 +82,9 @@
     <div class="funk-nav">
         <div class="nav-links">
             <button class="nav-link-btn" onclick="window.location.href='dashboard.html'">🏠 HQ</button>
-            <button class="nav-link-btn" onclick="window.location.href='Chat_Alli.html'">📢 Allianz</button>
             <button class="nav-link-btn" onclick="window.location.href='Chat_PN.html'">💬 PNs</button>
             <button class="nav-link-btn active">⚔️ Gruppen</button>
+            <button class="nav-link-btn" onclick="window.location.href='Chat_Support.html'">🚨 Support</button>
         </div>
         <div style="color: #ff3131; font-size: 18px;" id="userDisplay">Bulls Taktik-Funk...</div>
         <button class="logout-btn" onclick="logoutFunk()">X</button>
@@ -104,13 +97,12 @@
                 <div class="bar-title">Einsatzgruppen</div>
                 <button class="add-group-btn" onclick="openCreateGroupModal()">+</button>
             </div>
-            <div class="chat-list" id="groupVerteiler">
-                </div>
+            <div class="chat-list" id="groupVerteiler"></div>
         </div>
 
         <div class="chat-main">
             <div class="stream-area" id="groupStreamArea">
-                <div style="text-align:center; color:#ff8c00; font-style:italic; padding-top:50px;">Wähle links eine taktische Division aus oder klicke das (+), um eine neue Gruppe zu gründen. ⚡</div>
+                <div style="text-align:center; color:#ff8c00; font-style:italic; padding-top:50px;">Wähle links eine Division aus oder klicke (+), um eine neue Gruppe zu gründen. ⚡</div>
             </div>
             
             <div class="typing-box" id="typingIndicator"></div>
@@ -130,8 +122,7 @@
             
             <button class="deselect-btn" onclick="deselectAllUsers()">⚡ Alle Haken abwählen</button>
 
-            <div class="user-checkbox-list" id="modalUserCheckboxContainer">
-                </div>
+            <div class="user-checkbox-list" id="modalUserCheckboxContainer"></div>
 
             <div class="modal-actions">
                 <button class="modal-btn cancel" onclick="closeCreateGroupModal()">Abbrechen</button>
@@ -156,16 +147,14 @@
             } catch(e) { console.log("Fehler beim Holen der User-Datenbank."); }
         }
 
-        // MODAL MANAGEMENT
         function openCreateGroupModal() {
             document.getElementById("newGroupNameInput").value = "";
             const container = document.getElementById("modalUserCheckboxContainer");
             const myUser = localStorage.getItem('bulls_user');
             container.innerHTML = "";
 
-            // Baue die Checkbox-Liste aller Spieler auf (Standardmäßig sind alle angewählt)
             allianzUsersList.forEach(name => {
-                if(name === myUser) return; // Dich selbst musst du nicht anwählen
+                if(name === myUser) return;
                 container.innerHTML += `
                     <label class="checkbox-item">
                         <input type="checkbox" value="${name}" checked class="group-user-checkbox">
@@ -181,27 +170,25 @@
             document.getElementById("createGroupModal").style.display = "none";
         }
 
-        // KORREKTUR: DIE ABSOLUTE BLITZ-ENTFERNUNG DER HAKEN
         function deselectAllUsers() {
             const checkboxes = document.querySelectorAll(".group-user-checkbox");
             checkboxes.forEach(box => box.checked = false);
         }
 
-        // GRUPPE ABSCHICKEN
         async function submitNewGroupToServer() {
             const nameInput = document.getElementById("newGroupNameInput").value.trim();
             if(!nameInput) { alert("Bitte gib einen Gruppennamen ein!"); return; }
 
             const myUser = localStorage.getItem('bulls_user');
             const checkboxes = document.querySelectorAll(".group-user-checkbox");
-            let selectedMembers = [myUser]; // Du bist als Gründer automatisch dabei
+            let selectedMembers = [myUser];
 
             checkboxes.forEach(box => {
                 if(box.checked) selectedMembers.push(box.value);
             });
 
             const payload = {
-                action: "createNewGroupChannel",
+                action: "createGroup",
                 creator: myUser,
                 groupName: nameInput,
                 members: selectedMembers
@@ -215,10 +202,7 @@
                 const result = await res.json();
                 
                 closeCreateGroupModal();
-                // Setze das Ziel sofort auf die neu generierte Gruppen-ID
-                if(result.groupId) {
-                    currentChatTarget = result.groupId;
-                }
+                if(result.groupId) currentChatTarget = result.groupId;
                 updateMuteStatusAndFetch();
             } catch(e) {
                 alert("Fehler beim Erstellen der Gruppe.");
@@ -232,17 +216,14 @@
             updateMuteStatusAndFetch();
         }
 
-        // VERARBEITET DIE LIVE-DATEN VOM SERVER
         function processChatData(data) {
             const myUser = localStorage.getItem('bulls_user');
             const verteiler = document.getElementById("groupVerteiler");
             const stream = document.getElementById("groupStreamArea");
 
-            // --- TEIL A: DIE LINKER SEITE (ALLE GRUPPEN IN DENEN ICH MITGLIED BIN) ---
             let verteilerHTML = "";
             if (data.groups && data.groups.length > 0) {
                 data.groups.forEach(group => {
-                    // Prüfe, ob du im Mitglieds-Array dieser Gruppe stehst
                     if (group.members.includes(myUser)) {
                         let isActive = currentChatTarget === group.id ? "active" : "";
                         verteilerHTML += `
@@ -254,15 +235,13 @@
                     }
                 });
             }
-            verteiler.innerHTML = verteilerHTML || `<div style="padding:20px; color:#555; text-align:center; font-size:14px; font-family:sans-serif;">Du bist noch in keiner taktischen Division eingetragen.</div>`;
+            verteiler.innerHTML = verteilerHTML || `<div style="padding:20px; color:#555; text-align:center; font-size:14px; font-family:sans-serif;">Du bist noch in keiner taktischen Division.</div>`;
 
-            // --- TEIL B: STREAM FILTERN FÜR DIE AKTIVE GRUPPE ---
             if (currentChatTarget && currentChatTarget !== "global") {
                 document.getElementById('messageInput').disabled = false;
                 document.getElementById('sendButton').disabled = false;
 
                 let htmlHTML = "";
-                // Filter alle Nachrichten, die zu exakt dieser Gruppen-ID gehören
                 let filteredMessages = data.groupMessages ? data.groupMessages.filter(msg => msg.groupId === currentChatTarget) : [];
 
                 if (filteredMessages.length > 0) {
@@ -283,22 +262,17 @@
                     stream.innerHTML = htmlHTML;
                     if (!scrollCheck) stream.scrollTop = stream.scrollHeight;
                 } else {
-                    stream.innerHTML = `<div style="text-align:center; color:#ff8c00; padding-top:50px; font-style:italic;">Abgesicherter Taktik-Funkkanal. Sende eine Nachricht an deine Division! ⚡</div>`;
+                    stream.innerHTML = `<div style="text-align:center; color:#ff8c00; padding-top:50px; font-style:italic;">Abgesicherter Taktik-Funkkanal. Schreib deiner Division! ⚡</div>`;
                 }
             }
 
-            // --- TEIL C: GRUPPEN-TYPING INDICATOR ---
             const typingIndicator = document.getElementById("typingIndicator");
             if (data.typing && data.typing.groups && data.typing.groups[currentChatTarget] && data.typing.groups[currentChatTarget].length > 0) {
                 let writers = data.typing.groups[currentChatTarget].filter(u => u !== myUser);
                 if (writers.length > 0) {
                     typingIndicator.innerText = `${writers.join(", ")} tippt im Gruppenfunk... ✏️`;
-                } else {
-                    typingIndicator.innerText = "";
-                }
-            } else {
-                typingIndicator.innerText = "";
-            }
+                } else { typingIndicator.innerText = ""; }
+            } else { typingIndicator.innerText = ""; }
         }
     </script>
 </body>
