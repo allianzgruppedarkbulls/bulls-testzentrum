@@ -399,33 +399,50 @@
             });
         }
 
-        // SENDE FUNKTION AN GOOGLE-BACKEND (1:1 Kompatibel)
-        async function sendGroupMessage() {
-            const input = document.getElementById("groupMessageInput");
-            const msg = input.value.trim();
-            if(!msg || !currentChannelId) return;
+       // SENDE FUNKTION AN GOOGLE-BACKEND & DISCORD VIA WEBHOOK
+async function sendGroupMessage() {
+    const input = document.getElementById("groupMessageInput");
+    const msg = input.value.trim();
+    if(!msg || !currentChannelId) return;
 
-            // Lokales schnelles Feedback
-            const stream = document.getElementById("groupStreamArea");
-            let chan = channelsDatabase.find(c => c.id === currentChannelId);
-            let processedMsg = (chan && !chan.imagesAllowed) ? cleanFrogCodes(msg) : parseFrogEmojis(msg);
+    // Lokales schnelles Feedback im Browser-Chat
+    const stream = document.getElementById("groupStreamArea");
+    let chan = channelsDatabase.find(c => c.id === currentChannelId);
+    let processedMsg = (chan && !chan.imagesAllowed) ? cleanFrogCodes(msg) : parseFrogEmojis(msg);
 
-            stream.innerHTML += `
-                <div class="msg-line me">
-                    <div class="msg-meta"><span class="meta-user">${myName}</span><span class="meta-time">gesendet...</span></div>
-                    <div class="msg-text">${processedMsg}</div>
-                </div>`;
-            stream.scrollTop = stream.scrollHeight;
-            input.value = "";
+    stream.innerHTML += `
+        <div class="msg-line me">
+            <div class="msg-meta"><span class="meta-user">${myName}</span><span class="meta-time">gesendet...</span></div>
+            <div class="msg-text">${processedMsg}</div>
+        </div>`;
+    stream.scrollTop = stream.scrollHeight;
+    input.value = "";
 
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: "sendChat", absender: myName, kanalID: currentChannelId, nachricht: msg })
-                });
-            } catch(e) { console.error("Google-Upload Error"); }
-            loadChatHistory();
-        }
+    // 1. Abfahrt zum Google-Sheet Backend
+    try {
+        await fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "sendChat", absender: myName, kanalID: currentChannelId, nachricht: msg })
+        });
+    } catch(e) { console.error("Google-Upload Error"); }
+
+    // 2. ABFAHRT ZU DISCORD (Wenn ein gültiger Webhook-Link im Feld steht)
+    if (chan && chan.dc && (chan.dc.includes("discord.com/api/webhooks") || chan.dc.includes("discordapp.com/api/webhooks"))) {
+        try {
+            await fetch(chan.dc, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: `${myName} (Bulls Funk)`,
+                    avatar_url: "https://openmoji.org/data/color/svg/1F438.svg", // Frosch als Avatar bei Discord
+                    content: msg
+                })
+            });
+        } catch(e) { console.error("Discord-Webhook Error. Link evtl. kein echter Webhook?"); }
+    }
+
+    loadChatHistory();
+}
 
         // MODAL LOGIKEN & KANAL ERSTELLUNG
         function openCreateModal() {
