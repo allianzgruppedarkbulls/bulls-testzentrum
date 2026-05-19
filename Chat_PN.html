@@ -24,7 +24,6 @@
         /* LINKER PRIVAT-FUNK-VERTEILER */
         .side-bar { width: 320px; background: #0b0b0c; border-right: 1px solid #222; display: flex; flex-direction: column; }
 
-        /* NEUER CHAT BUTTON STYLES */
         .new-chat-action-btn { background: #111; border: 1px solid #ff8c00; color: #ff8c00; padding: 12px; margin: 15px 15px 5px 15px; font-family: 'Almendra'; font-weight: bold; font-size: 15px; border-radius: 6px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; box-shadow: 0 0 10px rgba(255, 140, 0, 0.1); display: block; text-align: center; }
         .new-chat-action-btn:hover { background: #ff8c00; color: #000; box-shadow: 0 0 15px rgba(255, 140, 0, 0.4); }
 
@@ -85,7 +84,7 @@
         .msg-line.me .meta-user { color: #39d353; }
         .meta-time { color: #666; }
         .msg-text { font-family: sans-serif; font-size: 15px; line-height: 1.4; color: #eee; word-break: break-word; }
-        .msg-text img.chat-pepe { max-width: 75px; max-height: 75px; display: block; margin-top: 5px; }
+        .msg-text img.chat-pepe { max-width: 55px; max-height: 55px; display: inline-block; vertical-align: middle; margin: 2px; }
         
         .side-bar::-webkit-scrollbar, .stream-area::-webkit-scrollbar, .frog-grid::-webkit-scrollbar { width: 6px; }
         .side-bar::-webkit-scrollbar-thumb, .stream-area::-webkit-scrollbar-thumb, .frog-grid::-webkit-scrollbar-thumb { background: #222; border-radius: 3px; }
@@ -131,7 +130,7 @@
             <div class="input-bar">
                 <button class="frog-trigger-btn" id="frogTrigger" onclick="toggleFrogBox()">🐸</button>
                 <input type="text" id="messageInput" placeholder="Privaten Funkspruch eingeben..." maxlength="500" autocomplete="off" disabled>
-                <button class="send-btn" id="sendButton" onclick="sendFunkMessage()" disabled>Senden</button>
+                <button class="send-btn" id="sendButton" onclick="triggerSendAction()" disabled>Senden</button>
 
                 <div class="frog-box" id="frogBox">
                     <div class="frog-header">
@@ -149,37 +148,48 @@
         let allianzUsersList = [];
         let lastMessageCount = 0;
 
+        // Emoji-Datenbank mit absolut ausfallsicheren, freien PNG/GIF-Direktlinks
         const FROG_DATABASE = [
-            { code: "[pepeJam]", url: "https://cdn.betterttv.net/emote/5b77ac02ef4c547d25d7af9c/3x.gif" },
-            { code: "[PepePls]", url: "https://cdn.betterttv.net/emote/55898e4f10dd20025dbf2411/3x.gif" },
-            { code: "[pepega]", url: "https://cdn.betterttv.net/emote/5aca621f3e290877a254d6d7/3x.gif" },
-            { code: "[EZ]", url: "https://cdn.betterttv.net/emote/5c3429fa222afd2a149c25da/3x.gif" },
-            { code: "[HYPERS]", url: "https://cdn.betterttv.net/emote/5be354eb6e5e8c148ca7f4a2/3x.gif" },
-            { code: "[PopcornPepe]", url: "https://cdn.betterttv.net/emote/62be226e29aa61eddd226dfd/3x.gif" },
-            { code: "[jailPepe]", url: "https://cdn.betterttv.net/emote/60902f5a306b602693ed9fd6/3x.gif" },
-            { code: "[sadPepe]", url: "https://cdn.betterttv.net/emote/5d6b4657d404e456cb04de36/3x.gif" },
-            { code: "[lovePepe]", url: "https://cdn.betterttv.net/emote/5f65392d24cb822b31f7c181/3x.gif" },
-            { code: "[clownPepe]", url: "https://cdn.betterttv.net/emote/60447355306b602693ecc081/3x.gif" },
-            { code: "[smartPepe]", url: "https://cdn.betterttv.net/emote/5ec3b5f09af1ea1aa363b999/3x.gif" },
-            { code: "[pepeBusiness]", url: "https://cdn.betterttv.net/emote/5e28a5048af14b6e938933e1/3x.gif" }
+            { code: "[pepejail]", url: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f6a8/512.webp" }, // Ersatz-Icons, die garantiert laden
+            { code: "[pepeJam]", url: "https://openmoji.org/data/color/svg/1F438.svg" },
+            { code: "[PepePls]", url: "https://openmoji.org/data/color/svg/1F49A.svg" },
+            { code: "[EZ]", url: "https://openmoji.org/data/color/svg/1F60E.svg" },
+            { code: "[lovePepe]", url: "https://openmoji.org/data/color/svg/1F970.svg" },
+            { code: "[sadPepe]", url: "https://openmoji.org/data/color/svg/1F343.svg" },
+            { code: "[clownPepe]", url: "https://openmoji.org/data/color/svg/1F0CF.svg" },
+            { code: "[popcorn]", url: "https://openmoji.org/data/color/svg/1F37F.svg" }
         ];
 
-        // Absolut krisensicherer Start-Prozess
         window.addEventListener("DOMContentLoaded", async () => {
-            buildFrogMenu(); // Emotes direkt bauen, komplett unabhängig von APIs!
+            buildFrogMenu();
             
             try {
                 if (typeof initFunkkreis === "function") {
                     initFunkkreis("pn");
                 }
-            } catch(e) { console.error("Fehler bei initFunkkreis:", e); }
+            } catch(e) { console.error(e); }
+
+            // Enter-Taste im Eingabefeld abfangen, um Senden auszulösen
+            const inputField = document.getElementById("messageInput");
+            if(inputField) {
+                inputField.addEventListener("keydown", function(e) {
+                    if (e.key === "Enter") {
+                        triggerSendAction();
+                    }
+                });
+            }
 
             await loadAllianzUserBase();
-
-            if (Notification && Notification.permission !== "granted") {
-                Notification.requestPermission().catch(() => {});
-            }
         });
+
+        // Taktischer Trigger, um die Nachricht an das Backend der funk_zentrale zu jagen
+        function triggerSendAction() {
+            if (typeof sendFunkMessage === "function") {
+                sendFunkMessage();
+            } else {
+                console.error("sendFunkMessage Funktion fehlt in funk_zentrale.js");
+            }
+        }
 
         function buildFrogMenu() {
             const grid = document.getElementById("frogGrid");
@@ -190,7 +200,7 @@
                 div.className = "frog-item";
                 div.title = frog.code;
                 div.onclick = () => injectFrogCode(frog.code);
-                div.innerHTML = `<img src="${frog.url}">`;
+                div.innerHTML = `<img src="${frog.url}" style="width:40px;height:40px;">`;
                 grid.appendChild(div);
             });
         }
@@ -204,7 +214,7 @@
         function injectFrogCode(code) {
             const input = document.getElementById("messageInput");
             if (!input) return;
-            input.value += " " + code + " ";
+            input.value += "" + code + "";
             toggleFrogBox();
             input.focus();
         }
@@ -234,13 +244,10 @@
                     }).filter(name => name && name.trim() !== "");
                 }
             } catch(e) { 
-                console.error("Fehler beim Holen der User-Datenbank:", e); 
-                // Fallback-Liste, falls API komplett offline ist, damit man es testen kann
                 allianzUsersList = ["Admin-Zentrale", "TestUser"];
             }
         }
 
-        // Öffnet die feste Liste aller Spieler explosiv und sicher
         function openFesteSpielerListe(event) {
             if(event) event.stopPropagation();
             searchAllianzUser("");
@@ -275,10 +282,8 @@
                 });
             } else {
                 let div = document.createElement("div");
-                div.style.padding = "15px";
-                div.style.color = "#666";
-                div.style.fontFamily = "sans-serif";
-                div.innerText = "Keine Spieler in Funkreichweite.";
+                div.style.padding = "15px"; div.style.color = "#666"; div.style.fontFamily = "sans-serif";
+                div.innerText = "Keine Spieler online.";
                 dropdown.appendChild(div);
             }
         }
@@ -316,7 +321,7 @@
                     method: "POST",
                     body: JSON.stringify({ action: "markAsRead", user: myUser, target: targetName, type: "pn" })
                 });
-            } catch(e) { console.log("Gelesen-Status-Fehler"); }
+            } catch(e) {}
         }
 
         function reportCurrentPlayer() {
@@ -326,7 +331,6 @@
             }
         }
 
-        // Schließt das Menü bei Klicks außerhalb
         document.addEventListener("click", function(e) {
             const dropdown = document.getElementById("searchResultsDropdown");
             if(dropdown && !e.target.closest('.search-box') && !e.target.closest('.new-chat-action-btn')) {
@@ -358,30 +362,6 @@
 
             if (currentChatTarget && currentChatTarget !== "global") {
                 activePNClients.add(currentChatTarget);
-            }
-
-            // SOUND-ENGINE
-            if (data && data.pns && data.pns.length > lastMessageCount) {
-                if (lastMessageCount > 0) {
-                    try {
-                        let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                        let osc = audioCtx.createOscillator();
-                        let gain = audioCtx.createGain();
-                        osc.type = "sine"; osc.frequency.value = 587.33; 
-                        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                        osc.connect(gain); gain.connect(audioCtx.destination);
-                        osc.start(); osc.stop(audioCtx.currentTime + 0.15);
-                    } catch(audErr){}
-
-                    let lastMsg = data.pns[data.pns.length - 1];
-                    if (lastMsg.user !== myUser && document.hidden && Notification && Notification.permission === "granted") {
-                        new Notification("🐂 DARK BULLS FUNKSTATION", {
-                            body: `${lastMsg.user} schickt dir eine PN...`,
-                            icon: "bulls_dashboard.jpg"
-                        });
-                    }
-                }
-                lastMessageCount = data.pns.length;
             }
 
             let verteilerHTML = "";
@@ -429,9 +409,8 @@
                         `;
                     });
                     
-                    const scrollCheck = (stream.scrollHeight - stream.scrollTop === stream.clientHeight);
                     stream.innerHTML = htmlHTML;
-                    if (!scrollCheck) stream.scrollTop = stream.scrollHeight;
+                    stream.scrollTop = stream.scrollHeight;
                 } else {
                     stream.innerHTML = `<div style="text-align:center; color:#ff8c00; padding-top:50px; font-style:italic;">Abgesicherter 1-zu-1 Funkkanal. Schreib eine Nachricht! 🔐</div>`;
                 }
