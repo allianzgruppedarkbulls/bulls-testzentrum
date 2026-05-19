@@ -38,7 +38,7 @@ function initFunkkreis(type) {
     }
 }
 
-// 2. LIVE-ABRUF (MUTE CHECK + CHAT DATA)
+// 2. LIVE-ABRUF (MUTE CHECK + CHAT DATA + AUTO-READ)
 async function updateMuteStatusAndFetch() {
     const user = localStorage.getItem('bulls_user');
     try {
@@ -48,6 +48,7 @@ async function updateMuteStatusAndFetch() {
         
         const inputField = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendButton');
+        const frogBtn = document.getElementById('frogTrigger');
         
         if (muteData.muted) {
             if (inputField) {
@@ -55,19 +56,50 @@ async function updateMuteStatusAndFetch() {
                 inputField.placeholder = `FUNKSPERRE! Du bist noch für ${muteData.rest} Min. stummgeschaltet. 🔇`;
             }
             if (sendBtn) sendBtn.disabled = true;
+            if (frogBtn) frogBtn.disabled = true;
         } else {
-            if (inputField && inputField.disabled) {
-                inputField.disabled = false;
-                inputField.placeholder = "Funkspruch eingeben...";
-            }
-            if (sendBtn && sendBtn.disabled) {
-                sendBtn.disabled = false;
+            // Nur aktivieren, wenn wir im PN-Modus auch ein aktives Ziel gewählt haben (Verhindert fehlerfreies Tippen ins Leere)
+            if (activeChatType === "pn" && (currentChatTarget === "global" || !currentChatTarget)) {
+                // Wartestatus für PN-Auswahl halten
+            } else {
+                if (inputField && inputField.disabled) {
+                    inputField.disabled = false;
+                    inputField.placeholder = "Funkspruch eingeben...";
+                }
+                if (sendBtn && sendBtn.disabled) sendBtn.disabled = false;
+                if (frogBtn && frogBtn.disabled) frogBtn.disabled = false;
             }
         }
 
         // B. Chat-Daten aus der Cloud ziehen
         const chatRes = await fetch(`${CHAT_API}?action=getChatData&user=${encodeURIComponent(user)}`);
         const chatData = await chatRes.json();
+        
+        // C. INTELLIGENTES AUTO-LESEN (Löscht rote Zahlen im aktiven Chatfenster)
+        if (currentChatTarget && currentChatTarget !== "global") {
+            let contextHasUnread = false;
+            
+            if (activeChatType === "pn" && chatData.pns) {
+                contextHasUnread = chatData.pns.some(msg => msg.user === currentChatTarget && msg.target === user && msg.unread);
+            } else if (activeChatType === "gruppe" && chatData.groupMessages) {
+                contextHasUnread = chatData.groupMessages.some(msg => msg.groupId === currentChatTarget && msg.unreadUsers && msg.unreadUsers.includes(user));
+            } else if (activeChatType === "support" && chatData.supportMessages) {
+                contextHasUnread = chatData.supportMessages.some(msg => msg.unread);
+            }
+
+            // Wenn ungelesene Nachrichten im offenen Fenster sind -> Gelesen-Signal an API senden
+            if (contextHasUnread) {
+                fetch(CHAT_API, {
+                    method: "POST",
+                    body: JSON.stringify({ 
+                        action: "markAsRead", 
+                        user: user, 
+                        target: currentChatTarget, 
+                        type: activeChatType 
+                    })
+                }).catch(err => console.log("Gelesen-Status Update fehlgeschlagen"));
+            }
+        }
         
         // Verteiler an die Logik der geöffneten HTML-Seite (PN, Gruppe oder Support)
         if (typeof processChatData === "function") {
@@ -107,22 +139,35 @@ async function sendFunkMessage() {
     }
 }
 
-// 4. SCHREIB-INDIKATOR FUNKTIONEN
+// 4. SCHREIB-INDIKATOR FUNKTIONEN (TYP-SICHER)
 function triggerTypingIndicator() {
     const user = localStorage.getItem('bulls_user');
+    if (currentChatTarget === "global" || !currentChatTarget) return;
     if (typingTimeout) clearTimeout(typingTimeout);
 
-    // Signalisiere dem HQ-Server "Ich tippe..."
+    // Signalisiere dem HQ-Server "Ich tippe..." mit Kontext (PN, Gruppe oder Support)
     fetch(CHAT_API, {
         method: "POST",
-        body: JSON.stringify({ action: "setTyping", user: user, target: currentChatTarget, status: true })
+        body: JSON.stringify({ 
+            action: "setTyping", 
+            user: user, 
+            target: currentChatTarget, 
+            chatType: activeChatType, 
+            status: true 
+        })
     });
 
     // Nach 3 Sekunden Inaktivität Zustand wieder löschen
     typingTimeout = setTimeout(() => {
         fetch(CHAT_API, {
             method: "POST",
-            body: JSON.stringify({ action: "setTyping", user: user, target: currentChatTarget, status: false })
+            body: JSON.stringify({ 
+                action: "setTyping", 
+                user: user, 
+                target: currentChatTarget, 
+                chatType: activeChatType, 
+                status: false 
+            })
         });
     }, 3000);
 }
