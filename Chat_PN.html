@@ -68,11 +68,10 @@
         .send-btn { background: #ff8c00; color: #000; border: none; padding: 15px 35px; font-family: 'Almendra'; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; box-shadow: 0 0 15px rgba(255, 140, 0, 0.3); }
         .send-btn:hover { background: #e07b00; }
 
-        /* DISCORD-STYLE FROSCH BOX (ERWEITERT & SCROLLBAR) */
+        /* DISCORD-STYLE FROSCH BOX */
         .frog-box { position: absolute; bottom: 85px; right: 20px; width: 360px; height: 340px; background: #0f0f11; border: 2px solid #39d353; border-radius: 8px; display: none; flex-direction: column; box-shadow: 0 0 25px rgba(57, 211, 83, 0.4); z-index: 2000; }
         .frog-header { background: #161a16; padding: 8px 12px; font-weight: bold; color: #39d353; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
         
-        /* UMKLAPP-KATEGORIEN (TABS) */
         .frog-tabs { display: flex; background: #111; border-bottom: 1px solid #222; }
         .frog-tab-btn { flex: 1; padding: 8px 5px; font-family: 'Almendra'; font-size: 13px; background: none; border: none; color: #666; cursor: pointer; border-bottom: 2px solid transparent; text-align: center; }
         .frog-tab-btn.active { color: #39d353; border-bottom-color: #39d353; background: #161a16; font-weight: bold; }
@@ -135,7 +134,7 @@
 
             <div class="input-bar">
                 <button class="frog-trigger-btn" id="frogTrigger" onclick="toggleFrogBox()">🐸</button>
-                <input type="text" id="messageInput" placeholder="Privaten Funkspruch eingeben..." maxlength="500" autocomplete="off" disabled>
+                <input type="text" id="messageInput" name="message" placeholder="Privaten Funkspruch eingeben..." maxlength="500" autocomplete="off" disabled>
                 <button class="send-btn" id="sendButton" onclick="triggerSendAction()" disabled>Senden</button>
 
                 <div class="frog-box" id="frogBox">
@@ -158,10 +157,9 @@
     <script>
         let allianzUsersList = [];
         let lastMessageCount = 0;
-        let locallyOpenedChats = new Set(); // Hält neu geöffnete Kanäle sofort links aktiv!
+        let locallyOpenedChats = new Set(); 
         let currentTab = 'classic';
 
-        // Gigantische, nach Kategorien sortierte Emoji-Datenbank (offene SVG/PNG Quellen)
         const FROG_DATABASE = {
             classic: [
                 { code: "[pepeFrog]", url: "https://openmoji.org/data/color/svg/1F438.svg" },
@@ -169,7 +167,7 @@
                 { code: "[pepeSmile]", url: "https://openmoji.org/data/color/svg/1F642.svg" },
                 { code: "[pepeWink]", url: "https://openmoji.org/data/color/svg/1F609.svg" },
                 { code: "[pepeLove]", url: "https://openmoji.org/data/color/svg/1F970.svg" },
-                { code: "[pepeHeart]", url: "https://openmoji.org/data/color/svg/1F49A.svg" },
+                { code: "[pepeHeart]", url: "https://openmoji.org/data/color/svg/1F44D.svg" },
                 { code: "[pepeCool]", url: "https://openmoji.org/data/color/svg/1F919.svg" },
                 { code: "[pepeSalute]", url: "https://openmoji.org/data/color/svg/1F601.svg" }
             ],
@@ -207,20 +205,64 @@
             const inputField = document.getElementById("messageInput");
             if(inputField) {
                 inputField.addEventListener("keydown", function(e) {
-                    if (e.key === "Enter") triggerSendAction();
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        triggerSendAction();
+                    }
                 });
             }
 
             await loadAllianzUserBase();
         });
 
-        function triggerSendAction() {
+        // Die ultimative, ausfallsichere Sende-Funktion
+        async function triggerSendAction() {
+            const inputField = document.getElementById("messageInput");
+            if (!inputField) return;
+            
+            const msgText = inputField.value.trim();
+            if (!msgText) return;
+
+            // 1. Priorität: Nutze die originale sendFunkMessage der Zentrale
             if (typeof sendFunkMessage === "function") {
-                sendFunkMessage();
+                try {
+                    sendFunkMessage();
+                    return; // Beendet, wenn erfolgreich an Zentrale übergeben
+                } catch(err) {
+                    console.log("Fehler beim Aufruf von sendFunkMessage, starte Fallback...", err);
+                }
+            }
+
+            // 2. Priorität (FALLBACK): Direktes, autonomes Senden ans Backend falls nötig
+            const myUser = localStorage.getItem('bulls_user');
+            const apiUrl = (window.BULLS_CONFIG && window.BULLS_CONFIG.SCRIPT_URL) ? window.BULLS_CONFIG.SCRIPT_URL : "";
+            
+            if(!apiUrl || !myUser || !currentChatTarget) return;
+
+            inputField.value = ""; // Textbox sofort leeren
+
+            try {
+                await fetch(apiUrl, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "sendMessage",
+                        user: myUser,
+                        target: currentChatTarget,
+                        msg: msgText,
+                        type: "pn"
+                    })
+                });
+                
+                // Aktualisierung manuell erzwingen
+                if (typeof updateMuteStatusAndFetch === "function") {
+                    updateMuteStatusAndFetch();
+                }
+            } catch(e) {
+                console.error("Kritischer Sende-Fehler im Fallback:", e);
+                inputField.value = msgText; // Text bei Fehler wiederherstellen
             }
         }
 
-        // Baut das Menü basierend auf dem aktiven Tab
         function buildFrogMenu() {
             const grid = document.getElementById("frogGrid");
             if (!grid) return;
@@ -237,7 +279,6 @@
             });
         }
 
-        // Schaltet die Kategorien um (Klassisch / Hype / Ernst)
         function switchFrogTab(tabName) {
             currentTab = tabName;
             document.querySelectorAll('.frog-tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -262,7 +303,6 @@
         function parseFrogEmojis(text) {
             if (!text) return "";
             let cleanText = text;
-            // Durchsucht alle Kategorien nach dem passenden Code
             Object.values(FROG_DATABASE).flat().forEach(frog => {
                 const regex = new RegExp(frog.code.replace('[','\\[').replace(']','\\]'), 'g');
                 cleanText = cleanText.replace(regex, `<img class="chat-pepe" src="${frog.url}" title="${frog.code}">`);
@@ -327,7 +367,7 @@
             document.getElementById("searchResultsDropdown").style.display = "none";
             
             currentChatTarget = name;
-            locallyOpenedChats.add(name); // Zwingt den Chat, SOFORT links in der Liste sichtbar zu sein!
+            locallyOpenedChats.add(name); 
             
             const inputField = document.getElementById('messageInput');
             const sendBtn = document.getElementById('sendButton');
@@ -339,7 +379,6 @@
             
             markChannelAsRead(name);
             
-            // Lokales Force-Update der Sidebar, damit man den Chat sofort sieht!
             if(window.lastChatDataCache) {
                 processChatData(window.lastChatDataCache);
             } else {
@@ -376,13 +415,12 @@
         });
 
         function processChatData(data) {
-            window.lastChatDataCache = data; // Cache für lokales Rendering sichern
+            window.lastChatDataCache = data; 
             const myUser = localStorage.getItem('bulls_user') || "";
             const verteiler = document.getElementById("pnChatVerteiler");
             const stream = document.getElementById("pnStreamArea");
             if(!verteiler || !stream) return;
 
-            // Map, um den Zeitstempel der ALLERNEUESTEN Nachricht pro User zu tracken
             let clientLastTimestamp = {};
             let unreadCounts = {};
 
@@ -391,7 +429,6 @@
                     let partner = (msg.user === myUser) ? msg.target : msg.user;
                     if(!partner) return;
 
-                    // Zeitstempel merken für die Sortierung (Discord-Style: Neueste oben)
                     let msgTime = new Date(msg.time).getTime() || 0;
                     if(!clientLastTimestamp[partner] || msgTime > clientLastTimestamp[partner]) {
                         clientLastTimestamp[partner] = msgTime;
@@ -403,10 +440,9 @@
                 });
             }
 
-            // Lokale, frisch geöffnete Chats hinzufügen, falls sie noch keine Nachrichten haben
             locallyOpenedChats.forEach(chatPartner => {
                 if (!clientLastTimestamp[chatPartner]) {
-                    clientLastTimestamp[chatPartner] = Date.now(); // Ganz nach oben setzen, da brandneu!
+                    clientLastTimestamp[chatPartner] = Date.now(); 
                 }
             });
 
@@ -414,7 +450,6 @@
                 if (!clientLastTimestamp[currentChatTarget]) clientLastTimestamp[currentChatTarget] = Date.now();
             }
 
-            // Sortiere die Chat-Partner: Höchster Zeitstempel (Neueste) zuerst!
             let sortedClients = Object.keys(clientLastTimestamp).sort((a, b) => clientLastTimestamp[b] - clientLastTimestamp[a]);
 
             let verteilerHTML = "";
