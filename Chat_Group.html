@@ -142,57 +142,67 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="createModal">
-        <div class="dark-modal">
-            <h2>Kanal gründen</h2>
-            <input type="text" id="newChanName" placeholder="Kanal-Name (z.B. Raid-Alpha)">
-            <input type="text" id="newChanDC" placeholder="Discord-Link (Optional)">
-            
-            <label style="color:#aaa; font-size:12px; font-family:sans-serif;">Zugriffsberechtigung:</label>
-            <select id="newChanAccess" onchange="toggleAccessSelection()">
-                <option value="allBulls">Alle Dark Bulls (Keine Gäste)</option>
-                <option value="allPlayers">Alle registrierten Spieler (Inkl. Gäste)</option>
-                <option value="select">Bestimmte Spieler auswählen...</option>
-            </select>
+   <div class="modal-overlay" id="createModal">
+    <div class="dark-modal">
+        <h2>Kanal gründen</h2>
+        <input type="text" id="newChanName" placeholder="Kanal-Name (z.B. Raid-Alpha)">
+        <input type="text" id="newChanDC" placeholder="Discord-Link (Optional)">
+        
+        <label style="color:#aaa; font-size:12px; font-family:sans-serif;">Zugriffsberechtigung:</label>
+        <select id="newChanAccess" onchange="toggleAccessSelection()">
+            <option value="allBulls">Alle Dark Bulls (Keine Gäste)</option>
+            <option value="allPlayers">Alle registrierten Spieler (Inkl. Gäste)</option>
+            <option value="select">Bestimmte Spieler auswählen...</option>
+        </select>
 
-            <div id="playerSelectionZone" style="display:none; max-height:120px; overflow-y:auto; background:#000; padding:10px; border:1px solid #333; margin-bottom:12px;"></div>
+        <div id="playerSelectionZone" style="display:none; max-height:120px; overflow-y:auto; background:#000; padding:10px; border:1px solid #333; margin-bottom:12px;"></div>
 
-            <div class="checkbox-row">
-                <input type="checkbox" id="newChanImages" checked>
-                <label for="newChanImages">Bilder/Frösche im Chat erlauben</label>
-            </div>
+        <div class="checkbox-row">
+            <input type="checkbox" id="newChanImages" checked>
+            <label for="newChanImages">Bilder/Frösche im Chat erlauben</label>
+        </div>
 
-            <div class="modal-buttons">
-                <button class="modal-btn" style="background:#39d353; color:#000;" onclick="submitCreateChannel()">Erstellen</button>
-                <button class="modal-btn" style="background:#ff3131; color:#fff;" onclick="closeModal('createModal')">Abbrechen</button>
-            </div>
+        <div class="modal-buttons">
+            <button class="modal-btn" style="background:#39d353; color:#000;" onclick="submitCreateChannel()">Erstellen</button>
+            <button class="modal-btn" style="background:#ff3131; color:#fff;" onclick="closeModal('createModal')">Abbrechen</button>
         </div>
     </div>
+</div>
 
-    <div class="modal-overlay" id="editModal">
-        <div class="dark-modal">
-            <h2>Kanal verwalten</h2>
-            <input type="text" id="editChanDC" placeholder="Discord-Link aktualisieren">
-            
-            <label style="color:#aaa; font-size:12px; font-family:sans-serif;">Status / Archivierung:</label>
-            <select id="editChanStatus">
-                <option value="active">Aktiv</option>
-                <option value="archived">Archiviert (Nur Lesezugriff)</option>
-            </select>
+<div class="modal-overlay" id="editModal">
+    <div class="dark-modal">
+        <h2>Kanal verwalten</h2>
+        <input type="text" id="editChanDC" placeholder="Discord-Link aktualisieren">
+        
+        <label style="color:#aaa; font-size:12px; font-family:sans-serif;">Status / Archivierung:</label>
+        <select id="editChanStatus">
+            <option value="active">Aktiv</option>
+            <option value="archived">Archiviert (Komplett eingefroren)</option>
+        </select>
 
-            <div class="checkbox-row" style="border: 1px solid rgba(255,0,0,0.3); padding:8px; background:rgba(20,0,0,0.5); border-radius:4px;">
-                <input type="checkbox" id="editChanMute">
-                <label for="editChanMute" style="color:#ff8282; font-weight:bold;">⚠️ Kanal-MUTE (Stress-Funktion für alle)</label>
-            </div>
-
-            <div class="modal-buttons">
-                <button class="modal-btn" style="background:#39d353; color:#000;" onclick="submitEditChannel()">Speichern</button>
-                <button class="modal-btn" style="background:#ff8c00; color:#000;" onclick="archiveChannelShortcut()">Sofort Archivieren</button>
-                <button class="modal-btn" style="background:#ff3131; color:#fff;" onclick="deleteChannelShortcut()">Löschen</button>
-            </div>
-            <button class="modal-btn" style="width:100%; margin-top:10px; background:#444; color:white;" onclick="closeModal('editModal')">Schließen</button>
+        <div class="checkbox-row">
+            <input type="checkbox" id="editChanImages">
+            <label for="editChanImages">Bilder/Frösche erlauben</label>
         </div>
+
+        <div class="checkbox-row">
+            <input type="checkbox" id="editChanReadOnly">
+            <label for="editChanReadOnly" style="color:#ff8c00;">🔒 Reiner Lesekanal (Nur Leitung schreibt)</label>
+        </div>
+
+        <div class="checkbox-row" style="border: 1px solid rgba(255,0,0,0.3); padding:8px; background:rgba(20,0,0,0.5); border-radius:4px;">
+            <input type="checkbox" id="editChanMute">
+            <label for="editChanMute" style="color:#ff8282; font-weight:bold;">⚠️ Globaler Kanal-MUTE</label>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="modal-btn" style="background:#39d353; color:#000;" onclick="submitEditChannel()">Speichern</button>
+            <button class="modal-btn" style="background:#ff8c00; color:#000;" onclick="archiveChannelShortcut()">Archivieren</button>
+            <button class="modal-btn" style="background:#ff3131; color:#fff;" onclick="deleteChannelShortcut()">Löschen</button>
+        </div>
+        <button class="modal-btn" style="width:100%; margin-top:10px; background:#444; color:white;" onclick="closeModal('editModal')">Schließen</button>
     </div>
+</div>
 
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIXKlIvApuZH1po2w1Hjzc03v8IhMiVnE40h6BRTuXbaWPHj1n0DwtO6DKVJo6-fCYxQ/exec'; 
