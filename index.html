@@ -98,6 +98,7 @@
             </div>
             <input type="text" id="regAware" placeholder="Wie auf uns aufmerksam geworden?">
             <input type="text" id="regAge" placeholder="Dein Alter">
+            <input type="text" id="regTestNum" placeholder="Testspiel-Nummer">
             <input type="text" id="regFreq" placeholder="Wie viel spielst du am Tag?">
             <select id="regReason">
                 <option value="" disabled selected>Grund der Anmeldung...</option>
@@ -217,11 +218,12 @@
 
         // REKRUTIERUNG LOGIK
         async function doRegister() {
-            const name = document.getElementById('regInGame').value.trim();
-            const pin = document.getElementById('regPin1').value.trim();
-            const pin2 = document.getElementById('regPin2').value.trim();
-            const kd = document.getElementById('regKD').value.trim();
-            const reason = document.getElementById('regReason').value;
+    const name = document.getElementById('regInGame').value.trim();
+    const pin = document.getElementById('regPin1').value.trim();
+    const pin2 = document.getElementById('regPin2').value.trim();
+    const kd = document.getElementById('regKD').value.trim();
+    const testNum = document.getElementById('regTestNum').value.trim(); // NEU
+    const reason = document.getElementById('regReason').value;
 
             if(!name || !pin) return alert("Bitte Namen und PIN eingeben!");
             if(pin !== pin2) return alert("Die PINs stimmen nicht überein!");
@@ -241,7 +243,7 @@
                 fetch(WEBHOOK_URL, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(discordMsg) });
 
                 localStorage.setItem('bulls_user', name);
-                localStorage.setItem('bulls_role', 'Gast');
+                localStorage.setItem('bulls_role', 'Anwärter');
                 localStorage.setItem('bulls_extra', '');
                 alert("Registrierung erfolgreich! Willkommen bei den Bulls.");
                 window.location.href = "dashboard.html";
