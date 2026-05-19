@@ -132,7 +132,7 @@
         </div>
     </div>
 
-    <script>
+   <script>
         let allianzUsersList = [];
         let locallyOpenedChats = new Set(); 
         let currentTab = 'classic';
@@ -190,9 +190,32 @@
             await loadAllianzUserBase();
         });
 
+        // HIER PASSIERT DIE MAGIE: Falls die Zentrale nach einer anderen ID sucht, fangen wir das ab!
         function triggerSendAction() {
+            const currentInput = document.getElementById("messageInput");
+            if (!currentInput || !currentInput.value.trim()) return;
+
+            console.log("Absende-Versuch gestartet für:", currentChatTarget);
+
+            // Sicherheitsnetz: Falls deine funk_zentrale.js hart auf 'chatTextInput' programmiert ist:
+            let backupInput = document.getElementById("chatTextInput");
+            if (!backupInput) {
+                backupInput = document.createElement("input");
+                backupInput.id = "chatTextInput";
+                backupInput.type = "hidden";
+                document.body.appendChild(backupInput);
+            }
+            backupInput.value = currentInput.value;
+
             if (typeof sendFunkMessage === "function") {
                 sendFunkMessage();
+                
+                // Textfeld nach kurzem Moment leeren (Zentrale braucht kurz zum Lesen)
+                setTimeout(() => {
+                    currentInput.value = "";
+                }, 50);
+            } else {
+                console.error("Fehler: sendFunkMessage() existiert nicht in funk_zentrale.js!");
             }
         }
 
@@ -294,11 +317,9 @@
             document.getElementById("userInputSearch").value = "";
             document.getElementById("searchResultsDropdown").style.display = "none";
             
-            // Setzt das globale Ziel für die funk_zentrale.js
             currentChatTarget = name; 
             locallyOpenedChats.add(name); 
             
-            // Override: Reißt der funk_zentrale die Kontrolle über die Deaktivierung weg!
             forceUnlockInput();
             
             document.getElementById('activeTargetLabel').innerText = `Sicherer Kanal mit: ${name}`;
@@ -313,15 +334,12 @@
             if(typeof updateMuteStatusAndFetch === "function") updateMuteStatusAndFetch();
         }
 
-        // Hilfsfunktion zur Erzwingung der Freischaltung
         function forceUnlockInput() {
             if (currentChatTarget && currentChatTarget !== "global") {
                 const inputField = document.getElementById('messageInput');
                 const sendBtn = document.getElementById('sendButton');
-                const frogBtn = document.getElementById('frogTrigger');
                 if(inputField) { inputField.disabled = false; inputField.placeholder = "Funkspruch eingeben..."; }
                 if(sendBtn) sendBtn.disabled = false;
-                if(frogBtn) frogBtn.disabled = false;
             }
         }
 
@@ -346,7 +364,6 @@
             const stream = document.getElementById("pnStreamArea");
             if(!verteiler || !stream) return;
 
-            // Stellt sicher, dass das Eingabefeld offen bleibt, wenn ein Ziel gewählt ist
             forceUnlockInput();
 
             let clientLastTimestamp = {};
