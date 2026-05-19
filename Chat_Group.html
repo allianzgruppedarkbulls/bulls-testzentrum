@@ -119,22 +119,26 @@
 
             <div id="muteNoticeBox" class="mute-notice" style="display:none;">MUTED: Die Kanalleitung hat diesen Raum temporär gesperrt! 🤐</div>
 
-            <div class="input-bar">
-                <button class="frog-trigger-btn" onclick="toggleFrogBox()">🐸</button>
-                <input type="text" id="groupMessageInput" placeholder="Funkspruch in Gruppe senden..." maxlength="500" disabled>
-                <button class="send-btn" id="groupSendBtn" onclick="sendGroupMessage()" disabled>Senden</button>
+          <div class="input-bar">
+    <button class="frog-trigger-btn" onclick="toggleFrogBox()">🐸</button>
+    
+    <input type="file" id="imageUploader" accept="image/*" style="display:none;" onchange="uploadToImageHost(this)">
+    <button class="frog-trigger-btn" onclick="document.getElementById('imageUploader').click()">📎</button>
+    
+    <input type="text" id="groupMessageInput" placeholder="Funkspruch in Gruppe senden..." maxlength="500" disabled>
+    
+    <button class="send-btn" id="groupSendBtn" onclick="sendGroupMessage()" disabled>Senden</button>
 
-                <div class="frog-box" id="frogBox">
-                    <div class="frog-header"><span>FROSCH-FUNK</span><span style="cursor:pointer;color:red;" onclick="toggleFrogBox()">X</span></div>
-                    <div class="frog-tabs">
-                        <button class="frog-tab-btn active" id="tab-classic" onclick="switchFrogTab('classic')">🟢 Klassiker</button>
-                        <button class="frog-tab-btn" id="tab-hype" onclick="switchFrogTab('hype')">🔥 Hype</button>
-                        <button class="frog-tab-btn" id="tab-sad" onclick="switchFrogTab('sad')">💀 Ernst</button>
-                    </div>
-                    <div class="frog-grid" id="frogGrid"></div>
-                </div>
-            </div>
+    <div class="frog-box" id="frogBox">
+        <div class="frog-header"><span>FROSCH-FUNK</span><span style="cursor:pointer;color:red;" onclick="toggleFrogBox()">X</span></div>
+        <div class="frog-tabs">
+            <button class="frog-tab-btn active" id="tab-classic" onclick="switchFrogTab('classic')">🟢 Klassiker</button>
+            <button class="frog-tab-btn" id="tab-hype" onclick="switchFrogTab('hype')">🔥 Hype</button>
+            <button class="frog-tab-btn" id="tab-sad" onclick="switchFrogTab('sad')">💀 Ernst</button>
         </div>
+        <div class="frog-grid" id="frogGrid"></div>
+    </div>
+</div>
 
         <div class="member-sidebar">
             <div class="member-title">👥 Kanal-Mitglieder</div>
