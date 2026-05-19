@@ -104,7 +104,7 @@
             <div class="chat-list" id="groupChannelList"></div>
         </div>
 
-        <div class="chat-main">
+    <div class="chat-main">
             <div class="chat-header-bar">
                 <span id="activeChannelLabel" style="font-weight:bold; color:#ff8c00;">Kein Gruppenkanal ausgewählt</span>
                 <div style="display:flex; gap:10px; align-items:center;">
@@ -119,7 +119,31 @@
 
             <div id="muteNoticeBox" class="mute-notice" style="display:none;">MUTED: Die Kanalleitung hat diesen Raum temporär gesperrt! 🤐</div>
 
-          <div class="input-bar">
+            <div class="input-bar">
+                <button class="frog-trigger-btn" onclick="toggleFrogBox()">🐸</button>
+                <input type="file" id="imageUploader" accept="image/*" style="display:none;" onchange="uploadToImageHost(this)">
+                <button class="frog-trigger-btn" onclick="document.getElementById('imageUploader').click()">📎</button>
+                <input type="text" id="groupMessageInput" placeholder="Funkspruch in Gruppe senden..." maxlength="500" disabled>
+                <button class="send-btn" id="groupSendBtn" onclick="sendGroupMessage()" disabled>Senden</button>
+
+                <div class="frog-box" id="frogBox">
+                    <div class="frog-header"><span>FROSCH-FUNK</span><span style="cursor:pointer;color:red;" onclick="toggleFrogBox()">X</span></div>
+                    <div class="frog-tabs">
+                        <button class="frog-tab-btn active" id="tab-classic" onclick="switchFrogTab('classic')">🟢 Klassiker</button>
+                        <button class="frog-tab-btn" id="tab-hype" onclick="switchFrogTab('hype')">🔥 Hype</button>
+                        <button class="frog-tab-btn" id="tab-sad" onclick="switchFrogTab('sad')">💀 Ernst</button>
+                    </div>
+                    <div class="frog-grid" id="frogGrid"></div>
+                </div>
+            </div> 
+        </div>
+
+### Was wurde geändert?
+1. **Container geschlossen:** Das `</div>` am Ende der `chat-main` Spalte befindet sich nun **nach** der `input-bar` und **nach** der `frog-box`.
+2. **Saubere Einrückung:** Dadurch weiß dein Browser: "Alles hier drin (Header, Nachrichten, Eingabe, Frösche) gehört zusammen in die mittlere Spalte."
+3. **Sidebar-Effekt:** Da die `member-sidebar` nun erst *nach* diesem `</div>` kommt, wird sie vom `chat-container` (der auf `display: flex` steht) automatisch wieder als dritte Spalte rechts daneben gesetzt.
+
+Wenn du das so einfügst, sollte dein Chat-Layout wieder exakt so aussehen wie vorher – nur eben mit der neuen Büroklammer! Hast du noch ein anderes Problem mit der Anzeige oder sieht es jetzt wieder aus wie ein Profi-Tool?
     <button class="frog-trigger-btn" onclick="toggleFrogBox()">🐸</button>
     
     <input type="file" id="imageUploader" accept="image/*" style="display:none;" onchange="uploadToImageHost(this)">
