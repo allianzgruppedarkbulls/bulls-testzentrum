@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DARK BULLS - TAKTIK-FUNK</title>
-    <script src="config.js"></script>
-    <script src="funk_zentrale.js"></script>
+    <title>DARK BULLS - GRUPPENFUNK</title>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; padding: 0; background-color: #050505; color: white; font-family: 'Almendra', serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        /* NAVIGATION BAR */
+        /* Navigation */
         .funk-nav { display: flex; justify-content: space-between; align-items: center; background: #0c0c0e; border-bottom: 2px solid #ff3131; padding: 10px 20px; box-shadow: 0 4px 15px rgba(255, 49, 49, 0.2); }
         .nav-links { display: flex; gap: 15px; }
         .nav-link-btn { background: #111; border: 1px solid #333; color: #888; font-family: 'Almendra'; padding: 10px 20px; font-size: 16px; border-radius: 6px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
@@ -18,35 +16,53 @@
         .nav-link-btn.active { background: #ff3131; color: #000; border-color: #ff3131; font-weight: bold; box-shadow: 0 0 15px rgba(255, 49, 49, 0.4); }
         .logout-btn { background: #ff0000; color: #fff; border: none; padding: 8px 15px; font-family: 'Almendra'; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
 
-        /* MULTI-PANEL GROUP LAYOUT */
-        .chat-container { flex: 1; display: flex; max-width: 1400px; width: 100%; margin: 0 guarded auto; background: rgba(10, 10, 10, 0.95); border-left: 1px solid #222; border-right: 1px solid #222; overflow: hidden; }
+        /* Container */
+        .chat-container { flex: 1; display: flex; max-width: 1400px; width: 100%; margin: 0 auto; background: rgba(10, 10, 10, 0.95); border-left: 1px solid #222; border-right: 1px solid #222; overflow: hidden; }
         
-        /* LINKER GRUPPEN-VERTEILER */
+        /* Linke Spalte: Kanäle & Erstellung */
         .side-bar { width: 320px; background: #0b0b0c; border-right: 1px solid #222; display: flex; flex-direction: column; }
-        .bar-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #222; background: #080809; }
-        .bar-title { font-size: 18px; font-weight: bold; color: #ff3131; letter-spacing: 1px; }
-        .add-group-btn { background: #ff3131; color: black; border: none; width: 32px; height: 32px; border-radius: 5px; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: sans-serif; box-shadow: 0 0 10px rgba(255, 49, 49, 0.4); }
-        .add-group-btn:hover { transform: scale(1.1); box-shadow: 0 0 15px red; }
-
-        .chat-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+        .action-btn-box { padding: 15px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid #1a1a1a; }
+        .admin-btn { background: #111; border: 1px solid #ff8c00; color: #ff8c00; padding: 10px; font-family: 'Almendra'; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .admin-btn:hover { background: #ff8c00; color: #000; }
+        
+        .chat-list { flex: 1; overflow-y: auto; }
         .chat-item { padding: 15px 20px; border-bottom: 1px solid #1a1a1a; cursor: pointer; display: flex; flex-direction: column; gap: 4px; transition: 0.2s; }
         .chat-item:hover { background: #151515; border-left: 3px solid #ff3131; }
         .chat-item.active { background: #1c1515; border-left: 3px solid #ff3131; }
-        .chat-name { font-weight: bold; font-size: 16px; color: #eee; }
-        .chat-members { font-size: 12px; color: #666; font-family: sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chat-item.muted-chan { border-left: 3px solid #555 !important; opacity: 0.6; }
+        .chat-name-row { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 16px; }
+        .chat-meta-sub { font-size: 12px; color: #666; font-family: sans-serif; }
 
-        /* RECHTER STREAM */
+        /* Mittlere Spalte: Haupt-Chat */
         .chat-main { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .chat-header-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #0c0c0e; border-bottom: 1px solid #222; }
+        .dc-link-btn { background: #5865F2; color: white; border: none; padding: 6px 12px; font-family: sans-serif; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; text-decoration: none; }
+        .manage-btn { background: #222; border: 1px solid #ff8c00; color: #ff8c00; padding: 6px 12px; font-family: 'Almendra'; font-size: 13px; border-radius: 4px; cursor: pointer; }
+
         .stream-area { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        .typing-box { padding: 5px 20px; color: #ff8c00; font-size: 14px; font-style: italic; min-height: 20px; }
+        .mute-notice { background: rgba(255,0,0,0.2); border: 1px solid red; color: #ff8282; padding: 10px; text-align: center; font-weight: bold; border-radius: 6px; margin-bottom: 10px; font-family: sans-serif; }
 
-        /* INPUT AREA */
-        .input-bar { display: flex; gap: 12px; padding: 20px; background: #0c0c0e; border-top: 1px solid #222; }
+        /* Eingabe & Frösche */
+        .input-bar { display: flex; gap: 12px; padding: 20px; background: #0c0c0e; border-top: 1px solid #222; align-items: center; position: relative; }
         .input-bar input { flex: 1; background: #151515; border: 1px solid #ff3131; padding: 15px; color: #fff; font-family: sans-serif; font-size: 15px; border-radius: 6px; }
-        .input-bar input:focus { outline: none; box-shadow: 0 0 10px rgba(255, 49, 49, 0.3); }
-        .send-btn { background: #ff8c00; color: #000; border: none; padding: 0 35px; font-family: 'Almendra'; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; box-shadow: 0 0 15px rgba(255, 140, 0, 0.3); }
+        .frog-trigger-btn { background: #151515; border: 1px solid #ff3131; font-size: 22px; cursor: pointer; padding: 11px; border-radius: 6px; }
+        .send-btn { background: #ff8c00; color: #000; border: none; padding: 15px 35px; font-family: 'Almendra'; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
 
-        /* MESSAGE LOGIC */
+        /* Rechte Spalte: Mitglieder-Liste */
+        .member-sidebar { width: 220px; background: #0b0b0c; border-left: 1px solid #222; display: flex; flex-direction: column; padding: 15px; }
+        .member-title { color: #ff3131; font-size: 16px; margin-bottom: 10px; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        .member-list-box { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-family: sans-serif; font-size: 14px; }
+
+        /* Modals / Overlays für Erstellung und Bearbeitung */
+        .modal-overlay { display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
+        .dark-modal { background: #111; padding: 25px; width: 450px; max-width: 90vw; border: 2px solid #ff3131; border-radius: 8px; box-shadow: 0 0 30px rgba(255,0,0,0.3); }
+        .dark-modal h2 { margin-top: 0; color: #ff3131; }
+        .dark-modal input, .dark-modal select { width: 100%; padding: 10px; margin-bottom: 12px; background: #000; color: #39d353; border: 1px solid #444; font-family: sans-serif; box-sizing: border-box; }
+        .checkbox-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-family: sans-serif; font-size: 14px; }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 15px; }
+        .modal-btn { flex: 1; padding: 12px; border: none; font-family: 'Almendra'; font-weight: bold; font-size: 16px; cursor: pointer; border-radius: 4px; }
+
+        /* Nachrichten-Design */
         .msg-line { display: flex; flex-direction: column; background: #111; border-left: 3px solid #ff3131; padding: 10px 15px; border-radius: 0 6px 6px 0; max-width: 85%; align-self: flex-start; }
         .msg-line.me { border-left: none; border-right: 3px solid #39d353; border-radius: 6px 0 0 6px; background: #161a16; align-self: flex-end; }
         .msg-meta { font-size: 13px; margin-bottom: 4px; display: flex; gap: 10px; }
@@ -54,27 +70,17 @@
         .msg-line.me .meta-user { color: #39d353; }
         .meta-time { color: #666; }
         .msg-text { font-family: sans-serif; font-size: 15px; line-height: 1.4; color: #eee; word-break: break-word; }
+        .msg-text img.chat-pepe { max-width: 40px; max-height: 40px; display: inline-block; vertical-align: middle; }
 
-        /* CREATION MODAL */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 5000; }
-        .modal-content { background: #0f0f11; border: 2px solid #ff3131; padding: 30px; border-radius: 12px; width: 400px; max-width: 90vw; box-shadow: 0 0 40px rgba(255,0,0,0.4); }
-        .modal-content h2 { color: #ff3131; margin-top: 0; font-size: 24px; text-transform: uppercase; text-align: center; }
-        .modal-input { width: 100%; background: #151515; border: 1px solid #333; padding: 12px; color: #fff; border-radius: 6px; font-family: sans-serif; font-size: 15px; margin-bottom: 15px; box-sizing: border-box; }
-        
-        .user-checkbox-list { max-height: 180px; overflow-y: auto; background: #151515; border: 1px solid #222; padding: 10px; border-radius: 6px; margin-bottom: 20px; }
-        .checkbox-item { display: flex; align-items: center; gap: 10px; padding: 6px 5px; font-family: sans-serif; font-size: 14px; color: #ccc; cursor: pointer; }
-        .checkbox-item input { accent-color: #ff3131; transform: scale(1.2); }
-
-        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
-        .modal-btn { padding: 10px 20px; font-family: 'Almendra'; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; text-transform: uppercase; border: none; }
-        .modal-btn.cancel { background: #333; color: #aaa; }
-        .modal-btn.confirm { background: #ff3131; color: #fff; }
-        
-        .deselect-btn { background: #39d353; color: #000; font-family: 'Almendra'; font-weight: bold; padding: 8px 12px; font-size: 13px; border-radius: 4px; border: none; cursor: pointer; text-transform: uppercase; width: 100%; margin-bottom: 10px; text-align: center; }
-        .deselect-btn:hover { background: #2fb145; }
-
-        .side-bar::-webkit-scrollbar, .stream-area::-webkit-scrollbar, .user-checkbox-list::-webkit-scrollbar { width: 6px; }
-        .side-bar::-webkit-scrollbar-thumb, .stream-area::-webkit-scrollbar-thumb, .user-checkbox-list::-webkit-scrollbar-thumb { background: #222; border-radius: 3px; }
+        /* Frosch Box */
+        .frog-box { position: absolute; bottom: 85px; right: 20px; width: 360px; height: 340px; background: #0f0f11; border: 2px solid #39d353; border-radius: 8px; display: none; flex-direction: column; box-shadow: 0 0 25px rgba(57, 211, 83, 0.4); z-index: 2000; }
+        .frog-header { background: #161a16; padding: 8px 12px; font-weight: bold; color: #39d353; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+        .frog-tabs { display: flex; background: #111; border-bottom: 1px solid #222; }
+        .frog-tab-btn { flex: 1; padding: 8px 5px; font-family: 'Almendra'; font-size: 13px; background: none; border: none; color: #666; cursor: pointer; text-align: center; }
+        .frog-tab-btn.active { color: #39d353; border-bottom: 2px solid #39d353; background: #161a16; font-weight: bold; }
+        .frog-grid { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 12px; overflow-y: auto; }
+        .frog-item { cursor: pointer; border: 1px solid #222; padding: 5px; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: #151515; height: 55px; }
+        .frog-item img { width: 35px; height: 35px; object-fit: contain; }
     </style>
 </head>
 <body>
@@ -86,194 +92,434 @@
             <button class="nav-link-btn active">⚔️ Gruppen</button>
             <button class="nav-link-btn" onclick="window.location.href='Chat_Support.html'">🚨 Support</button>
         </div>
-        <div style="color: #ff3131; font-size: 18px;" id="userDisplay">Bulls Taktik-Funk...</div>
-        <button class="logout-btn" onclick="logoutFunk()">X</button>
+        <div style="color: #ff3131; font-size: 18px;" id="userDisplay">Bulls Gruppenfunk...</div>
+        <button class="logout-btn" onclick="location.reload()">X</button>
     </div>
 
     <div class="chat-container">
-        
         <div class="side-bar">
-            <div class="bar-header">
-                <div class="bar-title">Einsatzgruppen</div>
-                <button class="add-group-btn" onclick="openCreateGroupModal()">+</button>
+            <div class="action-btn-box">
+                <button class="admin-btn" onclick="openCreateModal()">➕ Neuen Kanal gründen</button>
             </div>
-            <div class="chat-list" id="groupVerteiler"></div>
+            <div class="chat-list" id="groupChannelList"></div>
         </div>
 
         <div class="chat-main">
-            <div class="stream-area" id="groupStreamArea">
-                <div style="text-align:center; color:#ff8c00; font-style:italic; padding-top:50px;">Wähle links eine Division aus oder klicke (+), um eine neue Gruppe zu gründen. ⚡</div>
+            <div class="chat-header-bar">
+                <span id="activeChannelLabel" style="font-weight:bold; color:#ff8c00;">Kein Gruppenkanal ausgewählt</span>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <a href="#" target="_blank" id="discordLinkBtn" class="dc-link-btn" style="display:none;">🔊 Discord</a>
+                    <button class="manage-btn" id="manageChannelBtn" style="display:none;" onclick="openEditModal()">⚙️ Verwalten</button>
+                </div>
             </div>
-            
-            <div class="typing-box" id="typingIndicator"></div>
+
+            <div class="stream-area" id="groupStreamArea">
+                <div style="text-align:center; color:#ff8c00; font-style:italic; padding-top:50px;">Wähle links einen Einsatztrupp oder den Allianz-Chat aus. ⚔️</div>
+            </div>
+
+            <div id="muteNoticeBox" class="mute-notice" style="display:none;">MUTED: Die Kanalleitung hat diesen Raum temporär gesperrt! 🤐</div>
 
             <div class="input-bar">
-                <input type="text" id="messageInput" placeholder="Taktischen Gruppenfunk senden..." maxlength="500" autocomplete="off" disabled>
-                <button class="send-btn" id="sendButton" onclick="sendFunkMessage()" disabled>Senden</button>
+                <button class="frog-trigger-btn" onclick="toggleFrogBox()">🐸</button>
+                <input type="text" id="groupMessageInput" placeholder="Funkspruch in Gruppe senden..." maxlength="500" disabled>
+                <button class="send-btn" id="groupSendBtn" onclick="sendGroupMessage()" disabled>Senden</button>
+
+                <div class="frog-box" id="frogBox">
+                    <div class="frog-header"><span>FROSCH-FUNK</span><span style="cursor:pointer;color:red;" onclick="toggleFrogBox()">X</span></div>
+                    <div class="frog-tabs">
+                        <button class="frog-tab-btn active" id="tab-classic" onclick="switchFrogTab('classic')">🟢 Klassiker</button>
+                        <button class="frog-tab-btn" id="tab-hype" onclick="switchFrogTab('hype')">🔥 Hype</button>
+                        <button class="frog-tab-btn" id="tab-sad" onclick="switchFrogTab('sad')">💀 Ernst</button>
+                    </div>
+                    <div class="frog-grid" id="frogGrid"></div>
+                </div>
             </div>
         </div>
 
+        <div class="member-sidebar">
+            <div class="member-title">👥 Kanal-Mitglieder</div>
+            <div class="member-list-box" id="channelMemberBox"></div>
+        </div>
     </div>
 
-    <div class="modal" id="createGroupModal">
-        <div class="modal-content">
-            <h2>Neue Division gründen</h2>
-            <input type="text" id="newGroupNameInput" class="modal-input" placeholder="Name der Gruppe (z.B. Alpha-Team)..." maxlength="30">
+    <div class="modal-overlay" id="createModal">
+        <div class="dark-modal">
+            <h2>Kanal gründen</h2>
+            <input type="text" id="newChanName" placeholder="Kanal-Name (z.B. Raid-Alpha)">
+            <input type="text" id="newChanDC" placeholder="Discord-Link (Optional)">
             
-            <button class="deselect-btn" onclick="deselectAllUsers()">⚡ Alle Haken abwählen</button>
+            <label style="color:#aaa; font-size:12px; font-family:sans-serif;">Zugriffsberechtigung:</label>
+            <select id="newChanAccess" onchange="toggleAccessSelection()">
+                <option value="allBulls">Alle Dark Bulls (Keine Gäste)</option>
+                <option value="allPlayers">Alle registrierten Spieler (Inkl. Gäste)</option>
+                <option value="select">Bestimmte Spieler auswählen...</option>
+            </select>
 
-            <div class="user-checkbox-list" id="modalUserCheckboxContainer"></div>
+            <div id="playerSelectionZone" style="display:none; max-height:120px; overflow-y:auto; background:#000; padding:10px; border:1px solid #333; margin-bottom:12px;"></div>
 
-            <div class="modal-actions">
-                <button class="modal-btn cancel" onclick="closeCreateGroupModal()">Abbrechen</button>
-                <button class="modal-btn confirm" onclick="submitNewGroupToServer()">Gründen</button>
+            <div class="checkbox-row">
+                <input type="checkbox" id="newChanImages" checked>
+                <label for="newChanImages">Bilder/Frösche im Chat erlauben</label>
             </div>
+
+            <div class="modal-buttons">
+                <button class="modal-btn" style="background:#39d353; color:#000;" onclick="submitCreateChannel()">Erstellen</button>
+                <button class="modal-btn" style="background:#ff3131; color:#fff;" onclick="closeModal('createModal')">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editModal">
+        <div class="dark-modal">
+            <h2>Kanal verwalten</h2>
+            <input type="text" id="editChanDC" placeholder="Discord-Link aktualisieren">
+            
+            <label style="color:#aaa; font-size:12px; font-family:sans-serif;">Status / Archivierung:</label>
+            <select id="editChanStatus">
+                <option value="active">Aktiv</option>
+                <option value="archived">Archiviert (Nur Lesezugriff)</option>
+            </select>
+
+            <div class="checkbox-row" style="border: 1px solid rgba(255,0,0,0.3); padding:8px; background:rgba(20,0,0,0.5); border-radius:4px;">
+                <input type="checkbox" id="editChanMute">
+                <label for="editChanMute" style="color:#ff8282; font-weight:bold;">⚠️ Kanal-MUTE (Stress-Funktion für alle)</label>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="modal-btn" style="background:#39d353; color:#000;" onclick="submitEditChannel()">Speichern</button>
+                <button class="modal-btn" style="background:#ff8c00; color:#000;" onclick="archiveChannelShortcut()">Sofort Archivieren</button>
+                <button class="modal-btn" style="background:#ff3131; color:#fff;" onclick="deleteChannelShortcut()">Löschen</button>
+            </div>
+            <button class="modal-btn" style="width:100%; margin-top:10px; background:#444; color:white;" onclick="closeModal('editModal')">Schließen</button>
         </div>
     </div>
 
     <script>
-        let allianzUsersList = [];
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIXKlIvApuZH1po2w1Hjzc03v8IhMiVnE40h6BRTuXbaWPHj1n0DwtO6DKVJo6-fCYxQ/exec'; 
+        const SHEET_ID = '1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ';
+        const GID_USERS = '1188820112';
+        const GID_CHAT = '274206006';
 
-        window.addEventListener("DOMContentLoaded", () => {
-            initFunkkreis("gruppe");
-            loadAllianzUserBase();
+        let myName = localStorage.getItem('bulls_user') || "TestUser";
+        let myRole = "Gast"; 
+        let users = [];
+        let allChatData = [];
+        let currentFrogTab = 'classic';
+        
+        // Lokale simulierte Datenbank für deine dynamischen Räume (wird im Echtbetrieb via localStorage oder erweiterter Tabelle gehalten)
+        let channelsDatabase = JSON.parse(localStorage.getItem('bulls_dynamic_channels')) || [
+            { id: "ALLIANZ-CHAT", name: "Allianz-Chat Hauptfunk", creator: "System", dc: "", access: "allBulls", members: [], imagesAllowed: true, status: "active", isMuted: false }
+        ];
+
+        let currentChannelId = "";
+
+        const FROG_DATABASE = {
+            classic: [
+                { code: "[pepeFrog]", url: "https://openmoji.org/data/color/svg/1F438.svg" },
+                { code: "[pepeEZ]", url: "https://openmoji.org/data/color/svg/1F60E.svg" },
+                { code: "[pepeSmile]", url: "https://openmoji.org/data/color/svg/1F642.svg" },
+                { code: "[pepeWink]", url: "https://openmoji.org/data/color/svg/1F609.svg" }
+            ],
+            hype: [
+                { code: "[pepeFire]", url: "https://openmoji.org/data/color/svg/1F525.svg" },
+                { code: "[pepeRocket]", url: "https://openmoji.org/data/color/svg/1F680.svg" },
+                { code: "[pepeFlex]", url: "https://openmoji.org/data/color/svg/1F4AA.svg" },
+                { code: "[pepeParty]", url: "https://openmoji.org/data/color/svg/1F973.svg" }
+            ],
+            sad: [
+                { code: "[pepeJail]", url: "https://openmoji.org/data/color/svg/1F6A8.svg" },
+                { code: "[pepeSad]", url: "https://openmoji.org/data/color/svg/1F343.svg" },
+                { code: "[pepeClown]", url: "https://openmoji.org/data/color/svg/1F0CF.svg" },
+                { code: "[pepeWarning]", url: "https://openmoji.org/data/color/svg/26A0.svg" }
+            ]
+        };
+
+        window.addEventListener("DOMContentLoaded", async () => {
+            document.getElementById("userDisplay").innerText = `🔑 Funker: ${myName}`;
+            buildFrogMenu();
+            
+            // Enter-Taste fängt Senden ab
+            document.getElementById("groupMessageInput").addEventListener("keydown", function(e) {
+                if (e.key === "Enter") { e.preventDefault(); sendGroupMessage(); }
+            });
+
+            await loadUserData();
+            await loadChatHistory();
+            
+            setInterval(loadChatHistory, 4000);
+            setInterval(loadUserData, 10000);
         });
 
-        async function loadAllianzUserBase() {
+        // BENUTZER- UND ROLLENDATEN LADEN
+        async function loadUserData() {
             try {
-                const res = await fetch(window.BULLS_CONFIG.SCRIPT_URL + "?action=getDropdownData");
-                const data = await res.json();
-                if(data.user) allianzUsersList = data.user.map(u => u.name);
-            } catch(e) { console.log("Fehler beim Holen der User-Datenbank."); }
-        }
-
-        function openCreateGroupModal() {
-            document.getElementById("newGroupNameInput").value = "";
-            const container = document.getElementById("modalUserCheckboxContainer");
-            const myUser = localStorage.getItem('bulls_user');
-            container.innerHTML = "";
-
-            allianzUsersList.forEach(name => {
-                if(name === myUser) return;
-                container.innerHTML += `
-                    <label class="checkbox-item">
-                        <input type="checkbox" value="${name}" checked class="group-user-checkbox">
-                        <span>${name}</span>
-                    </label>
-                `;
-            });
-
-            document.getElementById("createGroupModal").style.display = "flex";
-        }
-
-        function closeCreateGroupModal() {
-            document.getElementById("createGroupModal").style.display = "none";
-        }
-
-        function deselectAllUsers() {
-            const checkboxes = document.querySelectorAll(".group-user-checkbox");
-            checkboxes.forEach(box => box.checked = false);
-        }
-
-        async function submitNewGroupToServer() {
-            const nameInput = document.getElementById("newGroupNameInput").value.trim();
-            if(!nameInput) { alert("Bitte gib einen Gruppennamen ein!"); return; }
-
-            const myUser = localStorage.getItem('bulls_user');
-            const checkboxes = document.querySelectorAll(".group-user-checkbox");
-            let selectedMembers = [myUser];
-
-            checkboxes.forEach(box => {
-                if(box.checked) selectedMembers.push(box.value);
-            });
-
-            const payload = {
-                action: "createGroup",
-                creator: myUser,
-                groupName: nameInput,
-                members: selectedMembers
-            };
-
-            try {
-                const res = await fetch(window.BULLS_CONFIG.SCRIPT_URL, {
-                    method: "POST",
-                    body: JSON.stringify(payload)
+                const res = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID_USERS}&t=${new Date().getTime()}`);
+                const text = await res.text();
+                const rows = text.split('\n').slice(1);
+                users = rows.map(r => {
+                    const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    const cl = (s) => s ? s.replace(/["']/g, "").trim() : "";
+                    return { name: cl(c[0]), pin: cl(c[2]), role: cl(c[3]), lastActive: cl(c[4]) };
                 });
-                const result = await res.json();
                 
-                closeCreateGroupModal();
-                if(result.groupId) currentChatTarget = result.groupId;
-                updateMuteStatusAndFetch();
-            } catch(e) {
-                alert("Fehler beim Erstellen der Gruppe.");
-            }
-        }
-
-        function switchGroupChannel(groupId) {
-            currentChatTarget = groupId;
-            document.getElementById('messageInput').disabled = false;
-            document.getElementById('sendButton').disabled = false;
-            updateMuteStatusAndFetch();
-        }
-
-        function processChatData(data) {
-            const myUser = localStorage.getItem('bulls_user');
-            const verteiler = document.getElementById("groupVerteiler");
-            const stream = document.getElementById("groupStreamArea");
-
-            let verteilerHTML = "";
-            if (data.groups && data.groups.length > 0) {
-                data.groups.forEach(group => {
-                    if (group.members.includes(myUser)) {
-                        let isActive = currentChatTarget === group.id ? "active" : "";
-                        verteilerHTML += `
-                            <div class="chat-item ${isActive}" onclick="switchGroupChannel('${group.id}')">
-                                <span class="chat-name">⚔️ ${group.name}</span>
-                                <span class="chat-members">${group.members.join(", ")}</span>
-                            </div>
-                        `;
-                    }
-                });
-            }
-            verteiler.innerHTML = verteilerHTML || `<div style="padding:20px; color:#555; text-align:center; font-size:14px; font-family:sans-serif;">Du bist noch in keiner taktischen Division.</div>`;
-
-            if (currentChatTarget && currentChatTarget !== "global") {
-                document.getElementById('messageInput').disabled = false;
-                document.getElementById('sendButton').disabled = false;
-
-                let htmlHTML = "";
-                let filteredMessages = data.groupMessages ? data.groupMessages.filter(msg => msg.groupId === currentChatTarget) : [];
-
-                if (filteredMessages.length > 0) {
-                    filteredMessages.forEach(msg => {
-                        let isMe = msg.user === myUser ? "me" : "";
-                        htmlHTML += `
-                            <div class="msg-line ${isMe}">
-                                <div class="msg-meta">
-                                    <span class="meta-user">${msg.user}</span>
-                                    <span class="meta-time">${formatFunkZeit(msg.time)}</span>
-                                </div>
-                                <div class="msg-text">${msg.msg}</div>
-                            </div>
-                        `;
-                    });
-                    
-                    const scrollCheck = (stream.scrollHeight - stream.scrollTop === stream.clientHeight);
-                    stream.innerHTML = htmlHTML;
-                    if (!scrollCheck) stream.scrollTop = stream.scrollHeight;
-                } else {
-                    stream.innerHTML = `<div style="text-align:center; color:#ff8c00; padding-top:50px; font-style:italic;">Abgesicherter Taktik-Funkkanal. Schreib deiner Division! ⚡</div>`;
+                let me = users.find(u => u.name.toLowerCase() === myName.toLowerCase());
+                if(me) {
+                    myRole = me.role;
+                    document.getElementById("userDisplay").innerText = `🔑 Funker: ${me.name} (${me.role})`;
                 }
+                renderChannelList();
+            } catch(e) { console.error("User-Update fehlgeschlagen"); }
+        }
+
+        // CHATVERLAUF LADEN
+        async function loadChatHistory() {
+            try {
+                const res = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID_CHAT}&t=${new Date().getTime()}`);
+                const text = await res.text();
+                const rows = text.split('\n').slice(1);
+                allChatData = rows.map(r => r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim()));
+                
+                renderStream();
+            } catch(e) { console.error("Chat-Update fehlgeschlagen"); }
+        }
+
+        // KANALLISTE LINKS RENDERN (ZUGRIFFS-PRÜFUNG)
+        function renderChannelList() {
+            const listEl = document.getElementById("groupChannelList");
+            listEl.innerHTML = "";
+
+            channelsDatabase.forEach(chan => {
+                // Zugriffsberechtigungs-Logik
+                let hasAccess = false;
+                if (myRole === "Admin" || chan.creator === myName) {
+                    hasAccess = true;
+                } else if (chan.access === "allPlayers") {
+                    hasAccess = true;
+                } else if (chan.access === "allBulls" && myRole !== "Gast") {
+                    hasAccess = true;
+                } else if (chan.access === "select" && chan.members.includes(myName)) {
+                    hasAccess = true;
+                }
+
+                if (!hasAccess) return;
+
+                let isActive = currentChannelId === chan.id ? "active" : "";
+                let isMutedStyle = chan.isMuted ? "muted-chan" : "";
+                let labelSub = chan.status === "archived" ? "🔒 Archiviert" : (chan.isMuted ? "🤐 FUNKSTILLE (MUTE)" : "📡 Aktiv");
+
+                listEl.innerHTML += `
+                    <div class="chat-item ${isActive} ${isMutedStyle}" onclick="selectChannel('${chan.id}')">
+                        <div class="chat-name-row">
+                            <span>⚔️ ${chan.name}</span>
+                        </div>
+                        <div class="chat-meta-sub">${labelSub}</div>
+                    </div>`;
+            });
+        }
+
+        // KANAL AUSWÄHLEN
+        function selectChannel(id) {
+            currentChannelId = id;
+            let chan = channelsDatabase.find(c => c.id === id);
+            if(!chan) return;
+
+            document.getElementById("activeChannelLabel").innerText = `Trupp: ${chan.name}`;
+            
+            // Discord Button
+            const dcBtn = document.getElementById("discordLinkBtn");
+            if(chan.dc) { dcBtn.href = chan.dc; dcBtn.style.display = "inline-block"; } else { dcBtn.style.display = "none"; }
+
+            // Verwalten Button (Nur für Ersteller oder Admins)
+            const manageBtn = document.getElementById("manageChannelBtn");
+            if(chan.creator === myName || myRole === "Admin") { manageBtn.style.display = "inline-block"; } else { manageBtn.style.display = "none"; }
+
+            // Mute / Archiv Status prüfen für Inputs
+            const inputField = document.getElementById("groupMessageInput");
+            const sendBtn = document.getElementById("groupSendBtn");
+            const muteNotice = document.getElementById("muteNoticeBox");
+
+            if(chan.status === "archived") {
+                inputField.disabled = true; sendBtn.disabled = true;
+                inputField.placeholder = "Kanal ist archiviert..."; muteNotice.style.display = "none";
+            } else if(chan.isMuted && myRole !== "Admin" && chan.creator !== myName) {
+                inputField.disabled = true; sendBtn.disabled = true;
+                inputField.placeholder = "Funkstille aktiv..."; muteNotice.style.display = "block";
+            } else {
+                inputField.disabled = false; sendBtn.disabled = false;
+                inputField.placeholder = "Funkspruch absenden..."; muteNotice.style.display = "none";
             }
 
-            const typingIndicator = document.getElementById("typingIndicator");
-            if (data.typing && data.typing.groups && data.typing.groups[currentChatTarget] && data.typing.groups[currentChatTarget].length > 0) {
-                let writers = data.typing.groups[currentChatTarget].filter(u => u !== myUser);
-                if (writers.length > 0) {
-                    typingIndicator.innerText = `${writers.join(", ")} tippt im Gruppenfunk... ✏️`;
-                } else { typingIndicator.innerText = ""; }
-            } else { typingIndicator.innerText = ""; }
+            renderStream();
+            renderMembers();
+            renderChannelList();
         }
+
+        // NACHRICHTEN STREAM LINKS EFFEKTIV ANZEIGEN
+        function renderStream() {
+            if(!currentChannelId) return;
+            const stream = document.getElementById("groupStreamArea");
+            let chan = channelsDatabase.find(c => c.id === currentChannelId);
+
+            let html = "";
+            allChatData.forEach(c => {
+                if(c[2] === currentChannelId) {
+                    let isMe = c[1] === myName ? "me" : "";
+                    // Prüfen ob Bilder/Frösche im Kanal verboten sind
+                    let processedMsg = (chan && !chan.imagesAllowed) ? cleanFrogCodes(c[3]) : parseFrogEmojis(c[3]);
+                    let timeDisplay = c[0] ? c[0].split(" ")[1] || "" : "";
+
+                    html += `
+                        <div class="msg-line ${isMe}">
+                            <div class="msg-meta"><span class="meta-user">${c[1]}</span><span class="meta-time">${timeDisplay}</span></div>
+                            <div class="msg-text">${processedMsg}</div>
+                        </div>`;
+                }
+            });
+
+            if(html) { stream.innerHTML = html; stream.scrollTop = stream.scrollHeight; } 
+            else { stream.innerHTML = `<div style="text-align:center; color:#666; padding-top:50px;">Bisher keine Funksprüche auf diesem Kanal. 📡</div>`; }
+        }
+
+        // RECHTE SPALTE MITGLIEDER ANZEIGEN
+        function renderMembers() {
+            const box = document.getElementById("channelMemberBox");
+            box.innerHTML = "";
+            let chan = channelsDatabase.find(c => c.id === currentChannelId);
+            if(!chan) return;
+
+            let displayedUsers = [];
+            if(chan.access === "allPlayers") { displayedUsers = users; } 
+            else if(chan.access === "allBulls") { displayedUsers = users.filter(u => u.role !== "Gast"); } 
+            else { displayedUsers = users.filter(u => chan.members.includes(u.name) || u.role === "Admin" || u.name === chan.creator); }
+
+            displayedUsers.forEach(u => {
+                let lastDate = new Date(u.lastActive);
+                let isOnline = (new Date() - lastDate) < 300000;
+                box.innerHTML += `<div><span style="display:inline-block; width:6px; height:6px; background:${isOnline ? '#39d353':'#444'}; border-radius:50%; margin-right:6px;"></span>${u.name} <small style="color:#555">(${u.role})</small></div>`;
+            });
+        }
+
+        // SENDE FUNKTION AN GOOGLE-BACKEND (1:1 Kompatibel)
+        async function sendGroupMessage() {
+            const input = document.getElementById("groupMessageInput");
+            const msg = input.value.trim();
+            if(!msg || !currentChannelId) return;
+
+            // Lokales schnelles Feedback
+            const stream = document.getElementById("groupStreamArea");
+            let chan = channelsDatabase.find(c => c.id === currentChannelId);
+            let processedMsg = (chan && !chan.imagesAllowed) ? cleanFrogCodes(msg) : parseFrogEmojis(msg);
+
+            stream.innerHTML += `
+                <div class="msg-line me">
+                    <div class="msg-meta"><span class="meta-user">${myName}</span><span class="meta-time">gesendet...</span></div>
+                    <div class="msg-text">${processedMsg}</div>
+                </div>`;
+            stream.scrollTop = stream.scrollHeight;
+            input.value = "";
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "sendChat", absender: myName, kanalID: currentChannelId, nachricht: msg })
+                });
+            } catch(e) { console.error("Google-Upload Error"); }
+            loadChatHistory();
+        }
+
+        // MODAL LOGIKEN & KANAL ERSTELLUNG
+        function openCreateModal() {
+            document.getElementById("createModal").style.display = "flex";
+            const zone = document.getElementById("playerSelectionZone");
+            zone.innerHTML = "";
+            users.forEach(u => {
+                if(u.name !== myName) {
+                    zone.innerHTML += `<div class="checkbox-row"><input type="checkbox" name="selectedPlayers" value="${u.name}"> <label>${u.name}</label></div>`;
+                }
+            });
+        }
+
+        function toggleAccessSelection() {
+            const select = document.getElementById("newChanAccess").value;
+            document.getElementById("playerSelectionZone").style.display = select === "select" ? "block" : "none";
+        }
+
+        function submitCreateChannel() {
+            let name = document.getElementById("newChanName").value.trim();
+            let dc = document.getElementById("newChanDC").value.trim();
+            let access = document.getElementById("newChanAccess").value;
+            let imgAllowed = document.getElementById("newChanImages").checked;
+            
+            if(!name) return alert("Bitte Namen eingeben!");
+
+            let selectedMembers = [];
+            if(access === "select") {
+                document.querySelectorAll('input[name="selectedPlayers"]:checked').forEach(cb => selectedMembers.push(cb.value));
+            }
+
+            let id = "GROUP-" + name.toUpperCase().replace(/\s+/g, "_") + "-" + Math.floor(Math.random()*1000);
+
+            let newChan = { id: id, name: name, creator: myName, dc: dc, access: access, members: selectedMembers, imagesAllowed: imgAllowed, status: "active", isMuted: false };
+            channelsDatabase.push(newChan);
+            saveChannelsLocal();
+
+            closeModal('createModal');
+            selectChannel(id);
+        }
+
+        // BEARBEITEN LOGIK (MUTTE, ARCHIV, LÖSCHEN)
+        function openEditModal() {
+            let chan = channelsDatabase.find(c => c.id === currentChannelId);
+            if(!chan) return;
+            document.getElementById("editChanDC").value = chan.dc;
+            document.getElementById("editChanStatus").value = chan.status;
+            document.getElementById("editChanMute").checked = chan.isMuted;
+            document.getElementById("editModal").style.display = "flex";
+        }
+
+        function submitEditChannel() {
+            let chan = channelsDatabase.find(c => c.id === currentChannelId);
+            if(!chan) return;
+            chan.dc = document.getElementById("editChanDC").value.trim();
+            chan.status = document.getElementById("editChanStatus").value;
+            chan.isMuted = document.getElementById("editChanMute").checked;
+            
+            saveChannelsLocal();
+            closeModal('editModal');
+            selectChannel(currentChannelId);
+        }
+
+        function archiveChannelShortcut() {
+            let chan = channelsDatabase.find(c => c.id === currentChannelId);
+            if(chan) { chan.status = "archived"; saveChannelsLocal(); closeModal('editModal'); selectChannel(currentChannelId); }
+        }
+
+        function deleteChannelShortcut() {
+            if(confirm("Kanal endgültig vernichten?")) {
+                channelsDatabase = channelsDatabase.filter(c => c.id !== currentChannelId);
+                saveChannelsLocal();
+                closeModal('editModal');
+                currentChannelId = "";
+                location.reload();
+            }
+        }
+
+        function saveChannelsLocal() { localStorage.setItem('bulls_dynamic_channels', JSON.stringify(channelsDatabase)); renderChannelList(); }
+        function closeModal(id) { document.getElementById(id).style.display = "none"; }
+
+        // FROSCH FUNKTIONEN
+        function buildFrogMenu() {
+            const grid = document.getElementById("frogGrid"); if (!grid) return; grid.innerHTML = "";
+            FROG_DATABASE[currentFrogTab].forEach(frog => {
+                let div = document.createElement("div"); div.className = "frog-item";
+                div.onclick = () => { document.getElementById("groupMessageInput").value += " " + frog.code + " "; toggleFrogBox(); document.getElementById("groupMessageInput").focus(); };
+                div.innerHTML = `<img src="${frog.url}">`; grid.appendChild(div);
+            });
+        }
+        function switchFrogTab(t) { currentFrogTab = t; document.querySelectorAll('.frog-tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(`tab-${t}`).classList.add('active'); buildFrogMenu(); }
+        function toggleFrogBox() { const b = document.getElementById("frogBox"); b.style.display = b.style.display === "flex" ? "none" : "flex"; }
+        function parseFrogEmojis(t) { if(!t) return ""; let ct = t; Object.values(FROG_DATABASE).flat().forEach(f => { ct = ct.replace(new RegExp(f.code.replace('[','\\[').replace(']','\\]'), 'g'), `<img class="chat-pepe" src="${f.url}">`); }); return ct; }
+        function cleanFrogCodes(t) { if(!t) return ""; let ct = t; Object.values(FROG_DATABASE).flat().forEach(f => { ct = ct.replace(new RegExp(f.code.replace('[','\\[').replace(']','\\]'), 'g'), ""); }); return ct; }
     </script>
 </body>
 </html>
