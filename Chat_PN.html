@@ -68,13 +68,19 @@
         .send-btn { background: #ff8c00; color: #000; border: none; padding: 15px 35px; font-family: 'Almendra'; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; box-shadow: 0 0 15px rgba(255, 140, 0, 0.3); }
         .send-btn:hover { background: #e07b00; }
 
-        /* FROSCH BOX STYLES */
-        .frog-box { position: absolute; bottom: 85px; right: 20px; width: 320px; height: 260px; background: #0f0f11; border: 2px solid #39d353; border-radius: 8px; display: none; flex-direction: column; box-shadow: 0 0 25px rgba(57, 211, 83, 0.4); z-index: 2000; }
+        /* DISCORD-STYLE FROSCH BOX (ERWEITERT & SCROLLBAR) */
+        .frog-box { position: absolute; bottom: 85px; right: 20px; width: 360px; height: 340px; background: #0f0f11; border: 2px solid #39d353; border-radius: 8px; display: none; flex-direction: column; box-shadow: 0 0 25px rgba(57, 211, 83, 0.4); z-index: 2000; }
         .frog-header { background: #161a16; padding: 8px 12px; font-weight: bold; color: #39d353; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
-        .frog-grid { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 10px; overflow-y: auto; }
-        .frog-item { cursor: pointer; border: 1px solid #222; padding: 5px; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: #151515; transition: 0.1s; }
-        .frog-item:hover { border-color: #39d353; background: #1c251c; transform: scale(1.08); }
-        .frog-item img { width: 45px; height: 45px; object-fit: contain; }
+        
+        /* UMKLAPP-KATEGORIEN (TABS) */
+        .frog-tabs { display: flex; background: #111; border-bottom: 1px solid #222; }
+        .frog-tab-btn { flex: 1; padding: 8px 5px; font-family: 'Almendra'; font-size: 13px; background: none; border: none; color: #666; cursor: pointer; border-bottom: 2px solid transparent; text-align: center; }
+        .frog-tab-btn.active { color: #39d353; border-bottom-color: #39d353; background: #161a16; font-weight: bold; }
+
+        .frog-grid { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 12px; overflow-y: auto; }
+        .frog-item { cursor: pointer; border: 1px solid #222; padding: 5px; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: #151515; transition: 0.1s; height: 55px; }
+        .frog-item:hover { border-color: #39d353; background: #1c251c; transform: scale(1.06); }
+        .frog-item img { width: 42px; height: 42px; object-fit: contain; }
 
         /* STREAM STYLES */
         .msg-line { display: flex; flex-direction: column; background: #111; border-left: 3px solid #ff3131; padding: 10px 15px; border-radius: 0 6px 6px 0; max-width: 85%; align-self: flex-start; }
@@ -84,7 +90,7 @@
         .msg-line.me .meta-user { color: #39d353; }
         .meta-time { color: #666; }
         .msg-text { font-family: sans-serif; font-size: 15px; line-height: 1.4; color: #eee; word-break: break-word; }
-        .msg-text img.chat-pepe { max-width: 55px; max-height: 55px; display: inline-block; vertical-align: middle; margin: 2px; }
+        .msg-text img.chat-pepe { max-width: 50px; max-height: 50px; display: inline-block; vertical-align: middle; margin: 2px; }
         
         .side-bar::-webkit-scrollbar, .stream-area::-webkit-scrollbar, .frog-grid::-webkit-scrollbar { width: 6px; }
         .side-bar::-webkit-scrollbar-thumb, .stream-area::-webkit-scrollbar-thumb, .frog-grid::-webkit-scrollbar-thumb { background: #222; border-radius: 3px; }
@@ -134,8 +140,13 @@
 
                 <div class="frog-box" id="frogBox">
                     <div class="frog-header">
-                        <span>FROSCH-FUNK EMOTES</span>
-                        <span style="cursor:pointer;color:#ff3131;" onclick="toggleFrogBox()">X</span>
+                        <span>FROSCH-FUNK MULTIVERSUM</span>
+                        <span style="cursor:pointer;color:#ff3131;font-weight:bold;" onclick="toggleFrogBox()">X</span>
+                    </div>
+                    <div class="frog-tabs">
+                        <button class="frog-tab-btn active" id="tab-classic" onclick="switchFrogTab('classic')">🟢 Klassiker</button>
+                        <button class="frog-tab-btn" id="tab-hype" onclick="switchFrogTab('hype')">🔥 Hype & Fun</button>
+                        <button class="frog-tab-btn" id="tab-sad" onclick="switchFrogTab('sad')">💀 Ernst</button>
                     </div>
                     <div class="frog-grid" id="frogGrid"></div>
                 </div>
@@ -147,18 +158,42 @@
     <script>
         let allianzUsersList = [];
         let lastMessageCount = 0;
+        let locallyOpenedChats = new Set(); // Hält neu geöffnete Kanäle sofort links aktiv!
+        let currentTab = 'classic';
 
-        // Emoji-Datenbank mit absolut ausfallsicheren, freien PNG/GIF-Direktlinks
-        const FROG_DATABASE = [
-            { code: "[pepejail]", url: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f6a8/512.webp" }, // Ersatz-Icons, die garantiert laden
-            { code: "[pepeJam]", url: "https://openmoji.org/data/color/svg/1F438.svg" },
-            { code: "[PepePls]", url: "https://openmoji.org/data/color/svg/1F49A.svg" },
-            { code: "[EZ]", url: "https://openmoji.org/data/color/svg/1F60E.svg" },
-            { code: "[lovePepe]", url: "https://openmoji.org/data/color/svg/1F970.svg" },
-            { code: "[sadPepe]", url: "https://openmoji.org/data/color/svg/1F343.svg" },
-            { code: "[clownPepe]", url: "https://openmoji.org/data/color/svg/1F0CF.svg" },
-            { code: "[popcorn]", url: "https://openmoji.org/data/color/svg/1F37F.svg" }
-        ];
+        // Gigantische, nach Kategorien sortierte Emoji-Datenbank (offene SVG/PNG Quellen)
+        const FROG_DATABASE = {
+            classic: [
+                { code: "[pepeFrog]", url: "https://openmoji.org/data/color/svg/1F438.svg" },
+                { code: "[pepeEZ]", url: "https://openmoji.org/data/color/svg/1F60E.svg" },
+                { code: "[pepeSmile]", url: "https://openmoji.org/data/color/svg/1F642.svg" },
+                { code: "[pepeWink]", url: "https://openmoji.org/data/color/svg/1F609.svg" },
+                { code: "[pepeLove]", url: "https://openmoji.org/data/color/svg/1F970.svg" },
+                { code: "[pepeHeart]", url: "https://openmoji.org/data/color/svg/1F49A.svg" },
+                { code: "[pepeCool]", url: "https://openmoji.org/data/color/svg/1F919.svg" },
+                { code: "[pepeSalute]", url: "https://openmoji.org/data/color/svg/1F601.svg" }
+            ],
+            hype: [
+                { code: "[pepeFire]", url: "https://openmoji.org/data/color/svg/1F525.svg" },
+                { code: "[pepeRocket]", url: "https://openmoji.org/data/color/svg/1F680.svg" },
+                { code: "[pepePopcorn]", url: "https://openmoji.org/data/color/svg/1F37F.svg" },
+                { code: "[pepeCrown]", url: "https://openmoji.org/data/color/svg/1F451.svg" },
+                { code: "[pepeBeer]", url: "https://openmoji.org/data/color/svg/1F37A.svg" },
+                { code: "[pepeTrophy]", url: "https://openmoji.org/data/color/svg/1F3C6.svg" },
+                { code: "[pepeFlex]", url: "https://openmoji.org/data/color/svg/1F4AA.svg" },
+                { code: "[pepeParty]", url: "https://openmoji.org/data/color/svg/1F973.svg" }
+            ],
+            sad: [
+                { code: "[pepeJail]", url: "https://openmoji.org/data/color/svg/1F6A8.svg" },
+                { code: "[pepeSad]", url: "https://openmoji.org/data/color/svg/1F343.svg" },
+                { code: "[pepeClown]", url: "https://openmoji.org/data/color/svg/1F0CF.svg" },
+                { code: "[pepeSkull]", url: "https://openmoji.org/data/color/svg/1F480.svg" },
+                { code: "[pepeAngry]", url: "https://openmoji.org/data/color/svg/1F4A5.svg" },
+                { code: "[pepeWarning]", url: "https://openmoji.org/data/color/svg/26A0.svg" },
+                { code: "[pepeStop]", url: "https://openmoji.org/data/color/svg/1F6D1.svg" },
+                { code: "[pepeGhost]", url: "https://openmoji.org/data/color/svg/1F47B.svg" }
+            ]
+        };
 
         window.addEventListener("DOMContentLoaded", async () => {
             buildFrogMenu();
@@ -169,40 +204,45 @@
                 }
             } catch(e) { console.error(e); }
 
-            // Enter-Taste im Eingabefeld abfangen, um Senden auszulösen
             const inputField = document.getElementById("messageInput");
             if(inputField) {
                 inputField.addEventListener("keydown", function(e) {
-                    if (e.key === "Enter") {
-                        triggerSendAction();
-                    }
+                    if (e.key === "Enter") triggerSendAction();
                 });
             }
 
             await loadAllianzUserBase();
         });
 
-        // Taktischer Trigger, um die Nachricht an das Backend der funk_zentrale zu jagen
         function triggerSendAction() {
             if (typeof sendFunkMessage === "function") {
                 sendFunkMessage();
-            } else {
-                console.error("sendFunkMessage Funktion fehlt in funk_zentrale.js");
             }
         }
 
+        // Baut das Menü basierend auf dem aktiven Tab
         function buildFrogMenu() {
             const grid = document.getElementById("frogGrid");
             if (!grid) return;
             grid.innerHTML = "";
-            FROG_DATABASE.forEach(frog => {
+            
+            const selectedList = FROG_DATABASE[currentTab] || FROG_DATABASE.classic;
+            selectedList.forEach(frog => {
                 let div = document.createElement("div");
                 div.className = "frog-item";
                 div.title = frog.code;
                 div.onclick = () => injectFrogCode(frog.code);
-                div.innerHTML = `<img src="${frog.url}" style="width:40px;height:40px;">`;
+                div.innerHTML = `<img src="${frog.url}">`;
                 grid.appendChild(div);
             });
+        }
+
+        // Schaltet die Kategorien um (Klassisch / Hype / Ernst)
+        function switchFrogTab(tabName) {
+            currentTab = tabName;
+            document.querySelectorAll('.frog-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            buildFrogMenu();
         }
 
         function toggleFrogBox() {
@@ -214,7 +254,7 @@
         function injectFrogCode(code) {
             const input = document.getElementById("messageInput");
             if (!input) return;
-            input.value += "" + code + "";
+            input.value += " " + code + " ";
             toggleFrogBox();
             input.focus();
         }
@@ -222,7 +262,8 @@
         function parseFrogEmojis(text) {
             if (!text) return "";
             let cleanText = text;
-            FROG_DATABASE.forEach(frog => {
+            // Durchsucht alle Kategorien nach dem passenden Code
+            Object.values(FROG_DATABASE).flat().forEach(frog => {
                 const regex = new RegExp(frog.code.replace('[','\\[').replace(']','\\]'), 'g');
                 cleanText = cleanText.replace(regex, `<img class="chat-pepe" src="${frog.url}" title="${frog.code}">`);
             });
@@ -233,10 +274,8 @@
             try {
                 const apiUrl = (window.BULLS_CONFIG && window.BULLS_CONFIG.SCRIPT_URL) ? window.BULLS_CONFIG.SCRIPT_URL : "";
                 if(!apiUrl) return;
-                
                 const res = await fetch(apiUrl + "?action=getDropdownData");
                 const data = await res.json();
-                
                 if(data && data.user && Array.isArray(data.user)) {
                     allianzUsersList = data.user.map(u => {
                         if (!u) return "";
@@ -256,12 +295,10 @@
         function searchAllianzUser(query) {
             const dropdown = document.getElementById("searchResultsDropdown");
             if(!dropdown) return;
-            
             const myUser = localStorage.getItem('bulls_user') || "";
             dropdown.innerHTML = "";
 
             let matches = allianzUsersList.filter(name => name.toLowerCase().includes(query.toLowerCase()) && name !== myUser);
-            
             dropdown.style.display = "block";
 
             let header = document.createElement("div");
@@ -274,10 +311,7 @@
                     let div = document.createElement("div");
                     div.className = "search-result-item";
                     div.innerHTML = `<span>👤 ${name}</span><div class="status-dot"></div>`;
-                    div.onclick = (e) => {
-                        e.stopPropagation();
-                        startNewPNChannel(name);
-                    };
+                    div.onclick = (e) => { e.stopPropagation(); startNewPNChannel(name); };
                     dropdown.appendChild(div);
                 });
             } else {
@@ -293,23 +327,26 @@
             document.getElementById("searchResultsDropdown").style.display = "none";
             
             currentChatTarget = name;
+            locallyOpenedChats.add(name); // Zwingt den Chat, SOFORT links in der Liste sichtbar zu sein!
             
             const inputField = document.getElementById('messageInput');
             const sendBtn = document.getElementById('sendButton');
-            
             if(inputField) { inputField.disabled = false; inputField.placeholder = "Funkspruch eingeben..."; }
             if(sendBtn) sendBtn.disabled = false;
             
-            const label = document.getElementById('activeTargetLabel');
-            if(label) label.innerText = `Sicherer Kanal mit: ${name}`;
-            
-            const repBtn = document.getElementById('reportChannelBtn');
-            if(repBtn) repBtn.style.display = "block";
+            document.getElementById('activeTargetLabel').innerText = `Sicherer Kanal mit: ${name}`;
+            document.getElementById('reportChannelBtn').style.display = "block";
             
             markChannelAsRead(name);
-            if(typeof updateMuteStatusAndFetch === "function") {
-                updateMuteStatusAndFetch();
+            
+            // Lokales Force-Update der Sidebar, damit man den Chat sofort sieht!
+            if(window.lastChatDataCache) {
+                processChatData(window.lastChatDataCache);
+            } else {
+                processChatData({ pns: [] });
             }
+
+            if(typeof updateMuteStatusAndFetch === "function") updateMuteStatusAndFetch();
         }
 
         async function markChannelAsRead(targetName) {
@@ -339,33 +376,49 @@
         });
 
         function processChatData(data) {
+            window.lastChatDataCache = data; // Cache für lokales Rendering sichern
             const myUser = localStorage.getItem('bulls_user') || "";
             const verteiler = document.getElementById("pnChatVerteiler");
             const stream = document.getElementById("pnStreamArea");
             if(!verteiler || !stream) return;
 
-            let activePNClients = new Set();
+            // Map, um den Zeitstempel der ALLERNEUESTEN Nachricht pro User zu tracken
+            let clientLastTimestamp = {};
             let unreadCounts = {};
 
             if (data && data.pns) {
                 data.pns.forEach(msg => {
-                    if (msg.user === myUser) {
-                        activePNClients.add(msg.target);
-                    } else {
-                        activePNClients.add(msg.user);
-                        if (msg.unread && msg.target === myUser) {
-                            unreadCounts[msg.user] = (unreadCounts[msg.user] || 0) + 1;
-                        }
+                    let partner = (msg.user === myUser) ? msg.target : msg.user;
+                    if(!partner) return;
+
+                    // Zeitstempel merken für die Sortierung (Discord-Style: Neueste oben)
+                    let msgTime = new Date(msg.time).getTime() || 0;
+                    if(!clientLastTimestamp[partner] || msgTime > clientLastTimestamp[partner]) {
+                        clientLastTimestamp[partner] = msgTime;
+                    }
+
+                    if (msg.unread && msg.target === myUser) {
+                        unreadCounts[partner] = (unreadCounts[partner] || 0) + 1;
                     }
                 });
             }
 
+            // Lokale, frisch geöffnete Chats hinzufügen, falls sie noch keine Nachrichten haben
+            locallyOpenedChats.forEach(chatPartner => {
+                if (!clientLastTimestamp[chatPartner]) {
+                    clientLastTimestamp[chatPartner] = Date.now(); // Ganz nach oben setzen, da brandneu!
+                }
+            });
+
             if (currentChatTarget && currentChatTarget !== "global") {
-                activePNClients.add(currentChatTarget);
+                if (!clientLastTimestamp[currentChatTarget]) clientLastTimestamp[currentChatTarget] = Date.now();
             }
 
+            // Sortiere die Chat-Partner: Höchster Zeitstempel (Neueste) zuerst!
+            let sortedClients = Object.keys(clientLastTimestamp).sort((a, b) => clientLastTimestamp[b] - clientLastTimestamp[a]);
+
             let verteilerHTML = "";
-            activePNClients.forEach(clientName => {
+            sortedClients.forEach(clientName => {
                 if(!clientName) return;
                 let isActive = currentChatTarget === clientName ? "active" : "";
                 let badgeHTML = unreadCounts[clientName] ? `<span class="unread-badge">${unreadCounts[clientName]}</span>` : "";
@@ -414,13 +467,6 @@
                 } else {
                     stream.innerHTML = `<div style="text-align:center; color:#ff8c00; padding-top:50px; font-style:italic;">Abgesicherter 1-zu-1 Funkkanal. Schreib eine Nachricht! 🔐</div>`;
                 }
-            }
-
-            const typingIndicator = document.getElementById("typingIndicator");
-            if (typingIndicator && data && data.typing && data.typing.pns && data.typing.pns[currentChatTarget]) {
-                typingIndicator.innerText = `⚡ ${currentChatTarget} schreibt gerade...`;
-            } else if(typingIndicator) {
-                typingIndicator.innerText = "";
             }
         }
     </script>
