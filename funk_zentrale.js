@@ -18,35 +18,35 @@
         .nav-link-btn.active { background: #ff3131; color: #000; border-color: #ff3131; font-weight: bold; box-shadow: 0 0 15px rgba(255, 49, 49, 0.4); }
         .logout-btn { background: #ff0000; color: #fff; border: none; padding: 8px 15px; font-family: 'Almendra'; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
 
-        /* MULTI-PANEL CHAT LAYOUT */
-        .chat-container { flex: 1; display: flex; max-width: 1400px; width: 100%; margin: 0 auto; background: rgba(10, 10, 10, 0.95); border-left: 1px solid #222; border-right: 1px solid #222; overflow: hidden; }
-        
-        /* LINKER PRIVAT-FUNK-VERTEILER */
-        .side-bar { width: 320px; background: #0b0b0c; border-right: 1px solid #222; display: flex; flex-direction: column; }
+       /* MULTI-PANEL CHAT LAYOUT */
+.chat-container { flex: 1; display: flex; max-width: 1400px; width: 100%; margin: 0 auto; background: rgba(10, 10, 10, 0.95); border-left: 1px solid #222; border-right: 1px solid #222; overflow: hidden; }
 
-        .new-chat-action-btn { background: #111; border: 1px solid #ff8c00; color: #ff8c00; padding: 12px; margin: 15px 15px 5px 15px; font-family: 'Almendra'; font-weight: bold; font-size: 15px; border-radius: 6px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; box-shadow: 0 0 10px rgba(255, 140, 0, 0.1); display: block; text-align: center; }
-        .new-chat-action-btn:hover { background: #ff8c00; color: #000; box-shadow: 0 0 15px rgba(255, 140, 0, 0.4); }
+/* LINKER PRIVAT-FUNK-VERTEILER */
+.side-bar { width: 320px; background: #0b0b0c; border-right: 1px solid #222; display: flex; flex-direction: column; }
 
-        .search-box { padding: 10px 15px 15px 15px; border-bottom: 1px solid #1a1a1a; position: relative; }
-        .search-box input { width: 100%; background: #151515; border: 1px solid #333; padding: 10px; color: #fff; border-radius: 5px; box-sizing: border-box; }
-        .search-box input:focus { outline: none; border-color: #ff3131; }
-        
-        /* Dropdown für feste Spieler-Liste */
-        .search-results { position: absolute; top: 55px; left: 15px; right: 15px; background: #0c0c0e; border: 1px solid #ff8c00; border-radius: 6px; max-height: 300px; overflow-y: auto; z-index: 9999; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.9); }
-        .search-results-header { background: #151518; padding: 8px 12px; font-size: 13px; color: #ff8c00; font-weight: bold; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
-        .search-result-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #161616; font-family: sans-serif; font-size: 14px; display: flex; justify-content: space-between; align-items: center; color: #eee; }
-        .search-result-item:hover { background: #ff8c00; color: #000; font-weight: bold; }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #39d353; box-shadow: 0 0 8px #39d353; }
+.new-chat-action-btn { background: #111; border: 1px solid #ff8c00; color: #ff8c00; padding: 12px; margin: 15px 15px 5px 15px; font-family: 'Almendra'; font-weight: bold; font-size: 15px; border-radius: 6px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; box-shadow: 0 0 10px rgba(255, 140, 0, 0.1); display: block; text-align: center; }
+.new-chat-action-btn:hover { background: #ff8c00; color: #000; box-shadow: 0 0 15px rgba(255, 140, 0, 0.4); }
 
-        .chat-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
-        .chat-item { padding: 15px 20px; border-bottom: 1px solid #1a1a1a; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
-        .chat-item:hover { background: #151515; border-left: 3px solid #ff3131; }
-        .chat-item.active { background: #1c1515; border-left: 3px solid #ff3131; }
-        .chat-name { font-weight: bold; font-size: 16px; }
-        
-        .unread-badge { background: #ff3131; color: white; font-family: sans-serif; font-size: 12px; font-weight: bold; padding: 3px 8px; border-radius: 10px; box-shadow: 0 0 10px rgba(255,49,49,0.5); }
+.search-box { padding: 10px 15px 15px 15px; border-bottom: 1px solid #1a1a1a; position: relative; }
+.search-box input { width: 100%; background: #151515; border: 1px solid #333; padding: 10px; color: #fff; border-radius: 5px; box-sizing: border-box; }
+.search-box input:focus { outline: none; border-color: #ff3131; }
 
-        /* RECHTER CHAT STREAM */
+/* Dropdown für feste Spieler-Liste */
+.search-results { position: absolute; top: 55px; left: 15px; right: 15px; background: #0c0c0e; border: 1px solid #ff8c00; border-radius: 6px; max-height: 300px; overflow-y: auto; z-index: 9999; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.9); }
+.search-results-header { background: #151518; padding: 8px 12px; font-size: 13px; color: #ff8c00; font-weight: bold; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+.search-result-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #161616; font-family: sans-serif; font-size: 14px; display: flex; justify-content: space-between; align-items: center; color: #eee; }
+.search-result-item:hover { background: #ff8c00; color: #000; font-weight: bold; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: #39d353; box-shadow: 0 0 8px #39d353; }
+
+.chat-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+.chat-item { padding: 15px 20px; border-bottom: 1px solid #1a1a1a; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+.chat-item:hover { background: #151515; border-left: 3px solid #ff3131; }
+.chat-item.active { background: #1c1515; border-left: 3px solid #ff3131; }
+.chat-name { font-weight: bold; font-size: 16px; }
+
+.unread-badge { background: #ff3131; color: white; font-family: sans-serif; font-size: 12px; font-weight: bold; padding: 3px 8px; border-radius: 10px; box-shadow: 0 0 10px rgba(255,49,49,0.5); }
+
+/* RECHTER CHAT STREAM */
         .chat-main { flex: 1; display: flex; flex-direction: column; position: relative; }
         
         /* CHAT HEADER MIT SUPPORT BUTTON */
