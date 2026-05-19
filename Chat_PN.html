@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DARK BULLS - DIREKTFUNK</title>
-    <script src="config.js"></script>
-    <script src="funk_zentrale.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; padding: 0; background-color: #050505; color: white; font-family: 'Almendra', serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
@@ -30,7 +28,8 @@
         .search-results-header { background: #151518; padding: 8px 12px; font-size: 13px; color: #ff8c00; font-weight: bold; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
         .search-result-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #161616; font-family: sans-serif; font-size: 14px; display: flex; justify-content: space-between; align-items: center; color: #eee; }
         .search-result-item:hover { background: #ff8c00; color: #000; font-weight: bold; }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #39d353; box-shadow: 0 0 8px #39d353; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #555; }
+        .status-dot.online { background: #39d353; box-shadow: 0 0 8px #39d353; }
 
         .chat-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
         .chat-item { padding: 15px 20px; border-bottom: 1px solid #1a1a1a; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
@@ -38,6 +37,7 @@
         .chat-item.active { background: #1c1515; border-left: 3px solid #ff3131; }
         .chat-name { font-weight: bold; font-size: 16px; }
         .unread-badge { background: #ff3131; color: white; font-family: sans-serif; font-size: 12px; font-weight: bold; padding: 3px 8px; border-radius: 10px; box-shadow: 0 0 10px rgba(255,49,49,0.5); }
+        .new-msg-dot { width: 10px; height: 10px; background: red; border-radius: 50%; display: inline-block; }
 
         .chat-main { flex: 1; display: flex; flex-direction: column; position: relative; }
         .chat-header-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #0c0c0e; border-bottom: 1px solid #222; min-height: 25px; }
@@ -45,7 +45,6 @@
         .report-btn:hover { background: #ff3131; color: #000; font-weight: bold; box-shadow: 0 0 10px rgba(255, 49, 49, 0.4); }
 
         .stream-area { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        .typing-box { padding: 5px 20px; color: #ff8c00; font-size: 14px; font-style: italic; min-height: 20px; }
 
         .input-bar { display: flex; gap: 12px; padding: 20px; background: #0c0c0e; border-top: 1px solid #222; align-items: center; position: relative; }
         .input-bar input { flex: 1; background: #151515; border: 1px solid #ff3131; padding: 15px; color: #fff; font-family: sans-serif; font-size: 15px; border-radius: 6px; }
@@ -86,7 +85,7 @@
             <button class="nav-link-btn" onclick="window.location.href='Chat_Support.html'">🚨 Support</button>
         </div>
         <div style="color: #ff3131; font-size: 18px;" id="userDisplay">Bulls Direktfunk...</div>
-        <button class="logout-btn" onclick="logoutFunk()">X</button>
+        <button class="logout-btn" onclick="location.reload()">X</button>
     </div>
 
     <div class="chat-container">
@@ -108,8 +107,6 @@
             <div class="stream-area" id="pnStreamArea">
                 <div style="text-align:center; color:#ff8c00; font-style:italic; padding-top:50px;">Wähle links einen aktiven Kanal aus oder nutze die Suche, um ein neues Gespräch zu beginnen. ⚡</div>
             </div>
-            
-            <div class="typing-box" id="typingIndicator"></div>
 
             <div class="input-bar">
                 <button class="frog-trigger-btn" id="frogTrigger" onclick="toggleFrogBox()">🐸</button>
@@ -132,10 +129,20 @@
         </div>
     </div>
 
-   <script>
-        let allianzUsersList = [];
-        let locallyOpenedChats = new Set(); 
+    <script>
+        // SYSTEM KONSTANTEN AUS DEINEM HAUPTCODE
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIXKlIvApuZH1po2w1Hjzc03v8IhMiVnE40h6BRTuXbaWPHj1n0DwtO6DKVJo6-fCYxQ/exec'; 
+        const SHEET_ID = '1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ';
+        const GID_USERS = '1188820112';
+        const GID_CHAT = '274206006';
+
+        let users = [];
+        let allChatData = [];
+        let currentChatTarget = ""; // Name des Partners
         let currentTab = 'classic';
+        let myName = "";
+        let lastSeen = JSON.parse(localStorage.getItem('bullsChatLastSeen')) || {};
+        let activeLocalPartners = new Set(); // Chats die temporär gesucht wurden
 
         const FROG_DATABASE = {
             classic: [
@@ -171,12 +178,18 @@
         };
 
         window.addEventListener("DOMContentLoaded", async () => {
+            // Hole Namen aus der Hauptseite, falls eingeloggt, andernfalls Testmodus
+            myName = localStorage.getItem('bulls_user') || window.name || "";
+            if(!myName) {
+                // Notfall-Abfrage falls localStorage leer ist
+                myName = prompt("Bitte gib deinen User-Namen ein für den Funkkreis:") || "TestUser";
+                localStorage.setItem('bulls_user', myName);
+            }
+            document.getElementById("userDisplay").innerText = `🔑 Funker: ${myName}`;
+
             buildFrogMenu();
             
-            if (typeof initFunkkreis === "function") {
-                initFunkkreis("pn");
-            }
-
+            // Enter-Taste fängt Senden ab
             const inputField = document.getElementById("messageInput");
             if (inputField) {
                 inputField.addEventListener("keydown", function(e) {
@@ -187,38 +200,236 @@
                 });
             }
 
-            await loadAllianzUserBase();
+            // Sofort laden und Intervalle starten (4 Sek Chat, 10 Sek User)
+            await loadData();
+            await loadChatHistory();
+            
+            setInterval(loadChatHistory, 4000);
+            setInterval(loadData, 10000);
         });
 
-        // HIER PASSIERT DIE MAGIE: Falls die Zentrale nach einer anderen ID sucht, fangen wir das ab!
-        function triggerSendAction() {
-            const currentInput = document.getElementById("messageInput");
-            if (!currentInput || !currentInput.value.trim()) return;
+        // 1:1 BACKEND-SPEZIFISCHE SENDEFUNKTION
+        async function triggerSendAction() {
+            const input = document.getElementById("messageInput"); 
+            const msg = input.value.trim(); 
+            if(!msg || !currentChatTarget) return;
 
-            console.log("Absende-Versuch gestartet für:", currentChatTarget);
-
-            // Sicherheitsnetz: Falls deine funk_zentrale.js hart auf 'chatTextInput' programmiert ist:
-            let backupInput = document.getElementById("chatTextInput");
-            if (!backupInput) {
-                backupInput = document.createElement("input");
-                backupInput.id = "chatTextInput";
-                backupInput.type = "hidden";
-                document.body.appendChild(backupInput);
-            }
-            backupInput.value = currentInput.value;
-
-            if (typeof sendFunkMessage === "function") {
-                sendFunkMessage();
-                
-                // Textfeld nach kurzem Moment leeren (Zentrale braucht kurz zum Lesen)
-                setTimeout(() => {
-                    currentInput.value = "";
-                }, 50);
+            // Generiere KanalID exakt wie auf der Hauptseite
+            let kanalID = [myName, currentChatTarget].sort().join("-");
+            
+            // Sofort lokal ins Interface spritzen für superschnelles Feedback
+            const stream = document.getElementById("pnStreamArea");
+            let processedMsg = parseFrogEmojis(msg);
+            let tempLine = `
+                <div class="msg-line me">
+                    <div class="msg-meta"><span class="meta-user">${myName}</span><span class="meta-time">gesendet...</span></div>
+                    <div class="msg-text">${processedMsg}</div>
+                </div>`;
+            
+            if(stream.innerHTML.includes("Abgesicherter Funkkanal")) {
+                stream.innerHTML = tempLine;
             } else {
-                console.error("Fehler: sendFunkMessage() existiert nicht in funk_zentrale.js!");
+                stream.innerHTML += tempLine;
+            }
+            stream.scrollTop = stream.scrollHeight;
+            
+            input.value = ""; // Feld leeren
+
+            // Senden mit exakter Struktur deines Sheets
+            try {
+                await fetch(SCRIPT_URL, { 
+                    method: "POST", 
+                    body: JSON.stringify({ 
+                        action: "sendChat", 
+                        absender: myName, 
+                        kanalID: kanalID, 
+                        nachricht: msg 
+                    }) 
+                });
+            } catch(e) {
+                console.error("Fehler beim Senden an Google:", e);
+            }
+            
+            // Direkt updaten nach Senden
+            loadChatHistory();
+        }
+
+        // DATEN AUS SHEET ABFRAGEN
+        async function loadData() {
+            try {
+                const res = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID_USERS}&t=${new Date().getTime()}`);
+                const text = await res.text();
+                const rows = text.split('\n').slice(1);
+                users = rows.map(r => {
+                    const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    const cl = (s) => s ? s.replace(/["']/g, "").trim() : "";
+                    return { name: cl(c[0]), pin: cl(c[2]), role: cl(c[3]), lastActive: cl(c[4]) };
+                });
+                buildVerteilerListe();
+            } catch(e) { console.error("Fehler beim User-Update"); }
+        }
+
+        async function loadChatHistory() {
+            try {
+                const res = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID_CHAT}&t=${new Date().getTime()}`);
+                const text = await res.text();
+                const rows = text.split('\n').slice(1);
+                allChatData = rows.map(r => r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/"/g,"").trim()));
+                
+                buildVerteilerListe();
+                renderStream();
+            } catch(e) { console.error("Fehler beim Chat-Update"); }
+        }
+
+        // RECHTE SPALTE RENDER-LOGIK
+        function renderStream() {
+            if(!currentChatTarget) return;
+            const stream = document.getElementById("pnStreamArea");
+            let kanalID = [myName, currentChatTarget].sort().join("-");
+            
+            // Gelesen-Zeitpunkt setzen
+            lastSeen[kanalID] = new Date().getTime();
+            localStorage.setItem('bullsChatLastSeen', JSON.stringify(lastSeen));
+
+            let html = "";
+            allChatData.forEach(c => {
+                if(c[2] === kanalID) {
+                    let isMe = c[1] === myName ? "me" : "";
+                    let processedMsg = parseFrogEmojis(c[3]);
+                    let timeDisplay = c[0] ? c[0].split(" ")[1] || "" : ""; // Extrahiert Uhrzeit falls vorhanden
+                    
+                    html += `
+                        <div class="msg-line ${isMe}">
+                            <div class="msg-meta">
+                                <span class="meta-user">${c[1]}</span>
+                                <span class="meta-time">${timeDisplay}</span>
+                            </div>
+                            <div class="msg-text">${processedMsg}</div>
+                        </div>`;
+                }
+            });
+
+            if(html) {
+                stream.innerHTML = html;
+                stream.scrollTop = stream.scrollHeight;
+            } else {
+                stream.innerHTML = `<div style="text-align:center; color:#ff8c00; padding-top:50px; font-style:italic;">Abgesicherter Funkkanal mit ${currentChatTarget}. Schreib eine Nachricht! 🔐</div>`;
             }
         }
 
+        // LINKE SPALTE RENDER-LOGIK (VERTEILER)
+        function buildVerteilerListe() {
+            const verteiler = document.getElementById("pnChatVerteiler");
+            if(!verteiler) return;
+
+            // Finde heraus, wer mit uns geschrieben hat anhand aller Chat-Zeilen
+            let chatPartnersFromDatabase = new Set();
+            allChatData.forEach(c => {
+                if(c[2] && c[2].includes("-") && !c[2].startsWith("SUPPORT-")) {
+                    let parts = c[2].split("-");
+                    if(parts.includes(myName)) {
+                        let partner = parts[0] === myName ? parts[1] : parts[0];
+                        if(partner) chatPartnersFromDatabase.add(partner);
+                    }
+                }
+            });
+
+            // Kombiniere Datenbank-Kontakte mit neu geöffneten Kontakten aus der Suche
+            let allPartners = new Set([...chatPartnersFromDatabase, ...activeLocalPartners]);
+            if(currentChatTarget) allPartners.add(currentChatTarget);
+
+            let htmlHTML = "";
+            allPartners.forEach(pName => {
+                if(!pName || pName === myName) return;
+                
+                let isActive = currentChatTarget === pName ? "active" : "";
+                let kanalID = [myName, pName].sort().join("-");
+                
+                // Online Check
+                let userObj = users.find(u => u.name.toLowerCase() === pName.toLowerCase());
+                let isOnline = false;
+                if(userObj && userObj.lastActive) {
+                    isOnline = (new Date() - new Date(userObj.lastActive)) < 300000;
+                }
+
+                // Benachrichtigungs-Check (Ungelesene Nachrichten zählen)
+                let unreadCount = 0;
+                allChatData.forEach(c => {
+                    if(c[2] === kanalID && c[1] !== myName) {
+                        let msgTime = new Date(c[0]).getTime();
+                        if(!lastSeen[kanalID] || msgTime > lastSeen[kanalID]) {
+                            unreadCount++;
+                        }
+                    }
+                });
+
+                let badge = unreadCount > 0 ? `<span class="unread-badge">${unreadCount}</span>` : "";
+
+                htmlHTML += `
+                    <div class="chat-item ${isActive}" onclick="startNewPNChannel('${pName}')">
+                        <span class="chat-name"><span class="status-dot ${isOnline ? 'online' : ''}" style="display:inline-block; margin-right:8px; width:8px; height:8px; border-radius:50%;"></span>👤 ${pName}</span>
+                        ${badge}
+                    </div>`;
+            });
+
+            verteiler.innerHTML = htmlHTML || `<div style="padding:20px; color:#555; text-align:center;">Keine aktiven PNs. Klicke auf "Neuen Chat öffnen"!</div>`;
+        }
+
+        function startNewPNChannel(name) {
+            currentChatTarget = name;
+            activeLocalPartners.add(name);
+            
+            document.getElementById('activeTargetLabel').innerText = `Sicherer Kanal mit: ${name}`;
+            document.getElementById('reportChannelBtn').style.display = "block";
+            
+            // Schalte Felder frei
+            const inputField = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendButton');
+            if(inputField) { inputField.disabled = false; inputField.placeholder = "Funkspruch eingeben..."; }
+            if(sendBtn) sendBtn.disabled = false;
+
+            renderStream();
+            buildVerteilerListe();
+        }
+
+        // USER-SUCHE LOGIK
+        function openFesteSpielerListe(event) {
+            if(event) event.stopPropagation();
+            searchAllianzUser("");
+        }
+
+        function searchAllianzUser(query) {
+            const dropdown = document.getElementById("searchResultsDropdown");
+            if(!dropdown) return;
+            dropdown.innerHTML = "";
+
+            let matches = users.filter(u => u.name.toLowerCase().includes(query.toLowerCase()) && u.name !== myName);
+            dropdown.style.display = "block";
+
+            let header = document.createElement("div");
+            header.className = "search-results-header";
+            header.innerHTML = `<span>VERFÜGBARE SPIELER</span><span style="cursor:pointer;color:#ff3131;" onclick="event.stopPropagation(); document.getElementById('searchResultsDropdown').style.display='none'">X</span>`;
+            dropdown.appendChild(header);
+
+            if (matches.length > 0) {
+                matches.forEach(u => {
+                    let lastDate = new Date(u.lastActive);
+                    let isOnline = (new Date() - lastDate) < 300000;
+                    let div = document.createElement("div");
+                    div.className = "search-result-item";
+                    div.innerHTML = `<span>👤 ${u.name}</span><div class="status-dot ${isOnline ? 'online' : ''}" style="width:8px; height:8px; border-radius:50%;"></div>`;
+                    div.onclick = (e) => { e.stopPropagation(); startNewPNChannel(u.name); document.getElementById("searchResultsDropdown").style.display='none'; };
+                    dropdown.appendChild(div);
+                });
+            } else {
+                let div = document.createElement("div");
+                div.style.padding = "15px"; div.style.color = "#666";
+                div.innerText = "Keine Spieler gefunden.";
+                dropdown.appendChild(div);
+            }
+        }
+
+        // FROSCH MULTIVERSUM LOGIK
         function buildFrogMenu() {
             const grid = document.getElementById("frogGrid");
             if (!grid) return;
@@ -264,87 +475,8 @@
             return cleanText;
         }
 
-        async function loadAllianzUserBase() {
-            try {
-                const apiUrl = (window.BULLS_CONFIG && window.BULLS_CONFIG.SCRIPT_URL) ? window.BULLS_CONFIG.SCRIPT_URL : "";
-                if(!apiUrl) return;
-                const res = await fetch(apiUrl + "?action=getDropdownData");
-                const data = await res.json();
-                if(data && data.user && Array.isArray(data.user)) {
-                    allianzUsersList = data.user.map(u => u && typeof u === "object" ? u.name : u).filter(name => name && name.trim() !== "");
-                }
-            } catch(e) { 
-                allianzUsersList = ["Admin-Zentrale", "TestUser"];
-            }
-        }
-
-        function openFesteSpielerListe(event) {
-            if(event) event.stopPropagation();
-            searchAllianzUser("");
-        }
-
-        function searchAllianzUser(query) {
-            const dropdown = document.getElementById("searchResultsDropdown");
-            if(!dropdown) return;
-            const myUser = localStorage.getItem('bulls_user') || "";
-            dropdown.innerHTML = "";
-
-            let matches = allianzUsersList.filter(name => name.toLowerCase().includes(query.toLowerCase()) && name !== myUser);
-            dropdown.style.display = "block";
-
-            let header = document.createElement("div");
-            header.className = "search-results-header";
-            header.innerHTML = `<span>VERFÜGBARE SPIELER</span><span style="cursor:pointer;color:#ff3131;" onclick="event.stopPropagation(); document.getElementById('searchResultsDropdown').style.display='none'">X</span>`;
-            dropdown.appendChild(header);
-
-            if (matches.length > 0) {
-                matches.forEach(name => {
-                    let div = document.createElement("div");
-                    div.className = "search-result-item";
-                    div.innerHTML = `<span>👤 ${name}</span><div class="status-dot"></div>`;
-                    div.onclick = (e) => { e.stopPropagation(); startNewPNChannel(name); };
-                    dropdown.appendChild(div);
-                });
-            } else {
-                let div = document.createElement("div");
-                div.style.padding = "15px"; div.style.color = "#666";
-                div.innerText = "Keine Spieler gefunden.";
-                dropdown.appendChild(div);
-            }
-        }
-
-        function startNewPNChannel(name) {
-            document.getElementById("userInputSearch").value = "";
-            document.getElementById("searchResultsDropdown").style.display = "none";
-            
-            currentChatTarget = name; 
-            locallyOpenedChats.add(name); 
-            
-            forceUnlockInput();
-            
-            document.getElementById('activeTargetLabel').innerText = `Sicherer Kanal mit: ${name}`;
-            document.getElementById('reportChannelBtn').style.display = "block";
-            
-            if(window.lastChatDataCache) {
-                processChatData(window.lastChatDataCache);
-            } else {
-                processChatData({ pns: [] });
-            }
-
-            if(typeof updateMuteStatusAndFetch === "function") updateMuteStatusAndFetch();
-        }
-
-        function forceUnlockInput() {
-            if (currentChatTarget && currentChatTarget !== "global") {
-                const inputField = document.getElementById('messageInput');
-                const sendBtn = document.getElementById('sendButton');
-                if(inputField) { inputField.disabled = false; inputField.placeholder = "Funkspruch eingeben..."; }
-                if(sendBtn) sendBtn.disabled = false;
-            }
-        }
-
         function reportCurrentPlayer() {
-            if(!currentChatTarget || currentChatTarget === "global") return;
+            if(!currentChatTarget) return;
             if(confirm(`PN-Kanal mit [ ${currentChatTarget} ] dem Support melden?`)) {
                 window.location.href = `Chat_Support.html?report=${encodeURIComponent(currentChatTarget)}`;
             }
@@ -356,92 +488,6 @@
                 dropdown.style.display = "none";
             }
         });
-
-        function processChatData(data) {
-            window.lastChatDataCache = data; 
-            const myUser = localStorage.getItem('bulls_user') || "";
-            const verteiler = document.getElementById("pnChatVerteiler");
-            const stream = document.getElementById("pnStreamArea");
-            if(!verteiler || !stream) return;
-
-            forceUnlockInput();
-
-            let clientLastTimestamp = {};
-            let unreadCounts = {};
-
-            if (data && data.pns) {
-                data.pns.forEach(msg => {
-                    let partner = (msg.user === myUser) ? msg.target : msg.user;
-                    if(!partner) return;
-                    let msgTime = new Date(msg.time).getTime() || 0;
-                    if(!clientLastTimestamp[partner] || msgTime > clientLastTimestamp[partner]) {
-                        clientLastTimestamp[partner] = msgTime;
-                    }
-                    if (msg.unread && msg.target === myUser) {
-                        unreadCounts[partner] = (unreadCounts[partner] || 0) + 1;
-                    }
-                });
-            }
-
-            locallyOpenedChats.forEach(chatPartner => {
-                if (!clientLastTimestamp[chatPartner]) clientLastTimestamp[chatPartner] = Date.now();
-            });
-
-            if (currentChatTarget && currentChatTarget !== "global") {
-                if (!clientLastTimestamp[currentChatTarget]) clientLastTimestamp[currentChatTarget] = Date.now();
-            }
-
-            let sortedClients = Object.keys(clientLastTimestamp).sort((a, b) => clientLastTimestamp[b] - clientLastTimestamp[a]);
-
-            let verteilerHTML = "";
-            sortedClients.forEach(clientName => {
-                if(!clientName) return;
-                let isActive = currentChatTarget === clientName ? "active" : "";
-                let badgeHTML = unreadCounts[clientName] ? `<span class="unread-badge">${unreadCounts[clientName]}</span>` : "";
-                verteilerHTML += `
-                    <div class="chat-item ${isActive}" onclick="startNewPNChannel('${clientName}')">
-                        <span class="chat-name">👤 ${clientName}</span>
-                        ${badgeHTML}
-                    </div>
-                `;
-            });
-            verteiler.innerHTML = verteilerHTML || `<div style="padding:20px; color:#555; text-align:center;">Keine aktiven PNs. Klicke auf "Neuen Chat öffnen"!</div>`;
-
-            if (currentChatTarget && currentChatTarget !== "global") {
-                let htmlHTML = "";
-                let filteredPNs = data && data.pns ? data.pns.filter(msg => 
-                    (msg.user === myUser && msg.target === currentChatTarget) || 
-                    (msg.user === currentChatTarget && msg.target === myUser)
-                ) : [];
-
-                if (filteredPNs.length > 0) {
-                    filteredPNs.forEach(msg => {
-                        let isMe = msg.user === myUser ? "me" : "";
-                        let processedMsg = parseFrogEmojis(msg.msg);
-                        htmlHTML += `
-                            <div class="msg-line ${isMe}">
-                                <div class="msg-meta">
-                                    <span class="meta-user">${msg.user}</span>
-                                    <span class="meta-time">${typeof formatFunkZeit === "function" ? formatFunkZeit(msg.time) : ""}</span>
-                                </div>
-                                <div class="msg-text">${processedMsg}</div>
-                            </div>
-                        `;
-                    });
-                    stream.innerHTML = htmlHTML;
-                    stream.scrollTop = stream.scrollHeight;
-                } else {
-                    stream.innerHTML = `<div style="text-align:center; color:#ff8c00; padding-top:50px; font-style:italic;">Abgesicherter Funkkanal. Schreib eine Nachricht! 🔐</div>`;
-                }
-            }
-
-            const typingIndicator = document.getElementById("typingIndicator");
-            if (typingIndicator && data && data.typing && data.typing.pns && data.typing.pns[currentChatTarget]) {
-                typingIndicator.innerText = `⚡ ${currentChatTarget} schreibt gerade...`;
-            } else if(typingIndicator) {
-                typingIndicator.innerText = "";
-            }
-        }
     </script>
 </body>
 </html>
