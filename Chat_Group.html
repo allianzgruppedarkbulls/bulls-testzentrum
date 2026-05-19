@@ -283,39 +283,102 @@
             } catch(e) { console.error("Chat-Update fehlgeschlagen"); }
         }
 
-        // KANALLISTE LINKS RENDERN (ZUGRIFFS-PRÜFUNG)
-        function renderChannelList() {
-            const listEl = document.getElementById("groupChannelList");
-            listEl.innerHTML = "";
+       // KANALLISTE LINKS RENDERN (MIT DRAG & DROP SORTIERUNG)
+function renderChannelList() {
+    const listEl = document.getElementById("groupChannelList");
+    listEl.innerHTML = "";
 
-            channelsDatabase.forEach(chan => {
-                // Zugriffsberechtigungs-Logik
-                let hasAccess = false;
-                if (myRole === "Admin" || chan.creator === myName) {
-                    hasAccess = true;
-                } else if (chan.access === "allPlayers") {
-                    hasAccess = true;
-                } else if (chan.access === "allBulls" && myRole !== "Gast") {
-                    hasAccess = true;
-                } else if (chan.access === "select" && chan.members.includes(myName)) {
-                    hasAccess = true;
-                }
-
-                if (!hasAccess) return;
-
-                let isActive = currentChannelId === chan.id ? "active" : "";
-                let isMutedStyle = chan.isMuted ? "muted-chan" : "";
-                let labelSub = chan.status === "archived" ? "🔒 Archiviert" : (chan.isMuted ? "🤐 FUNKSTILLE (MUTE)" : "📡 Aktiv");
-
-                listEl.innerHTML += `
-                    <div class="chat-item ${isActive} ${isMutedStyle}" onclick="selectChannel('${chan.id}')">
-                        <div class="chat-name-row">
-                            <span>⚔️ ${chan.name}</span>
-                        </div>
-                        <div class="chat-meta-sub">${labelSub}</div>
-                    </div>`;
-            });
+    channelsDatabase.forEach((chan, index) => {
+        // Zugriffsberechtigungs-Logik
+        let hasAccess = false;
+        if (myRole === "Admin" || chan.creator === myName) {
+            hasAccess = true;
+        } else if (chan.access === "allPlayers") {
+            hasAccess = true;
+        } else if (chan.access === "allBulls" && myRole !== "Gast") {
+            hasAccess = true;
+        } else if (chan.access === "select" && chan.members.includes(myName)) {
+            hasAccess = true;
         }
+
+        if (!hasAccess) return;
+
+        let isActive = currentChannelId === chan.id ? "active" : "";
+        let isMutedStyle = chan.isMuted ? "muted-chan" : "";
+        let labelSub = chan.status === "archived" ? "🔒 Archiviert" : (chan.isMuted ? "🤐 FUNKSTILLE" : "📡 Aktiv");
+
+        // Erstelle das Element als Drag-Objekt (Neu mit draggable, index und dem ☰ Griff)
+        let itemHtml = `
+            <div class="chat-item ${isActive} ${isMutedStyle}" 
+                 draggable="true" 
+                 data-index="${index}"
+                 onclick="selectChannel('${chan.id}')"
+                 style="cursor: grab;">
+                <div class="chat-name-row" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>☰ ⚔️ ${chan.name}</span>
+                </div>
+                <div class="chat-meta-sub">${labelSub}</div>
+            </div>`;
+            
+        listEl.insertAdjacentHTML('beforeend', itemHtml);
+    });
+
+    // Drag & Drop Event-Listener aktivieren
+    addDragAndDropListeners();
+}
+
+// DRAG & DROP LOGIK WIE IN DISCORD
+function addDragAndDropListeners() {
+    const items = document.querySelectorAll('#groupChannelList .chat-item');
+    let dragSrcEl = null;
+
+    items.forEach(item => {
+        item.addEventListener('dragstart', function(e) {
+            dragSrcEl = this;
+            this.style.opacity = '0.4';
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+        });
+
+        item.addEventListener('dragover', function(e) {
+            if (e.preventDefault) { e.preventDefault(); }
+            return false;
+        });
+
+        item.addEventListener('dragenter', function() {
+            this.style.borderTop = '2px solid #ff8c00'; // Orangefarbene Linie zeigt an, wo der Kanal landet
+        });
+
+        item.addEventListener('dragleave', function() {
+            this.style.borderTop = 'none';
+        });
+
+        item.addEventListener('drop', function(e) {
+            if (e.stopPropagation) { e.stopPropagation(); }
+            
+            if (dragSrcEl !== this) {
+                let fromIndex = parseInt(dragSrcEl.getAttribute('data-index'));
+                let toIndex = parseInt(this.getAttribute('data-index'));
+                
+                // Array-Element im Speicher an die neue Position schieben
+                const targetChannel = channelsDatabase.splice(fromIndex, 1)[0];
+                channelsDatabase.splice(toIndex, 0, targetChannel);
+                
+                // Neue Reihenfolge im LocalStorage sichern
+                localStorage.setItem('bulls_dynamic_channels', JSON.stringify(channelsDatabase));
+                
+                // Liste sofort neu zeichnen
+                renderChannelList();
+            }
+            return false;
+        });
+
+        item.addEventListener('dragend', function() {
+            this.style.opacity = '1';
+            items.forEach(i => i.style.borderTop = 'none');
+        });
+    });
+}
 
         // KANAL AUSWÄHLEN
         function selectChannel(id) {
