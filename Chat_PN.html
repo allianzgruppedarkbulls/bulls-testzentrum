@@ -24,14 +24,19 @@
         /* LINKER PRIVAT-FUNK-VERTEILER */
         .side-bar { width: 320px; background: #0b0b0c; border-right: 1px solid #222; display: flex; flex-direction: column; }
 
-        .search-box { padding: 15px; border-bottom: 1px solid #1a1a1a; position: relative; }
+        /* NEUER CHAT BUTTON STYLES */
+        .new-chat-action-btn { background: #111; border: 1px solid #ff8c00; color: #ff8c00; padding: 12px; margin: 15px 15px 5px 15px; font-family: 'Almendra'; font-weight: bold; font-size: 15px; border-radius: 6px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; box-shadow: 0 0 10px rgba(255, 140, 0, 0.1); }
+        .new-chat-action-btn:hover { background: #ff8c00; color: #000; box-shadow: 0 0 15px rgba(255, 140, 0, 0.4); }
+
+        .search-box { padding: 10px 15px 15px 15px; border-bottom: 1px solid #1a1a1a; position: relative; }
         .search-box input { width: 100%; background: #151515; border: 1px solid #333; padding: 10px; color: #fff; border-radius: 5px; box-sizing: border-box; }
         .search-box input:focus { outline: none; border-color: #ff3131; }
         
-        /* Dropdown für Suchergebnisse */
-        .search-results { position: absolute; top: 60px; left: 15px; right: 15px; background: #111; border: 1px solid #ff3131; border-radius: 5px; max-height: 250px; overflow-y: auto; z-index: 100; display: none; }
-        .search-result-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #222; font-family: sans-serif; font-size: 14px; display: flex; justify-content: space-between; align-items: center; color: #ccc; }
-        .search-result-item:hover { background: #ff3131; color: #000; font-weight: bold; }
+        /* Dropdown für feste Spieler-Liste */
+        .search-results { position: absolute; top: 55px; left: 15px; right: 15px; background: #0c0c0e; border: 1px solid #ff8c00; border-radius: 6px; max-height: 300px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.8); }
+        .search-results-header { background: #151518; padding: 8px 12px; font-size: 13px; color: #ff8c00; font-weight: bold; border-bottom: 1px solid #222; display: flex; justify-content: space-between; }
+        .search-result-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #161616; font-family: sans-serif; font-size: 14px; display: flex; justify-content: space-between; align-items: center; color: #eee; }
+        .search-result-item:hover { background: #ff8c00; color: #000; font-weight: bold; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #39d353; box-shadow: 0 0 8px #39d353; }
 
         .chat-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
@@ -45,7 +50,7 @@
         /* RECHTER CHAT STREAM */
         .chat-main { flex: 1; display: flex; flex-direction: column; position: relative; }
         
-        /* CHAT HEADER MIT DEZENTEM SUPPORT BUTTON */
+        /* CHAT HEADER MIT SUPPORT BUTTON */
         .chat-header-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #0c0c0e; border-bottom: 1px solid #222; min-height: 25px; }
         .report-btn { background: #221111; border: 1px solid #ff3131; color: #ff3131; padding: 5px 12px; font-family: 'Almendra'; font-size: 13px; border-radius: 4px; cursor: pointer; text-transform: uppercase; transition: 0.2s; display: none; }
         .report-btn:hover { background: #ff3131; color: #000; font-weight: bold; box-shadow: 0 0 10px rgba(255, 49, 49, 0.4); }
@@ -102,8 +107,10 @@
     <div class="chat-container">
         
         <div class="side-bar">
+            <button class="new-chat-action-btn" onclick="openFesteSpielerListe()">➕ Neuen Chat öffnen</button>
+
             <div class="search-box">
-                <input type="text" id="userInputSearch" placeholder="🔍 Spieler suchen..." oninput="searchAllianzUser(this.value)" onclick="searchAllianzUser('')">
+                <input type="text" id="userInputSearch" placeholder="🔍 Namen filtern..." oninput="searchAllianzUser(this.value)">
                 <div class="search-results" id="searchResultsDropdown"></div>
             </div>
             <div class="chat-list" id="pnChatVerteiler"></div>
@@ -142,7 +149,6 @@
         let allianzUsersList = [];
         let lastMessageCount = 0;
 
-        // Die Frosch-Datenbank geladen mit den Kult-Emotes aus deinem Discord-Screen
         const FROG_DATABASE = [
             { code: "[pepeJam]", url: "https://cdn.betterttv.net/emote/5b77ac02ef4c547d25d7af9c/3x.gif" },
             { code: "[PepePls]", url: "https://cdn.betterttv.net/emote/55898e4f10dd20025dbf2411/3x.gif" },
@@ -160,7 +166,7 @@
 
         window.addEventListener("DOMContentLoaded", async () => {
             initFunkkreis("pn");
-            loadAllianzUserBase();
+            await loadAllianzUserBase();
             buildFrogMenu();
 
             if (Notification.permission !== "granted") {
@@ -206,11 +212,20 @@
             try {
                 const res = await fetch(window.BULLS_CONFIG.SCRIPT_URL + "?action=getDropdownData");
                 const data = await res.json();
-                // Fix für das reine String-Array aus deiner Datenbank
-                if(data.user) {
-                    allianzUsersList = data.user.map(u => typeof u === "object" ? u.name : u);
+                
+                // Absicherung für beide Datenbank-Typen (Objekt-Array und reines Text-Array)
+                if(data && data.user) {
+                    allianzUsersList = data.user.map(u => {
+                        if (!u) return "";
+                        return typeof u === "object" ? u.name : u;
+                    }).filter(name => name !== "");
                 }
             } catch(e) { console.log("Fehler beim Holen der User-Datenbank."); }
+        }
+
+        // Öffnet die feste Liste aller Spieler
+        function openFesteSpielerListe() {
+            searchAllianzUser("");
         }
 
         function searchAllianzUser(query) {
@@ -218,11 +233,18 @@
             const myUser = localStorage.getItem('bulls_user');
             dropdown.innerHTML = "";
 
-            // Zeigt alle oder gefilterte User an
+            // Filtert die Liste oder zeigt bei leerem Query einfach alle an
             let matches = allianzUsersList.filter(name => name.toLowerCase().includes(query.toLowerCase()) && name !== myUser);
             
+            dropdown.style.display = "block";
+
+            // Header einfügen
+            let header = document.createElement("div");
+            header.className = "search-results-header";
+            header.innerHTML = `<span>VERFÜGBARE SPIELER</span><span style="cursor:pointer;color:#ff3131" onclick="document.getElementById('searchResultsDropdown').style.display='none'">X</span>`;
+            dropdown.appendChild(header);
+
             if (matches.length > 0) {
-                dropdown.style.display = "block";
                 matches.forEach(name => {
                     let div = document.createElement("div");
                     div.className = "search-result-item";
@@ -231,7 +253,11 @@
                     dropdown.appendChild(div);
                 });
             } else {
-                dropdown.style.display = "none";
+                let div = document.createElement("div");
+                div.style.padding = "15px";
+                div.style.color = "#666";
+                div.innerText = "Keine Spieler gefunden.";
+                dropdown.appendChild(div);
             }
         }
 
@@ -241,12 +267,10 @@
             
             currentChatTarget = name;
             
-            // Schaltet UI frei
             document.getElementById('messageInput').disabled = false;
             document.getElementById('sendButton').disabled = false;
             document.getElementById('frogTrigger').disabled = false;
             
-            // Setzt Header-Informationen & Meldebutton aktiv
             document.getElementById('activeTargetLabel').innerText = `Sicherer Kanal mit: ${name}`;
             document.getElementById('reportChannelBtn').style.display = "block";
             
@@ -264,16 +288,15 @@
             } catch(e) { console.log("Gelesen-Status-Fehler"); }
         }
 
-        // Taktische PN-Meldefunktion an den Support
         function reportCurrentPlayer() {
             if(!currentChatTarget || currentChatTarget === "global") return;
-            if(confirm(`Möchtest du den PN-Kanal mit [ ${currentChatTarget} ] wirklich wegen eines Regelverstoßes beim Support melden?`)) {
+            if(confirm(`Möchtest du den PN-Kanal mit [ ${currentChatTarget} ] wirklich beim Support melden?`)) {
                 window.location.href = `Chat_Support.html?report=${encodeURIComponent(currentChatTarget)}`;
             }
         }
 
         document.addEventListener("click", function(e) {
-            if(!e.target.closest('.search-box')) {
+            if(!e.target.closest('.search-box') && !e.target.closest('.new-chat-action-btn')) {
                 document.getElementById("searchResultsDropdown").style.display = "none";
             }
         });
@@ -286,7 +309,7 @@
             let activePNClients = new Set();
             let unreadCounts = {};
 
-            if (data.pns) {
+            if (data && data.pns) {
                 data.pns.forEach(msg => {
                     if (msg.user === myUser) {
                         activePNClients.add(msg.target);
@@ -303,28 +326,10 @@
                 activePNClients.add(currentChatTarget);
             }
 
-            // SOUND & PUSH LOGIK
-            if (data.pns && data.pns.length > lastMessageCount) {
+            // SOUND-ENGINE
+            if (data && data.pns && data.pns.length > lastMessageCount) {
                 if (lastMessageCount > 0) {
                     let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     let osc = audioCtx.createOscillator();
                     let gain = audioCtx.createGain();
-                    osc.type = "sine"; osc.frequency.value = 587.33; 
-                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                    osc.connect(gain); gain.connect(audioCtx.destination);
-                    osc.start(); osc.stop(audioCtx.currentTime + 0.15);
-
-                    let lastMsg = data.pns[data.pns.length - 1];
-                    if (lastMsg.user !== myUser && document.hidden && Notification.permission === "granted") {
-                        new Notification("🐂 DARK BULLS FUNKSTATION", {
-                            body: `${lastMsg.user} schickt dir eine PN...`,
-                            icon: "bulls_dashboard.jpg"
-                        });
-                    }
-                }
-                lastMessageCount = data.pns.length;
-            }
-
-            let verteilerHTML = "";
-            activePNClients.forEach(clientName => {
-                let isActive = currentChatTarget === clientName
+                    osc.type = "sine"; osc.frequency.value
