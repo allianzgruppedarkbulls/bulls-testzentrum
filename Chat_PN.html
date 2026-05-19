@@ -23,18 +23,14 @@
         
         /* LINKER PRIVAT-FUNK-VERTEILER */
         .side-bar { width: 320px; background: #0b0b0c; border-right: 1px solid #222; display: flex; flex-direction: column; }
-        
-        /* ROTER NOTFALL BUTTON */
-        .emergency-btn { background: #ff0000; color: white; border: none; padding: 12px; margin: 10px 15px 0 15px; font-family: 'Almendra'; font-weight: bold; font-size: 15px; border-radius: 5px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 0 15px rgba(255, 0, 0, 0.6); animation: pulseEmergency 2s infinite; }
-        @keyframes pulseEmergency { 0% { opacity: 1; } 50% { opacity: 0.5; box-shadow: 0 0 25px red; } 100% { opacity: 1; } }
 
-        .search-box { padding: 15px; border-bottom: 1px solid #222; position: relative; }
+        .search-box { padding: 15px; border-bottom: 1px solid #1a1a1a; position: relative; }
         .search-box input { width: 100%; background: #151515; border: 1px solid #333; padding: 10px; color: #fff; border-radius: 5px; box-sizing: border-box; }
         .search-box input:focus { outline: none; border-color: #ff3131; }
         
         /* Dropdown für Suchergebnisse */
-        .search-results { position: absolute; top: 60px; left: 15px; right: 15px; background: #111; border: 1px solid #ff3131; border-radius: 5px; max-height: 200px; overflow-y: auto; z-index: 100; display: none; }
-        .search-result-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #222; font-family: sans-serif; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .search-results { position: absolute; top: 60px; left: 15px; right: 15px; background: #111; border: 1px solid #ff3131; border-radius: 5px; max-height: 250px; overflow-y: auto; z-index: 100; display: none; }
+        .search-result-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #222; font-family: sans-serif; font-size: 14px; display: flex; justify-content: space-between; align-items: center; color: #ccc; }
         .search-result-item:hover { background: #ff3131; color: #000; font-weight: bold; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #39d353; box-shadow: 0 0 8px #39d353; }
 
@@ -44,15 +40,20 @@
         .chat-item.active { background: #1c1515; border-left: 3px solid #ff3131; }
         .chat-name { font-weight: bold; font-size: 16px; }
         
-        /* UNGELESEN BADGE STYLE */
         .unread-badge { background: #ff3131; color: white; font-family: sans-serif; font-size: 12px; font-weight: bold; padding: 3px 8px; border-radius: 10px; box-shadow: 0 0 10px rgba(255,49,49,0.5); }
 
         /* RECHTER CHAT STREAM */
         .chat-main { flex: 1; display: flex; flex-direction: column; position: relative; }
+        
+        /* CHAT HEADER MIT DEZENTEM SUPPORT BUTTON */
+        .chat-header-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #0c0c0e; border-bottom: 1px solid #222; min-height: 25px; }
+        .report-btn { background: #221111; border: 1px solid #ff3131; color: #ff3131; padding: 5px 12px; font-family: 'Almendra'; font-size: 13px; border-radius: 4px; cursor: pointer; text-transform: uppercase; transition: 0.2s; display: none; }
+        .report-btn:hover { background: #ff3131; color: #000; font-weight: bold; box-shadow: 0 0 10px rgba(255, 49, 49, 0.4); }
+
         .stream-area { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
         .typing-box { padding: 5px 20px; color: #ff8c00; font-size: 14px; font-style: italic; min-height: 20px; }
 
-        /* INPUT AREA + FROG TRIGGER TRIGGER FIX */
+        /* INPUT AREA */
         .input-bar { display: flex; gap: 12px; padding: 20px; background: #0c0c0e; border-top: 1px solid #222; align-items: center; position: relative; }
         .input-bar input { flex: 1; background: #151515; border: 1px solid #ff3131; padding: 15px; color: #fff; font-family: sans-serif; font-size: 15px; border-radius: 6px; }
         .input-bar input:focus { outline: none; box-shadow: 0 0 10px rgba(255, 49, 49, 0.3); }
@@ -101,8 +102,6 @@
     <div class="chat-container">
         
         <div class="side-bar">
-            <button class="emergency-btn" onclick="window.location.href='Chat_Support.html'">🚨 NOTFALL-SUPPORT</button>
-
             <div class="search-box">
                 <input type="text" id="userInputSearch" placeholder="🔍 Spieler suchen..." oninput="searchAllianzUser(this.value)" onclick="searchAllianzUser('')">
                 <div class="search-results" id="searchResultsDropdown"></div>
@@ -111,6 +110,11 @@
         </div>
 
         <div class="chat-main">
+            <div class="chat-header-bar">
+                <span id="activeTargetLabel" style="color:#aaa; font-size:14px;">Kein Kanal aktiv</span>
+                <button class="report-btn" id="reportChannelBtn" onclick="reportCurrentPlayer()">🚨 PN an Support melden</button>
+            </div>
+
             <div class="stream-area" id="pnStreamArea">
                 <div style="text-align:center; color:#ff8c00; font-style:italic; padding-top:50px;">Wähle links einen aktiven Kanal aus oder nutze die Suche, um ein neues Gespräch zu beginnen. ⚡</div>
             </div>
@@ -138,7 +142,7 @@
         let allianzUsersList = [];
         let lastMessageCount = 0;
 
-        // Frosch-Datenbank für dynamisches Rendering im Stream
+        // Die Frosch-Datenbank geladen mit den Kult-Emotes aus deinem Discord-Screen
         const FROG_DATABASE = [
             { code: "[pepeJam]", url: "https://cdn.betterttv.net/emote/5b77ac02ef4c547d25d7af9c/3x.gif" },
             { code: "[PepePls]", url: "https://cdn.betterttv.net/emote/55898e4f10dd20025dbf2411/3x.gif" },
@@ -146,7 +150,7 @@
             { code: "[EZ]", url: "https://cdn.betterttv.net/emote/5c3429fa222afd2a149c25da/3x.gif" },
             { code: "[HYPERS]", url: "https://cdn.betterttv.net/emote/5be354eb6e5e8c148ca7f4a2/3x.gif" },
             { code: "[PopcornPepe]", url: "https://cdn.betterttv.net/emote/62be226e29aa61eddd226dfd/3x.gif" },
-            { code: "[pepeSamurai]", url: "https://cdn.betterttv.net/emote/5f9dfb6070014b2d56a053c8/3x.gif" },
+            { code: "[jailPepe]", url: "https://cdn.betterttv.net/emote/60902f5a306b602693ed9fd6/3x.gif" },
             { code: "[sadPepe]", url: "https://cdn.betterttv.net/emote/5d6b4657d404e456cb04de36/3x.gif" },
             { code: "[lovePepe]", url: "https://cdn.betterttv.net/emote/5f65392d24cb822b31f7c181/3x.gif" },
             { code: "[clownPepe]", url: "https://cdn.betterttv.net/emote/60447355306b602693ecc081/3x.gif" },
@@ -202,7 +206,10 @@
             try {
                 const res = await fetch(window.BULLS_CONFIG.SCRIPT_URL + "?action=getDropdownData");
                 const data = await res.json();
-                if(data.user) allianzUsersList = data.user.map(u => u.name);
+                // Fix für das reine String-Array aus deiner Datenbank
+                if(data.user) {
+                    allianzUsersList = data.user.map(u => typeof u === "object" ? u.name : u);
+                }
             } catch(e) { console.log("Fehler beim Holen der User-Datenbank."); }
         }
 
@@ -211,6 +218,7 @@
             const myUser = localStorage.getItem('bulls_user');
             dropdown.innerHTML = "";
 
+            // Zeigt alle oder gefilterte User an
             let matches = allianzUsersList.filter(name => name.toLowerCase().includes(query.toLowerCase()) && name !== myUser);
             
             if (matches.length > 0) {
@@ -233,9 +241,14 @@
             
             currentChatTarget = name;
             
+            // Schaltet UI frei
             document.getElementById('messageInput').disabled = false;
             document.getElementById('sendButton').disabled = false;
             document.getElementById('frogTrigger').disabled = false;
+            
+            // Setzt Header-Informationen & Meldebutton aktiv
+            document.getElementById('activeTargetLabel').innerText = `Sicherer Kanal mit: ${name}`;
+            document.getElementById('reportChannelBtn').style.display = "block";
             
             markChannelAsRead(name);
             updateMuteStatusAndFetch();
@@ -249,6 +262,14 @@
                     body: JSON.stringify({ action: "markAsRead", user: myUser, target: targetName, type: "pn" })
                 });
             } catch(e) { console.log("Gelesen-Status-Fehler"); }
+        }
+
+        // Taktische PN-Meldefunktion an den Support
+        function reportCurrentPlayer() {
+            if(!currentChatTarget || currentChatTarget === "global") return;
+            if(confirm(`Möchtest du den PN-Kanal mit [ ${currentChatTarget} ] wirklich wegen eines Regelverstoßes beim Support melden?`)) {
+                window.location.href = `Chat_Support.html?report=${encodeURIComponent(currentChatTarget)}`;
+            }
         }
 
         document.addEventListener("click", function(e) {
@@ -282,7 +303,7 @@
                 activePNClients.add(currentChatTarget);
             }
 
-            // BLITZ-SOUND & PUSH LOGIK BEI NEUEINGANG
+            // SOUND & PUSH LOGIK
             if (data.pns && data.pns.length > lastMessageCount) {
                 if (lastMessageCount > 0) {
                     let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -306,62 +327,4 @@
 
             let verteilerHTML = "";
             activePNClients.forEach(clientName => {
-                let isActive = currentChatTarget === clientName ? "active" : "";
-                let badgeHTML = unreadCounts[clientName] ? `<span class="unread-badge">${unreadCounts[clientName]}</span>` : "";
-                verteilerHTML += `
-                    <div class="chat-item ${isActive}" onclick="startNewPNChannel('${clientName}')">
-                        <span class="chat-name">👤 ${clientName}</span>
-                        ${badgeHTML}
-                    </div>
-                `;
-            });
-            verteiler.innerHTML = verteilerHTML || `<div style="padding:20px; color:#555; text-align:center; font-size:14px; font-family:sans-serif;">Keine aktiven PNs. Nutze das Suchfeld!</div>`;
-
-            if (currentChatTarget && currentChatTarget !== "global") {
-                document.getElementById('messageInput').disabled = false;
-                document.getElementById('sendButton').disabled = false;
-                document.getElementById('frogTrigger').disabled = false;
-
-                if (unreadCounts[currentChatTarget]) {
-                    markChannelAsRead(currentChatTarget);
-                }
-
-                let htmlHTML = "";
-                let filteredPNs = data.pns ? data.pns.filter(msg => 
-                    (msg.user === myUser && msg.target === currentChatTarget) || 
-                    (msg.user === currentChatTarget && msg.target === myUser)
-                ) : [];
-
-                if (filteredPNs.length > 0) {
-                    filteredPNs.forEach(msg => {
-                        let isMe = msg.user === myUser ? "me" : "";
-                        let processedMsg = parseFrogEmojis(msg.msg);
-                        htmlHTML += `
-                            <div class="msg-line ${isMe}">
-                                <div class="msg-meta">
-                                    <span class="meta-user">${msg.user}</span>
-                                    <span class="meta-time">${formatFunkZeit(msg.time)}</span>
-                                </div>
-                                <div class="msg-text">${processedMsg}</div>
-                            </div>
-                        `;
-                    });
-                    
-                    const scrollCheck = (stream.scrollHeight - stream.scrollTop === stream.clientHeight);
-                    stream.innerHTML = htmlHTML;
-                    if (!scrollCheck) stream.scrollTop = stream.scrollHeight;
-                } else {
-                    stream.innerHTML = `<div style="text-align:center; color:#ff8c00; padding-top:50px; font-style:italic;">Abgesicherter 1-zu-1 Funkkanal. Schreib eine Nachricht! 🔐</div>`;
-                }
-            }
-
-            const typingIndicator = document.getElementById("typingIndicator");
-            if (data.typing && data.typing.pns && data.typing.pns[currentChatTarget]) {
-                typingIndicator.innerText = `⚡ ${currentChatTarget} schreibt gerade...`;
-            } else {
-                typingIndicator.innerText = "";
-            }
-        }
-    </script>
-</body>
-</html>
+                let isActive = currentChatTarget === clientName
