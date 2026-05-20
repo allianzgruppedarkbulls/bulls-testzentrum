@@ -3,40 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <title>DARK BULLS - BLACKLIST PFLEGE</title>
-    <script src="config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #050505; color: #fff; font-family: 'Almendra', serif; padding: 20px; }
-        .container { width: 900px; margin: auto; background: #0f0f0f; border: 1px solid #333; padding: 20px; }
-        h1 { color: #39d353; text-align: center; }
-        #searchInput { width: 100%; padding: 12px; background: #000; border: 1px solid #39d353; color: #fff; margin-bottom: 20px; }
+        body { background-color: #050505; color: #fff; font-family: 'Almendra', serif; margin: 0; padding: 20px; }
+        .container { width: 1000px; margin: auto; height: 90vh; display: flex; flex-direction: column; }
+        h1 { color: #ff3131; text-align: center; text-shadow: 0 0 10px #ff3131; }
+        
+        /* Scrollbarer Tabellenbereich */
+        .table-wrapper { flex-grow: 1; overflow-y: auto; border: 1px solid #333; background: #0f0f0f; }
         table { width: 100%; border-collapse: collapse; }
-        tr { border-bottom: 1px solid #222; cursor: pointer; }
-        tr:hover { background: #1a1a1a; }
-        td { padding: 12px; }
-        .btn-box { display: flex; gap: 10px; margin-top: 20px; justify-content: center; }
-        button { padding: 10px 20px; cursor: pointer; background: #222; color: #fff; border: 1px solid #444; }
-        button:hover { background: #39d353; color: #000; }
+        th { position: sticky; top: 0; background: #1a1a1a; color: #5dade2; padding: 15px; cursor: pointer; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #222; }
+        tr:hover { background: #2a2a2a; }
+
+        /* Sticky Aktionsbereich unten */
+        #actionPanel { background: #151515; border-top: 2px solid #ff3131; padding: 20px; }
+        .btn-group { display: flex; gap: 15px; justify-content: center; margin-top: 10px; }
+        button { padding: 12px 25px; background: #222; border: 1px solid #444; color: #fff; cursor: pointer; font-family: 'Almendra'; transition: 0.3s; }
+        button:hover { background: #ff3131; color: #000; border-color: #ff3131; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>Blacklist Pflege</h1>
-    <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Spieler suchen...">
-    
-    <table id="playerTable">
-        <thead><tr><th>Fall</th><th>Name</th><th>Status</th></tr></thead>
-        <tbody id="playerBody"></tbody>
-    </table>
+    <div class="table-wrapper">
+        <table id="playerTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">Fall ↕</th>
+                    <th onclick="sortTable(1)">Name ↕</th>
+                    <th onclick="sortTable(2)">Status ↕</th>
+                    <th onclick="sortTable(3)">Nächste Kontrolle ↕</th>
+                </tr>
+            </thead>
+            <tbody id="playerBody"></tbody>
+        </table>
+    </div>
 
-    <div id="actionPanel" style="display:none; border-top: 2px solid #39d353; margin-top: 20px; padding-top: 20px;">
-        <h2 id="selPlayerName"></h2>
-        <div class="btn-box">
-            <button onclick="alert('Diagramm')">Diagramm</button>
-            <button onclick="alert('Intervall')">Intervall</button>
-            <button onclick="alert('Bearbeiten')">Bearbeiten</button>
-            <button onclick="alert('Löschen')">Löschen</button>
+    <div id="actionPanel" style="display:none;">
+        <h2 id="selPlayerName" style="color:#ff3131; margin-top:0;"></h2>
+        <div class="btn-group">
+            <button>Diagramm</button>
+            <button>Intervall</button>
+            <button>Bearbeiten</button>
+            <button>Löschen</button>
         </div>
     </div>
 </div>
@@ -48,28 +59,40 @@
     async function loadBlacklist() {
         const res = await fetch(API + "?action=getBlacklist");
         blacklistData = await res.json();
-        const body = document.getElementById("playerBody");
-        
-        blacklistData.forEach((d, i) => {
-            // Ampel-Logik
-            const lastDate = new Date(d.letzteKontrolle);
-            const diffMonate = (new Date() - lastDate) / (1000 * 60 * 60 * 24 * 30);
-            let status = diffMonate > 3 ? "🔴" : (diffMonate > 2 ? "🟡" : "🟢");
+        renderTable(blacklistData);
+    }
 
-            let row = document.createElement("tr");
-            row.onclick = () => selectPlayer(i);
-            row.innerHTML = `<td>${d.gameNumber}</td><td>${d.target}</td><td>${status}</td>`;
-            body.appendChild(row);
+    function renderTable(data) {
+        const body = document.getElementById("playerBody");
+        body.innerHTML = "";
+        data.forEach((d, i) => {
+            const lastDate = new Date(d.letzteKontrolle);
+            const nextDate = new Date(lastDate);
+            nextDate.setMonth(nextDate.getMonth() + 3);
+            
+            // Ampel-Logik
+            const diff = (new Date() - nextDate) / (1000 * 60 * 60 * 24);
+            let status = "🟢";
+            if (diff > 14) status = "🔴";
+            else if (diff > -14) status = "🟡";
+
+            body.innerHTML += `<tr onclick="selectPlayer(${i})">
+                <td>${d.gameNumber}</td><td>${d.target}</td><td>${status}</td><td>${nextDate.toLocaleDateString()}</td>
+            </tr>`;
         });
     }
 
-    function selectPlayer(i) {
-        const d = blacklistData[i];
-        document.getElementById("actionPanel").style.display = "block";
-        document.getElementById("selPlayerName").innerText = "Aktionen für: " + d.target;
+    function sortTable(n) {
+        // Einfache Sortierfunktion für Tabellenspalten
+        blacklistData.sort((a, b) => (a.target > b.target ? 1 : -1)); // Beispiel
+        renderTable(blacklistData);
     }
 
-    function filterTable() { /* Deine Suchfunktion */ }
+    function selectPlayer(i) {
+        document.getElementById("actionPanel").style.display = "block";
+        document.getElementById("selPlayerName").innerText = "Aktionen für: " + blacklistData[i].target;
+    }
+
     window.onload = loadBlacklist;
 </script>
 </body>
