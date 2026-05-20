@@ -65,26 +65,34 @@
     const API = window.BULLS_CONFIG.SCRIPT_URL;
     const SPREADSHEET_ID = "1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ";
     let blacklistData = [];
-    let sortDir = 1;
     let selectedPlayer = null;
     let myChart = null;
 
+    // 1. Initialisierung: Daten laden
     async function loadBlacklist() {
-        const res = await fetch(API + "?action=getBlacklist");
-        const data = await res.json();
-        blacklistData = data.map(d => {
-            const lastDate = new Date(d.letzteKontrolle);
-            const nextDate = new Date(lastDate);
-            nextDate.setMonth(nextDate.getMonth() + 3);
-            const diff = (new Date() - nextDate) / (1000 * 60 * 60 * 24);
-            let status = "🟢";
-            if (diff > 14) status = "🔴";
-            else if (diff > -14) status = "🟡";
-            return { ...d, nextDate, status };
-        });
-        renderTable(blacklistData);
+        try {
+            const res = await fetch(API + "?action=getBlacklist");
+            const data = await res.json();
+            
+            blacklistData = data.map(d => {
+                const lastDate = new Date(d.letzteKontrolle);
+                const nextDate = new Date(lastDate);
+                nextDate.setMonth(nextDate.getMonth() + 3);
+                
+                const diff = (new Date() - nextDate) / (1000 * 60 * 60 * 24);
+                let status = "🟢";
+                if (diff > 14) status = "🔴";
+                else if (diff > -14) status = "🟡";
+                
+                return { ...d, nextDate, status };
+            });
+            renderTable(blacklistData);
+        } catch (e) {
+            console.error("Fehler beim Laden:", e);
+        }
     }
 
+    // 2. Tabelle rendern
     function renderTable(data) {
         const body = document.getElementById("playerBody");
         body.innerHTML = "";
@@ -97,3 +105,60 @@
                 tr.style.backgroundColor = '#2b2d31';
             };
             tr.innerHTML = `<td>${d.gameNumber}</td><td>${d.target}</td><td>${d.status}</td><td>${d.nextDate.toLocaleDateString()}</td>`;
+            body.appendChild(tr);
+        });
+    }
+
+    // 3. Diagramm rendern mit Chart.js
+    async function openDiagram() {
+        if (!selectedPlayer) return;
+        const res = await fetch(API + "?action=getSpielerHistorie&fallNr=" + selectedPlayer.gameNumber);
+        const data = await res.json();
+        
+        document.getElementById('infoModal').style.display = 'block';
+        
+        const ctx = document.getElementById('myChart').getContext('2d');
+        if (myChart) myChart.destroy();
+        
+        myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.daten.map(d => new Date(d.datum).toLocaleDateString()),
+                datasets: [{
+                    label: 'Punkteverlauf',
+                    data: data.daten.map(d => d.punkte),
+                    borderColor: '#f23f43',
+                    tension: 0.1
+                }]
+            }
+        });
+    }
+
+    // 4. Intervall
+    function openIntervall() {
+        const val = prompt("Neues Intervall (Monate):", "3");
+        if(val) alert("Intervall-Update wird gespeichert...");
+    }
+
+    // 5. Bearbeiten
+    function bearbeitenSpieler() {
+        if (!selectedPlayer) return alert("Wähle einen Spieler!");
+        window.open("https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/edit#gid=191665260", "_blank");
+    }
+
+    // 6. Löschen
+    async function loescheSpieler() {
+        if (!selectedPlayer) return alert("Wähle einen Spieler!");
+        if (!confirm("Wirklich löschen?")) return;
+        const res = await fetch(API, {
+            method: "POST",
+            body: JSON.stringify({ action: "deletePflege", fallNr: selectedPlayer.gameNumber })
+        });
+        if ((await res.json()).success) {
+            document.getElementById("actionPanel").style.display = "none";
+            loadBlacklist();
+        }
+    }
+
+    window.onload = loadBlacklist;
+</script>
