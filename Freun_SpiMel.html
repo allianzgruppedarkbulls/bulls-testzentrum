@@ -77,9 +77,7 @@
         <div class="grid-3">
             <div class="form-group">
                 <label>Allianz bei Erstkontakt</label>
-                <select id="targetAlli">
-                    <option value="">-- Allianz wählen --</option>
-                </select>
+                <select id="targetAlli"><option value="">-- Allianz wählen --</option></select>
             </div>
             <div class="form-group">
                 <label>Punktestand</label>
@@ -87,18 +85,14 @@
             </div>
             <div class="form-group">
                 <label>Meistgespielte Map</label>
-                <select id="playerMap">
-                    <option value="">-- Map wählen --</option>
-                </select>
+                <select id="playerMap"><option value="">-- Map wählen --</option></select>
             </div>
         </div>
 
         <div class="grid-3">
             <div class="form-group">
                 <label>Verstoß</label>
-                <select id="reason" required>
-                    <option value="">-- Verstoß wählen --</option>
-                </select>
+                <select id="reason" required><option value="">-- Verstoß wählen --</option></select>
             </div>
             <div class="form-group">
                 <label>Beweise vorhanden?</label>
@@ -116,9 +110,6 @@
 
         <div class="section-title" style="margin-top: 25px;">Fallbeschreibung</div>
         <span class="desc-label">Was ist passiert / Beschreibung:</span>
-        <div class="info-box-text">
-            ⚠️ Hinweis: Falls deine Allianz oder der Verstoß nicht in den Auswahllisten oben drin ist, lass das Dropdown leer und trage es einfach hier unten ausführlich in den Text ein!
-        </div>
         <textarea id="description" placeholder="Details, Zeiten und Vorfälle hier lückenlos dokumentieren..." required></textarea>
 
         <div class="section-title">Zeugen & Melder</div>
@@ -129,11 +120,11 @@
             </div>
             <div class="form-group">
                 <label>Zeuge 1</label>
-                <input type="text" id="witness1" placeholder="Name Zeuge 1...">
+                <select id="witness1"><option value="">-- Zeuge 1 --</option></select>
             </div>
             <div class="form-group">
                 <label>Zeuge 3</label>
-                <input type="text" id="witness3" placeholder="Name Zeuge 3...">
+                <select id="witness3"><option value="">-- Zeuge 3 --</option></select>
             </div>
         </div>
         <div class="grid-3">
@@ -143,11 +134,11 @@
             </div>
             <div class="form-group">
                 <label>Zeuge 2</label>
-                <input type="text" id="witness2" placeholder="Name Zeuge 2...">
+                <select id="witness2"><option value="">-- Zeuge 2 --</option></select>
             </div>
             <div class="form-group">
                 <label>Zeuge 4</label>
-                <input type="text" id="witness4" placeholder="Name Zeuge 4...">
+                <select id="witness4"><option value="">-- Zeuge 4 --</option></select>
             </div>
         </div>
 
@@ -163,43 +154,40 @@
 <script>
     const API = window.BULLS_CONFIG.SCRIPT_URL;
 
-    async function setMeta() {
-        document.getElementById("reporterName").value = localStorage.getItem("bulls_user") || "Unbekannt";
-        const heute = new Date();
-        document.getElementById("reportDate").value = heute.toLocaleDateString("de-DE");
-        
-        // Dropdowns laden und auf Abschluss warten
-        await loadDropdowns(); 
-    }
-
-    async function loadDropdowns() {
+    async function loadAllData() {
         try {
             const res = await fetch(API + "?action=getDropdownData");
-            if (!res.ok) throw new Error("Netzwerkfehler");
             const data = await res.json();
-            
-            const alliSel = document.getElementById("targetAlli");
-            if(data.allianzen) {
-                data.allianzen.sort().forEach(a => {
-                    let o = document.createElement("option"); o.value = a; o.innerText = a; alliSel.appendChild(o);
-                });
-            }
-            
-            const mapSel = document.getElementById("playerMap");
-            if(data.maps) {
-                data.maps.sort().forEach(m => {
-                    let o = document.createElement("option"); o.value = m; o.innerText = m; mapSel.appendChild(o);
-                });
-            }
 
+            // 1. Allianzen füllen
+            const alliSel = document.getElementById("targetAlli");
+            data.allianzen.forEach(a => {
+                let o = document.createElement("option"); o.value = a; o.innerText = a; alliSel.appendChild(o);
+            });
+
+            // 2. Maps füllen
+            const mapSel = document.getElementById("playerMap");
+            data.maps.forEach(m => {
+                let o = document.createElement("option"); o.value = m; o.innerText = m; mapSel.appendChild(o);
+            });
+
+            // 3. Verstöße füllen
             const reasonSel = document.getElementById("reason");
-            if(data.vorwuerfe) {
-                data.vorwuerfe.sort().forEach(v => {
-                    let o = document.createElement("option"); o.value = v; o.innerText = v; reasonSel.appendChild(o);
+            data.verstoesse.forEach(v => {
+                let o = document.createElement("option"); o.value = v; o.innerText = v; reasonSel.appendChild(o);
+            });
+
+            // 4. Zeugen (aus der User-Liste) füllen
+            const userNames = data.user.map(u => u.name);
+            ["witness1", "witness2", "witness3", "witness4"].forEach(id => {
+                const el = document.getElementById(id);
+                userNames.forEach(name => {
+                    let o = document.createElement("option"); o.value = name; o.innerText = name; el.appendChild(o);
                 });
-            }
+            });
+
         } catch(e) { 
-            console.error("Fehler beim Abruf der Dropdown-Strukturen:", e); 
+            console.error("Fehler beim Laden der Daten:", e); 
         }
     }
 
@@ -223,17 +211,16 @@
             reportDate: document.getElementById("reportDate").value,
             description: document.getElementById("description").value.trim(),
             reporter: document.getElementById("reporterName").value,
-            witness1: document.getElementById("witness1").value.trim(),
-            witness2: document.getElementById("witness2").value.trim(),
-            witness3: document.getElementById("witness3").value.trim(),
-            witness4: document.getElementById("witness4").value.trim()
+            witness1: document.getElementById("witness1").value,
+            witness2: document.getElementById("witness2").value,
+            witness3: document.getElementById("witness3").value,
+            witness4: document.getElementById("witness4").value
         };
 
         try {
             await fetch(API, { method: "POST", body: JSON.stringify(payload) });
             alert("✓ AKTE ERFOLGREICH AN DIE ZENTRALE ÜBERMITTELT!");
             document.getElementById("reportForm").reset();
-            setMeta();
         } catch(e) {
             alert("Fehler beim Übertragen der Akte!");
         } finally {
@@ -242,9 +229,7 @@
         }
     }
 
-    window.onload = async function() {
-        await setMeta();
-    };
+    window.onload = loadAllData;
 </script>
 </body>
 </html>
