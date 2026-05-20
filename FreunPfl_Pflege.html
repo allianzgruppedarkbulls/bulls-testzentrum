@@ -6,20 +6,20 @@
     <script src="config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #050505; color: #fff; font-family: 'Almendra', serif; margin: 0; padding: 20px; }
-        .container { width: 1000px; margin: auto; height: 90vh; display: flex; flex-direction: column; }
-        h1 { color: #ff3131; text-align: center; text-shadow: 0 0 10px #ff3131; }
+        body { background-color: #0c0c0e; color: #dbdee1; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 1100px; background: #1e1f22; border: 1px solid #f23f43; border-radius: 8px; padding: 25px; box-shadow: 0 0 20px rgba(242, 63, 67, 0.2); }
+        h1 { color: #f23f43; text-align: center; text-transform: uppercase; letter-spacing: 2px; margin-top: 0; font-size: 32px; }
         
-        .table-wrapper { flex-grow: 1; overflow-y: auto; border: 1px solid #333; background: #0f0f0f; }
+        .table-wrapper { max-height: 480px; overflow-y: auto; border: 1px solid #333; background: #111214; border-radius: 4px; margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; }
-        th { position: sticky; top: 0; background: #1a1a1a; color: #5dade2; padding: 15px; cursor: pointer; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid #222; }
-        tr:hover { background: #2a2a2a; cursor: pointer; }
+        th { position: sticky; top: 0; background: #111214; color: #f23f43; text-align: left; padding: 12px; font-size: 16px; border-bottom: 2px solid #f23f43; cursor: pointer; }
+        th:hover { color: #ff3131; }
+        td { padding: 12px; border-bottom: 1px solid #2b2d31; font-size: 16px; }
+        tr:hover { background: #2b2d31; cursor: pointer; }
 
-        #actionPanel { background: #151515; border-top: 2px solid #ff3131; padding: 20px; }
-        .btn-group { display: flex; gap: 15px; justify-content: center; margin-top: 10px; }
-        button { padding: 12px 25px; background: #222; border: 1px solid #444; color: #fff; cursor: pointer; font-family: 'Almendra'; transition: 0.3s; }
-        button:hover { background: #ff3131; color: #000; }
+        .action-tray { display: flex; justify-content: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #2b2d31; gap: 10px; }
+        .action-btn { background: #f23f43; color: #fff; border: none; padding: 12px 30px; font-family: 'Almendra'; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
+        .action-btn:hover { background: #ff3131; box-shadow: 0 0 10px #ff3131; }
     </style>
 </head>
 <body>
@@ -30,60 +30,64 @@
         <table id="playerTable">
             <thead>
                 <tr>
-                    <th>Fall</th><th>Name</th><th>Status</th><th>Nächste Kontrolle</th>
+                    <th onclick="sortTable('gameNumber')">Fall ↕</th>
+                    <th onclick="sortTable('target')">Name ↕</th>
+                    <th onclick="sortTable('status')">Status ↕</th>
+                    <th onclick="sortTable('nextDate')">Nächste Kontrolle ↕</th>
                 </tr>
             </thead>
             <tbody id="playerBody"></tbody>
         </table>
     </div>
 
-    <div id="actionPanel" style="display:none;">
-        <h2 id="selPlayerName" style="color:#ff3131; margin-top:0;"></h2>
-        <div class="btn-group">
-            <button onclick="alert('Diagramm')">Diagramm</button>
-            <button onclick="alert('Intervall')">Intervall</button>
-            <button onclick="alert('Bearbeiten')">Bearbeiten</button>
-            <button onclick="alert('Löschen')">Löschen</button>
-        </div>
+    <div class="action-tray" id="actionPanel" style="display:none;">
+        <button class="action-btn" onclick="alert('Diagramm')">Diagramm</button>
+        <button class="action-btn" onclick="alert('Intervall')">Intervall</button>
+        <button class="action-btn" onclick="alert('Bearbeiten')">Bearbeiten</button>
+        <button class="action-btn" onclick="alert('Löschen')">Löschen</button>
     </div>
 </div>
 
 <script>
     const API = window.BULLS_CONFIG.SCRIPT_URL;
     let blacklistData = [];
+    let sortDir = 1;
 
     async function loadBlacklist() {
-        try {
-            const res = await fetch(API + "?action=getBlacklist");
-            blacklistData = await res.json();
-            
-            const body = document.getElementById("playerBody");
-            body.innerHTML = ""; // Sicherstellen, dass leer
-
-            blacklistData.forEach((d, i) => {
-                const lastDate = new Date(d.letzteKontrolle);
-                const nextDate = new Date(lastDate);
-                nextDate.setMonth(nextDate.getMonth() + 3);
-                
-                const diff = (new Date() - nextDate) / (1000 * 60 * 60 * 24);
-                let status = "🟢";
-                if (diff > 14) status = "🔴";
-                else if (diff > -14) status = "🟡";
-
-                const tr = document.createElement("tr");
-                tr.onclick = () => selectPlayer(i);
-                tr.innerHTML = `<td>${d.gameNumber}</td><td>${d.target}</td><td>${status}</td><td>${nextDate.toLocaleDateString()}</td>`;
-                body.appendChild(tr);
-            });
-        } catch (e) {
-            console.error("Fehler beim Laden:", e);
-            document.getElementById("playerBody").innerHTML = "<tr><td colspan='4'>Fehler beim Laden der Daten</td></tr>";
-        }
+        const res = await fetch(API + "?action=getBlacklist");
+        const data = await res.json();
+        
+        // Daten für Anzeige aufbereiten
+        blacklistData = data.map(d => {
+            const lastDate = new Date(d.letzteKontrolle);
+            const nextDate = new Date(lastDate);
+            nextDate.setMonth(nextDate.getMonth() + 3);
+            const diff = (new Date() - nextDate) / (1000 * 60 * 60 * 24);
+            let status = "🟢";
+            if (diff > 14) status = "🔴";
+            else if (diff > -14) status = "🟡";
+            return { ...d, nextDate, status };
+        });
+        renderTable(blacklistData);
     }
 
-    function selectPlayer(i) {
-        document.getElementById("actionPanel").style.display = "block";
-        document.getElementById("selPlayerName").innerText = "Aktionen für: " + blacklistData[i].target;
+    function renderTable(data) {
+        const body = document.getElementById("playerBody");
+        body.innerHTML = "";
+        data.forEach((d, i) => {
+            const tr = document.createElement("tr");
+            tr.onclick = () => {
+                document.getElementById("actionPanel").style.display = "flex";
+            };
+            tr.innerHTML = `<td>${d.gameNumber}</td><td>${d.target}</td><td>${d.status}</td><td>${d.nextDate.toLocaleDateString()}</td>`;
+            body.appendChild(tr);
+        });
+    }
+
+    function sortTable(key) {
+        sortDir *= -1;
+        blacklistData.sort((a, b) => (a[key] > b[key] ? 1 : -1) * sortDir);
+        renderTable(blacklistData);
     }
 
     window.onload = loadBlacklist;
