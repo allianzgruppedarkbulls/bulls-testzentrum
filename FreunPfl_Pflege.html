@@ -83,7 +83,21 @@
             body.appendChild(tr);
         });
     }
+// Neue Logik für die Button-Bar
+async function handleAction(action) {
+    if (!selectedPlayer) return alert("Wähle erst einen Spieler aus!");
 
+    if (action === 'bearbeiten') {
+        window.open("https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/edit#gid=191665260", "_blank");
+    } else if (action === 'loeschen') {
+        if (!confirm("Wirklich löschen?")) return;
+        await fetch(API, { method: "POST", body: JSON.stringify({ action: "delete", rowIdx: selectedPlayer.rowIdx }) });
+        loadBlacklist(); // Liste neu laden
+    }
+    // Diagramm/Intervall kannst du hier nach dem gleichen Schema ergänzen
+}
+    
+    
     function sortTable(key) {
         sortDir *= -1;
         blacklistData.sort((a, b) => (a[key] > b[key] ? 1 : -1) * sortDir);
