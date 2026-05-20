@@ -40,12 +40,12 @@
         </table>
     </div>
 
-    <div class="action-tray" id="actionPanel" style="display:none;">
-        <button class="action-btn" onclick="alert('Diagramm')">Diagramm</button>
-        <button class="action-btn" onclick="alert('Intervall')">Intervall</button>
-        <button class="action-btn" onclick="alert('Bearbeiten')">Bearbeiten</button>
-        <button class="action-btn" onclick="alert('Löschen')">Löschen</button>
-    </div>
+   <div class="action-tray" id="actionPanel" style="display:none;">
+    <button class="action-btn" onclick="openDiagram()">Diagramm</button>
+    <button class="action-btn" onclick="openIntervall()">Intervall</button>
+    <button class="action-btn" onclick="window.open('...', '_blank')">Bearbeiten</button>
+    <button class="action-btn" onclick="loescheSpieler()" style="background:#b32424;">Löschen</button>
+</div>
 </div>
 
 <script>
