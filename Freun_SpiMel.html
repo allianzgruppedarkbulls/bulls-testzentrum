@@ -86,7 +86,7 @@
 
             fill("targetAlli", data.allianzen || []);
             fill("playerMap", data.maps || []);
-            fill("reason", data.vorwuerfe || []);
+            fill("reason", data.verstoesse || []);
             
             const witnesses = data.user ? data.user.map(u => u.name) : [];
             ["witness1", "witness2", "witness3", "witness4"].forEach(id => fill(id, witnesses));
