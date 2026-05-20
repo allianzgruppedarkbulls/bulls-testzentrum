@@ -101,7 +101,7 @@
 <script>
     const API = window.BULLS_CONFIG.SCRIPT_URL;
 
-    // Dropdowns wie beim Melde-Formular laden
+   // Dropdowns wie beim Melde-Formular laden
     async function setupForm() {
         try {
             const res = await fetch(API + "?action=getDropdownData");
@@ -109,6 +109,9 @@
             
             const fill = (id, list) => {
                 const el = document.getElementById(id);
+                // Sicherheits-Check: Nur laden, wenn die Liste wirklich existiert!
+                if (!list) return; 
+                
                 list.forEach(item => {
                     let opt = document.createElement("option");
                     opt.value = item; opt.innerText = item;
@@ -116,9 +119,13 @@
                 });
             };
 
-            fill("pVerstoss", data.vorwuerfe);
+            // HIER WAR DER FEHLER: Es muss data.verstoesse heißen!
+            fill("pVerstoss", data.verstoesse);
             fill("pMap", data.maps);
-        } catch(e) { console.error("Fehler beim Laden der Listen"); }
+            
+        } catch(e) { 
+            console.error("Fehler beim Laden der Listen", e); 
+        }
     }
 
     async function submitDirect() {
