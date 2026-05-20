@@ -20,6 +20,9 @@
         .action-tray { display: flex; justify-content: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #2b2d31; gap: 10px; }
         .action-btn { background: #f23f43; color: #fff; border: none; padding: 12px 30px; font-family: 'Almendra'; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
         .action-btn:hover { background: #ff3131; box-shadow: 0 0 10px #ff3131; }
+        
+        /* Modal Style */
+        #infoModal { display:none; position:fixed; top:20%; left:30%; width:40%; background:#1e1f22; border:2px solid #f23f43; padding:20px; z-index:1000; color:white; border-radius:8px; }
     </style>
 </head>
 <body>
@@ -40,12 +43,18 @@
         </table>
     </div>
 
-   <div class="action-tray" id="actionPanel" style="display:none;">
-    <button class="action-btn" onclick="openDiagram()">Diagramm</button>
-    <button class="action-btn" onclick="openIntervall()">Intervall</button>
-    <button class="action-btn" onclick="window.open('...', '_blank')">Bearbeiten</button>
-    <button class="action-btn" onclick="loescheSpieler()" style="background:#b32424;">Löschen</button>
+    <div class="action-tray" id="actionPanel" style="display:none;">
+        <button class="action-btn" onclick="openDiagram()">Diagramm</button>
+        <button class="action-btn" onclick="openIntervall()">Intervall</button>
+        <button class="action-btn" onclick="bearbeitenSpieler()">Bearbeiten</button>
+        <button class="action-btn" onclick="loescheSpieler()" style="background:#b32424;">Löschen</button>
+    </div>
 </div>
+
+<div id="infoModal">
+    <h2 id="modalTitle">Historie</h2>
+    <ul id="modalContent"></ul>
+    <button class="action-btn" onclick="document.getElementById('infoModal').style.display='none'">Schließen</button>
 </div>
 
 <script>
@@ -53,12 +62,11 @@
     const SPREADSHEET_ID = "1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ";
     let blacklistData = [];
     let sortDir = 1;
-    let selectedPlayer = null; // Hier definiert!
+    let selectedPlayer = null;
 
     async function loadBlacklist() {
         const res = await fetch(API + "?action=getBlacklist");
         const data = await res.json();
-        
         blacklistData = data.map(d => {
             const lastDate = new Date(d.letzteKontrolle);
             const nextDate = new Date(lastDate);
@@ -78,9 +86,8 @@
         data.forEach((d) => {
             const tr = document.createElement("tr");
             tr.onclick = () => {
-                selectedPlayer = d; // Spieler direkt hier beim Klicken speichern
+                selectedPlayer = d;
                 document.getElementById("actionPanel").style.display = "flex";
-                // Optional: visuelles Highlight
                 document.querySelectorAll('tr').forEach(r => r.style.backgroundColor = '');
                 tr.style.backgroundColor = '#2b2d31';
             };
@@ -89,18 +96,21 @@
         });
     }
 
+    function bearbeitenSpieler() {
+        if (!selectedPlayer) return alert("Wähle einen Spieler!");
+        window.open("https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/edit#gid=191665260", "_blank");
+    }
+
     async function loescheSpieler() {
         if (!selectedPlayer) return alert("Wähle erst einen Spieler aus!");
         if (!confirm("Soll der Eintrag für " + selectedPlayer.target + " wirklich gelöscht werden?")) return;
-
         const res = await fetch(API, {
             method: "POST",
             body: JSON.stringify({ action: "deletePflege", fallNr: selectedPlayer.gameNumber })
         });
-        
         const result = await res.json();
         if (result.success) {
-            alert("Erfolgreich vernichtet.");
+            alert("Erfolgreich gelöscht.");
             document.getElementById("actionPanel").style.display = "none";
             loadBlacklist();
         }
@@ -110,13 +120,16 @@
         if (!selectedPlayer) return;
         const res = await fetch(API + "?action=getSpielerHistorie&fallNr=" + selectedPlayer.gameNumber);
         const data = await res.json();
-        console.log("Historie:", data);
-        alert("Historie geladen! (Diagramm-Ansicht folgt im nächsten Schritt)");
+        const modal = document.getElementById('infoModal');
+        const content = document.getElementById('modalContent');
+        content.innerHTML = "";
+        data.daten.forEach(d => {
+            content.innerHTML += `<li>Datum: ${new Date(d.datum).toLocaleDateString()} | Punkte: ${d.punkte} | Allianz: ${d.allianz}</li>`;
+        });
+        modal.style.display = 'block';
     }
 
-    function openIntervall() {
-        alert("Intervall-Einstellungen öffnen...");
-    }
+    function openIntervall() { alert("Intervall-Einstellungen öffnen..."); }
 
     function sortTable(key) {
         sortDir *= -1;
