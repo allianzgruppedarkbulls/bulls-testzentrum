@@ -3,24 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>DARK BULLS - BLACKLIST PFLEGE</title>
+    <script src="config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { background-color: #050505; color: #fff; font-family: 'Almendra', serif; margin: 0; padding: 20px; }
         .container { width: 1000px; margin: auto; height: 90vh; display: flex; flex-direction: column; }
         h1 { color: #ff3131; text-align: center; text-shadow: 0 0 10px #ff3131; }
         
-        /* Scrollbarer Tabellenbereich */
         .table-wrapper { flex-grow: 1; overflow-y: auto; border: 1px solid #333; background: #0f0f0f; }
         table { width: 100%; border-collapse: collapse; }
         th { position: sticky; top: 0; background: #1a1a1a; color: #5dade2; padding: 15px; cursor: pointer; text-align: left; }
         td { padding: 12px; border-bottom: 1px solid #222; }
-        tr:hover { background: #2a2a2a; }
+        tr:hover { background: #2a2a2a; cursor: pointer; }
 
-        /* Sticky Aktionsbereich unten */
         #actionPanel { background: #151515; border-top: 2px solid #ff3131; padding: 20px; }
         .btn-group { display: flex; gap: 15px; justify-content: center; margin-top: 10px; }
         button { padding: 12px 25px; background: #222; border: 1px solid #444; color: #fff; cursor: pointer; font-family: 'Almendra'; transition: 0.3s; }
-        button:hover { background: #ff3131; color: #000; border-color: #ff3131; }
+        button:hover { background: #ff3131; color: #000; }
     </style>
 </head>
 <body>
@@ -31,10 +30,7 @@
         <table id="playerTable">
             <thead>
                 <tr>
-                    <th onclick="sortTable(0)">Fall ↕</th>
-                    <th onclick="sortTable(1)">Name ↕</th>
-                    <th onclick="sortTable(2)">Status ↕</th>
-                    <th onclick="sortTable(3)">Nächste Kontrolle ↕</th>
+                    <th>Fall</th><th>Name</th><th>Status</th><th>Nächste Kontrolle</th>
                 </tr>
             </thead>
             <tbody id="playerBody"></tbody>
@@ -44,10 +40,10 @@
     <div id="actionPanel" style="display:none;">
         <h2 id="selPlayerName" style="color:#ff3131; margin-top:0;"></h2>
         <div class="btn-group">
-            <button>Diagramm</button>
-            <button>Intervall</button>
-            <button>Bearbeiten</button>
-            <button>Löschen</button>
+            <button onclick="alert('Diagramm')">Diagramm</button>
+            <button onclick="alert('Intervall')">Intervall</button>
+            <button onclick="alert('Bearbeiten')">Bearbeiten</button>
+            <button onclick="alert('Löschen')">Löschen</button>
         </div>
     </div>
 </div>
@@ -57,35 +53,32 @@
     let blacklistData = [];
 
     async function loadBlacklist() {
-        const res = await fetch(API + "?action=getBlacklist");
-        blacklistData = await res.json();
-        renderTable(blacklistData);
-    }
-
-    function renderTable(data) {
-        const body = document.getElementById("playerBody");
-        body.innerHTML = "";
-        data.forEach((d, i) => {
-            const lastDate = new Date(d.letzteKontrolle);
-            const nextDate = new Date(lastDate);
-            nextDate.setMonth(nextDate.getMonth() + 3);
+        try {
+            const res = await fetch(API + "?action=getBlacklist");
+            blacklistData = await res.json();
             
-            // Ampel-Logik
-            const diff = (new Date() - nextDate) / (1000 * 60 * 60 * 24);
-            let status = "🟢";
-            if (diff > 14) status = "🔴";
-            else if (diff > -14) status = "🟡";
+            const body = document.getElementById("playerBody");
+            body.innerHTML = ""; // Sicherstellen, dass leer
 
-            body.innerHTML += `<tr onclick="selectPlayer(${i})">
-                <td>${d.gameNumber}</td><td>${d.target}</td><td>${status}</td><td>${nextDate.toLocaleDateString()}</td>
-            </tr>`;
-        });
-    }
+            blacklistData.forEach((d, i) => {
+                const lastDate = new Date(d.letzteKontrolle);
+                const nextDate = new Date(lastDate);
+                nextDate.setMonth(nextDate.getMonth() + 3);
+                
+                const diff = (new Date() - nextDate) / (1000 * 60 * 60 * 24);
+                let status = "🟢";
+                if (diff > 14) status = "🔴";
+                else if (diff > -14) status = "🟡";
 
-    function sortTable(n) {
-        // Einfache Sortierfunktion für Tabellenspalten
-        blacklistData.sort((a, b) => (a.target > b.target ? 1 : -1)); // Beispiel
-        renderTable(blacklistData);
+                const tr = document.createElement("tr");
+                tr.onclick = () => selectPlayer(i);
+                tr.innerHTML = `<td>${d.gameNumber}</td><td>${d.target}</td><td>${status}</td><td>${nextDate.toLocaleDateString()}</td>`;
+                body.appendChild(tr);
+            });
+        } catch (e) {
+            console.error("Fehler beim Laden:", e);
+            document.getElementById("playerBody").innerHTML = "<tr><td colspan='4'>Fehler beim Laden der Daten</td></tr>";
+        }
     }
 
     function selectPlayer(i) {
