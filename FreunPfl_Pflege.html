@@ -6,64 +6,40 @@
     <script src="config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .container { width: 900px; background-color: #0f0f0f; border: 1px solid #444; border-radius: 10px; padding: 30px; box-shadow: 0 0 20px rgba(57, 211, 83, 0.2); }
-        
-        h1 { color: #39d353; text-align: center; text-transform: uppercase; margin-bottom: 25px; }
-        
-        /* Suche Bereich */
-        .search-area { background: #1a1a1a; padding: 20px; border-radius: 8px; border: 1px solid #333; margin-bottom: 30px; display: flex; gap: 15px; align-items: center; }
-        select#editDropdown { flex: 1; background: #000; color: #39d353; border: 1px solid #ff3131; padding: 10px; font-family: 'Almendra'; font-size: 18px; }
-
-        /* Eingabemaske */
-        .edit-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
-        .field { display: flex; flex-direction: column; margin-bottom: 15px; }
-        .field label { color: #5dade2; font-size: 14px; margin-bottom: 5px; }
-        input, textarea, select { background: #000; border: 1px solid #444; color: #fff; padding: 10px; font-family: 'Almendra'; font-size: 16px; border-radius: 4px; }
-        input:focus { border-color: #39d353; }
-
-        .btn-update { width: 100%; padding: 15px; background: #39d353; color: #000; border: none; font-weight: bold; font-size: 20px; cursor: pointer; font-family: 'Almendra'; margin-top: 20px; text-transform: uppercase; }
-        .btn-update:hover { background: #fff; }
-
-        .btn-back { display: block; text-align: center; margin-top: 20px; color: #888; text-decoration: none; }
+        body { background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 900px; background-color: #0f0f0f; border: 1px solid #444; border-radius: 10px; padding: 30px; }
+        h1 { color: #39d353; text-align: center; }
+        .search-area { background: #1a1a1a; padding: 20px; margin-bottom: 20px; border: 1px solid #333; }
+        select, input { width: 100%; background: #000; color: #39d353; border: 1px solid #444; padding: 10px; }
+        .btn-update { width: 100%; padding: 15px; background: #39d353; color: #000; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        #historie-liste { margin-top: 20px; font-size: 14px; color: #aaa; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Blacklist Pflege</h1>
+    <h1>Blacklist Pflege (9-Block-System)</h1>
     
     <div class="search-area">
-        <label>Eintrag wählen:</label>
+        <label>Spieler auswählen:</label>
         <select id="editDropdown" onchange="fillFields()">
-            <option value="">-- Spieler auswählen --</option>
+            <option value="">-- Spieler wählen --</option>
         </select>
     </div>
 
     <div id="editForm" style="display:none;">
-        <div class="edit-grid">
-            <div class="field"><label>Fallnummer</label><input type="text" id="fFall" readonly style="color:#888;"></div>
-            <div class="field"><label>ID (Spalte B)</label><input type="text" id="fID"></div>
-            <div class="field"><label>Name (Spalte C)</label><input type="text" id="fName"></div>
-            
+        <input type="hidden" id="fFall">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="field"><label>Punkte (Aktuell)</label><input type="number" id="fPunkte"></div>
             <div class="field"><label>Allianz</label><input type="text" id="fAlli"></div>
-            <div class="field"><label>Punkte</label><input type="number" id="fPunkte"></div>
-            <div class="field"><label>Map</label><input type="text" id="fMap"></div>
-            
-            <div class="field"><label>Verstoß</label><input type="text" id="fVerstoss"></div>
-            <div class="field"><label>Beweise</label><select id="fBeweise"><option>Ja</option><option>Nein</option></select></div>
-            <div class="field"><label>Melder</label><input type="text" id="fMelder"></div>
         </div>
+        <button class="btn-update" onclick="updateEntry()">Kontroll-Daten speichern</button>
         
-        <div class="field">
-            <label>Beschreibung</label>
-            <textarea id="fDesc" rows="4"></textarea>
+        <div id="historie-liste">
+            <h3>Letzte Kontrollen:</h3>
+            <ul id="historyList"></ul>
         </div>
-
-        <button class="btn-update" onclick="updateEntry()">Änderungen Speichern</button>
     </div>
-
-    <a href="dashboard.html" class="btn-back">ZURÜCK</a>
 </div>
 
 <script>
@@ -71,64 +47,47 @@
     let blacklistData = [];
 
     async function loadBlacklist() {
-        try {
-            const res = await fetch(API + "?action=getBlacklistData");
-            blacklistData = await res.json();
-            const drop = document.getElementById("editDropdown");
-            
-            blacklistData.forEach((item, i) => {
-                const opt = document.createElement("option");
-                opt.value = i;
-                opt.innerText = (item.fallNr || "??") + " - " + item.target;
-                drop.appendChild(opt);
-            });
-        } catch(e) { console.error("Ladefehler"); }
+        const res = await fetch(API + "?action=getBlacklist");
+        blacklistData = await res.json();
+        const drop = document.getElementById("editDropdown");
+        blacklistData.forEach((item, i) => {
+            let opt = document.createElement("option");
+            opt.value = i;
+            opt.innerText = item.gameNumber + " - " + item.target;
+            drop.appendChild(opt);
+        });
     }
 
-    function fillFields() {
+    async function fillFields() {
         const idx = document.getElementById("editDropdown").value;
-        if(idx === "") {
-            document.getElementById("editForm").style.display = "none";
-            return;
-        }
-        
+        if(idx === "") return;
         const d = blacklistData[idx];
         document.getElementById("editForm").style.display = "block";
+        document.getElementById("fFall").value = d.gameNumber;
         
-        document.getElementById("fFall").value = d.fallNr || "";
-        document.getElementById("fID").value = d.playerID || "";
-        document.getElementById("fName").value = d.playerName || "";
-        document.getElementById("fAlli").value = d.alli || "";
-        document.getElementById("fPunkte").value = d.punkte || "";
-        document.getElementById("fMap").value = d.map || "";
-        document.getElementById("fVerstoss").value = d.verstoss || "";
-        document.getElementById("fBeweise").value = d.beweise || "Ja";
-        document.getElementById("fMelder").value = d.melder || "";
-        document.getElementById("fDesc").value = d.beschreibung || "";
+        // Historie laden
+        const res = await fetch(API + "?action=getSpielerHistorie&fallNr=" + d.gameNumber);
+        const hist = await res.json();
+        const list = document.getElementById("historyList");
+        list.innerHTML = "";
+        hist.daten.forEach(b => {
+            if(b.punkte) {
+                list.innerHTML += `<li>${b.datum ? new Date(b.datum).toLocaleDateString() : 'N/A'}: ${b.punkte} Punkte (${b.allianz})</li>`;
+            }
+        });
     }
 
     async function updateEntry() {
-        if(!confirm("Eintrag wirklich aktualisieren?")) return;
-
         const data = {
-            action: "fullUpdate", // Diese Aktion muss im Google Script die Zeile überschreiben
+            action: "updatePflege",
             fallNr: document.getElementById("fFall").value,
-            playerID: document.getElementById("fID").value,
-            playerName: document.getElementById("fName").value,
-            alli: document.getElementById("fAlli").value,
             punkte: document.getElementById("fPunkte").value,
-            map: document.getElementById("fMap").value,
-            verstoss: document.getElementById("fVerstoss").value,
-            beweise: document.getElementById("fBeweise").value,
-            melder: document.getElementById("fMelder").value,
-            desc: document.getElementById("fDesc").value
+            alli: document.getElementById("fAlli").value
         };
 
-        try {
-            const res = await fetch(API, { method: "POST", body: JSON.stringify(data) });
-            alert("Eintrag wurde erfolgreich aktualisiert!");
-            location.reload();
-        } catch(e) { alert("Fehler beim Speichern!"); }
+        const res = await fetch(API, { method: "POST", body: JSON.stringify(data) });
+        alert("Daten gespeichert! Pointer wurde rotiert.");
+        location.reload();
     }
 
     window.onload = loadBlacklist;
