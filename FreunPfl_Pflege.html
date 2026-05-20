@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>DARK BULLS - BLACKLIST PFLEGE</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -22,7 +23,7 @@
         .action-btn:hover { background: #ff3131; box-shadow: 0 0 10px #ff3131; }
         
         /* Modal Style */
-        #infoModal { display:none; position:fixed; top:20%; left:30%; width:40%; background:#1e1f22; border:2px solid #f23f43; padding:20px; z-index:1000; color:white; border-radius:8px; }
+        #infoModal { display:none; position:fixed; top:10%; left:20%; width:60%; height: 80%; background:#1e1f22; border:2px solid #f23f43; padding:20px; z-index:1000; color:white; border-radius:8px; overflow-y: auto;}
     </style>
 </head>
 <body>
@@ -52,8 +53,11 @@
 </div>
 
 <div id="infoModal">
-    <h2 id="modalTitle">Historie</h2>
-    <ul id="modalContent"></ul>
+    <h2 id="modalTitle">Historie & Verlauf</h2>
+    <div id="modalContent" style="width: 100%; height: 300px;">
+        <canvas id="myChart"></canvas>
+    </div>
+    <br><br>
     <button class="action-btn" onclick="document.getElementById('infoModal').style.display='none'">Schließen</button>
 </div>
 
@@ -63,6 +67,7 @@
     let blacklistData = [];
     let sortDir = 1;
     let selectedPlayer = null;
+    let myChart = null;
 
     async function loadBlacklist() {
         const res = await fetch(API + "?action=getBlacklist");
@@ -92,52 +97,3 @@
                 tr.style.backgroundColor = '#2b2d31';
             };
             tr.innerHTML = `<td>${d.gameNumber}</td><td>${d.target}</td><td>${d.status}</td><td>${d.nextDate.toLocaleDateString()}</td>`;
-            body.appendChild(tr);
-        });
-    }
-
-    function bearbeitenSpieler() {
-        if (!selectedPlayer) return alert("Wähle einen Spieler!");
-        window.open("https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/edit#gid=191665260", "_blank");
-    }
-
-    async function loescheSpieler() {
-        if (!selectedPlayer) return alert("Wähle erst einen Spieler aus!");
-        if (!confirm("Soll der Eintrag für " + selectedPlayer.target + " wirklich gelöscht werden?")) return;
-        const res = await fetch(API, {
-            method: "POST",
-            body: JSON.stringify({ action: "deletePflege", fallNr: selectedPlayer.gameNumber })
-        });
-        const result = await res.json();
-        if (result.success) {
-            alert("Erfolgreich gelöscht.");
-            document.getElementById("actionPanel").style.display = "none";
-            loadBlacklist();
-        }
-    }
-
-    async function openDiagram() {
-        if (!selectedPlayer) return;
-        const res = await fetch(API + "?action=getSpielerHistorie&fallNr=" + selectedPlayer.gameNumber);
-        const data = await res.json();
-        const modal = document.getElementById('infoModal');
-        const content = document.getElementById('modalContent');
-        content.innerHTML = "";
-        data.daten.forEach(d => {
-            content.innerHTML += `<li>Datum: ${new Date(d.datum).toLocaleDateString()} | Punkte: ${d.punkte} | Allianz: ${d.allianz}</li>`;
-        });
-        modal.style.display = 'block';
-    }
-
-    function openIntervall() { alert("Intervall-Einstellungen öffnen..."); }
-
-    function sortTable(key) {
-        sortDir *= -1;
-        blacklistData.sort((a, b) => (a[key] > b[key] ? 1 : -1) * sortDir);
-        renderTable(blacklistData);
-    }
-
-    window.onload = loadBlacklist;
-</script>
-</body>
-</html>
