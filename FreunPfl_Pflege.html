@@ -50,14 +50,15 @@
 
 <script>
     const API = window.BULLS_CONFIG.SCRIPT_URL;
+    const SPREADSHEET_ID = "1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ";
     let blacklistData = [];
     let sortDir = 1;
+    let selectedPlayer = null; // Hier definiert!
 
     async function loadBlacklist() {
         const res = await fetch(API + "?action=getBlacklist");
         const data = await res.json();
         
-        // Daten für Anzeige aufbereiten
         blacklistData = data.map(d => {
             const lastDate = new Date(d.letzteKontrolle);
             const nextDate = new Date(lastDate);
@@ -74,30 +75,49 @@
     function renderTable(data) {
         const body = document.getElementById("playerBody");
         body.innerHTML = "";
-        data.forEach((d, i) => {
+        data.forEach((d) => {
             const tr = document.createElement("tr");
             tr.onclick = () => {
+                selectedPlayer = d; // Spieler direkt hier beim Klicken speichern
                 document.getElementById("actionPanel").style.display = "flex";
+                // Optional: visuelles Highlight
+                document.querySelectorAll('tr').forEach(r => r.style.backgroundColor = '');
+                tr.style.backgroundColor = '#2b2d31';
             };
             tr.innerHTML = `<td>${d.gameNumber}</td><td>${d.target}</td><td>${d.status}</td><td>${d.nextDate.toLocaleDateString()}</td>`;
             body.appendChild(tr);
         });
     }
-// Neue Logik für die Button-Bar
-async function handleAction(action) {
-    if (!selectedPlayer) return alert("Wähle erst einen Spieler aus!");
 
-    if (action === 'bearbeiten') {
-        window.open("https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/edit#gid=191665260", "_blank");
-    } else if (action === 'loeschen') {
-        if (!confirm("Wirklich löschen?")) return;
-        await fetch(API, { method: "POST", body: JSON.stringify({ action: "delete", rowIdx: selectedPlayer.rowIdx }) });
-        loadBlacklist(); // Liste neu laden
+    async function loescheSpieler() {
+        if (!selectedPlayer) return alert("Wähle erst einen Spieler aus!");
+        if (!confirm("Soll der Eintrag für " + selectedPlayer.target + " wirklich gelöscht werden?")) return;
+
+        const res = await fetch(API, {
+            method: "POST",
+            body: JSON.stringify({ action: "deletePflege", fallNr: selectedPlayer.gameNumber })
+        });
+        
+        const result = await res.json();
+        if (result.success) {
+            alert("Erfolgreich vernichtet.");
+            document.getElementById("actionPanel").style.display = "none";
+            loadBlacklist();
+        }
     }
-    // Diagramm/Intervall kannst du hier nach dem gleichen Schema ergänzen
-}
-    
-    
+
+    async function openDiagram() {
+        if (!selectedPlayer) return;
+        const res = await fetch(API + "?action=getSpielerHistorie&fallNr=" + selectedPlayer.gameNumber);
+        const data = await res.json();
+        console.log("Historie:", data);
+        alert("Historie geladen! (Diagramm-Ansicht folgt im nächsten Schritt)");
+    }
+
+    function openIntervall() {
+        alert("Intervall-Einstellungen öffnen...");
+    }
+
     function sortTable(key) {
         sortDir *= -1;
         blacklistData.sort((a, b) => (a[key] > b[key] ? 1 : -1) * sortDir);
