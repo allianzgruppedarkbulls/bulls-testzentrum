@@ -6,159 +6,96 @@
     <script src="config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .container { width: 850px; background-color: #0f0f0f; border: 2px solid #ff3131; border-radius: 10px; padding: 30px; box-shadow: 0 0 20px rgba(255, 49, 49, 0.3); }
-        
-        h1 { color: #ff3131; text-align: center; text-transform: uppercase; margin-bottom: 5px; }
-        p.subtitle { text-align: center; color: #888; margin-bottom: 30px; font-style: italic; }
-        
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-        .field { display: flex; flex-direction: column; margin-bottom: 15px; }
-        .field label { color: #5dade2; margin-bottom: 5px; font-size: 16px; }
-        
-        input, select, textarea { 
-            background: #000; border: 1px solid #444; color: #39d353; padding: 10px; 
-            font-family: 'Almendra'; font-size: 18px; border-radius: 5px; outline: none;
-        }
-        input:focus { border-color: #ff3131; }
-        
-        .full-width { grid-column: span 3; }
-        
-        .btn-direct { 
-            width: 100%; padding: 15px; background: #ff3131; color: #fff; border: none; 
-            border-radius: 5px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; 
-            font-size: 22px; text-transform: uppercase; margin-top: 20px;
-        }
-        .btn-direct:hover { background: #fff; color: #ff3131; }
-        
-        .btn-back { display: block; text-align: center; margin-top: 20px; color: #888; text-decoration: none; }
+        body { background-color: #050505; color: #ffffff; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; }
+        .modal-box { width: 1000px; max-width: 95vw; background-color: #0f0f0f; border: 2px solid #ff3131; border-radius: 12px; padding: 30px; box-shadow: 0 0 40px rgba(255, 0, 0, 0.4); }
+        h1 { color: #ff3131; text-transform: uppercase; margin-top: 0; margin-bottom: 25px; letter-spacing: 3px; font-size: 32px; text-align: center; }
+        .section-title { color: #5dade2; font-size: 18px; font-style: italic; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 15px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 15px; }
+        .form-group { display: flex; flex-direction: column; text-align: left; }
+        label { color: #fff; font-size: 16px; margin-bottom: 5px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 10px; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 16px; border-radius: 5px; outline: none; }
+        textarea { height: 100px; resize: none; }
+        .button-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
+        .btn-action { padding: 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 18px; text-transform: uppercase; text-align: center; text-decoration: none; }
+        .btn-yellow { background: #ffd600; color: #000; }
+        .btn-red { background: #ff3131; color: #000; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Direkt-Aufnahme</h1>
-    <p class="subtitle">Spieler ohne Umweg in die Blacklist eintragen</p>
-    
-    <div class="form-grid">
-        <div class="field">
-            <label>Gegner ID (Spalte B)</label>
-            <input type="text" id="pID" placeholder="12345678">
+<div class="modal-box">
+    <h1>Direkt-Eintrag Blackliste</h1>
+    <form id="directForm" onsubmit="submitDirect(event)">
+        <div class="section-title">Spielerdaten</div>
+        <div class="grid-3">
+            <div class="form-group"><label>Spieler ID</label><input type="text" id="pID" required></div>
+            <div class="form-group"><label>Spielername</label><input type="text" id="pName" required></div>
+            <div class="form-group"><label>Allianz</label><select id="pAlli"><option value="">-- Wählen --</option></select></div>
         </div>
-        <div class="field">
-            <label>Gegner Name (Spalte C)</label>
-            <input type="text" id="pName" placeholder="Spielername">
-        </div>
-        <div class="field">
-            <label>Allianz</label>
-            <input type="text" id="pAlli" placeholder="Allianz-Tag">
-        </div>
-        
-        <div class="field">
-            <label>Verstoß</label>
-            <select id="pVerstoss">
-                <option value="">-- wählen --</option>
-            </select>
-        </div>
-        <div class="field">
-            <label>Map</label>
-            <select id="pMap">
-                <option value="">-- wählen --</option>
-            </select>
-        </div>
-        <div class="field">
-            <label>Punkte</label>
-            <input type="number" id="pPunkte" placeholder="0">
+        <div class="grid-3">
+            <div class="form-group"><label>Verstoß</label><select id="pVerstoss" required><option value="">-- Wählen --</option></select></div>
+            <div class="form-group"><label>Meistgespielte Map</label><select id="pMap"><option value="">-- Wählen --</option></select></div>
+            <div class="form-group"><label>Melder (Buchhalter)</label><select id="pMelder"><option value="Buchhaltung">Buchhaltung</option></select></div>
         </div>
 
-        <div class="field">
-            <label>Beweise vorhanden?</label>
-            <select id="pBeweis">
-                <option>Ja</option>
-                <option>Nein</option>
-            </select>
+        <div class="section-title">Details</div>
+        <div class="grid-3">
+            <div class="form-group"><label>Punkte</label><input type="text" id="pPunkte"></div>
+            <div class="form-group"><label>Beweise vorhanden?</label><select id="pBeweis"><option value="Ja">Ja</option><option value="Nein">Nein</option></select></div>
+            <div class="form-group"><label>Fallnummer</label><input type="text" id="pFall"></div>
         </div>
-        <div class="field">
-            <label>Melder (intern)</label>
-            <input type="text" id="pMelder" value="Buchhaltung">
-        </div>
-        <div class="field">
-            <label>Angemeldet am (optional)</label>
-            <input type="date" id="pJoin">
-        </div>
+        <label>Beschreibung</label>
+        <textarea id="pDesc" required></textarea>
 
-        <div class="field full-width">
-            <label>Detaillierte Beschreibung</label>
-            <textarea id="pDesc" rows="4" placeholder="Was genau ist vorgefallen?"></textarea>
+        <div class="button-row">
+            <a href="dashboard.html" class="btn-action btn-yellow">Zurück</a>
+            <button type="submit" class="btn-action btn-red" id="saveBtn">In Blackliste speichern</button>
         </div>
-    </div>
-
-    <button class="btn-direct" onclick="submitDirect()">Sofort in Blacklist speichern</button>
-    
-    <a href="dashboard.html" class="btn-back">Abbruch & Zurück</a>
+    </form>
 </div>
 
 <script>
     const API = window.BULLS_CONFIG.SCRIPT_URL;
 
-   // Dropdowns wie beim Melde-Formular laden
-    async function setupForm() {
-        try {
-            const res = await fetch(API + "?action=getDropdownData");
-            const data = await res.json();
-            
-            const fill = (id, list) => {
-                const el = document.getElementById(id);
-                // Sicherheits-Check: Nur laden, wenn die Liste wirklich existiert!
-                if (!list) return; 
-                
-                list.forEach(item => {
-                    let opt = document.createElement("option");
-                    opt.value = item; opt.innerText = item;
-                    el.appendChild(opt);
-                });
-            };
-
-            // HIER WAR DER FEHLER: Es muss data.verstoesse heißen!
-            fill("pVerstoss", data.verstoesse);
-            fill("pMap", data.maps);
-            
-        } catch(e) { 
-            console.error("Fehler beim Laden der Listen", e); 
-        }
+    async function loadForm() {
+        const res = await fetch(API + "?action=getDropdownData");
+        const data = await res.json();
+        
+        const fill = (id, arr) => {
+            const el = document.getElementById(id);
+            if(arr) arr.forEach(v => { let o = document.createElement("option"); o.value = v; o.innerText = v; el.appendChild(o); });
+        };
+        fill("pAlli", data.allianzen);
+        fill("pVerstoss", data.verstoesse);
+        fill("pMap", data.maps);
+        fill("pMelder", data.user ? data.user.map(u => u.name) : []);
     }
 
-    async function submitDirect() {
-        const id = document.getElementById("pID").value.trim();
-        const name = document.getElementById("pName").value.trim();
-        
-        if(!id || !name) {
-            alert("ID und Name müssen eingetragen werden!");
-            return;
-        }
+    async function submitDirect(e) {
+        e.preventDefault();
+        const btn = document.getElementById("saveBtn");
+        btn.innerText = "SPEICHERE..."; btn.disabled = true;
 
-        const data = {
-            action: "approveMeldung", // Wir nutzen die approve-Funktion, da sie alles final einträgt
-            target: id + " | " + name,
-            alli: document.getElementById("pAlli").value,
-            verstoss: document.getElementById("pVerstoss").value,
+        const payload = {
+            action: "submitDirectEntry", // Neue Aktion für dein Code.gs
+            targetID: document.getElementById("pID").value,
+            targetUser: document.getElementById("pName").value,
+            targetAlli: document.getElementById("pAlli").value,
+            reason: document.getElementById("pVerstoss").value,
             map: document.getElementById("pMap").value,
-            punkte: document.getElementById("pPunkte").value,
-            beweise: document.getElementById("pBeweis").value,
-            desc: document.getElementById("pDesc").value,
-            melder: document.getElementById("pMelder").value,
-            joinDate: document.getElementById("pJoin").value,
-            isDirect: true // Flag für das Script
+            reporter: document.getElementById("pMelder").value,
+            points: document.getElementById("pPunkte").value,
+            proof: document.getElementById("pBeweis").value,
+            fall: document.getElementById("pFall").value,
+            description: document.getElementById("pDesc").value,
+            date: new Date().toLocaleDateString("de-DE")
         };
 
-        try {
-            const response = await fetch(API, { method: "POST", body: JSON.stringify(data) });
-            alert("Spieler wurde erfolgreich in die Blacklist aufgenommen!");
-            window.location.href = 'dashboard.html';
-        } catch(e) { alert("Fehler beim Speichern!"); }
+        await fetch(API, { method: "POST", body: JSON.stringify(payload) });
+        alert("Eintrag erfolgreich in Blackliste übernommen!");
+        window.location.href = "dashboard.html";
     }
-
-    window.onload = setupForm;
+    window.onload = loadForm;
 </script>
 </body>
 </html>
