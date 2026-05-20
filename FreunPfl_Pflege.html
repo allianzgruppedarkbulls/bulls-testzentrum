@@ -35,9 +35,10 @@
         </div>
         <button class="btn-update" onclick="updateEntry()">Kontroll-Daten speichern</button>
         
-        <div id="historie-liste">
-            <h3>Letzte Kontrollen:</h3>
-            <ul id="historyList"></ul>
+        <div id="historie-liste" style="margin-top: 30px; border-top: 1px solid #333; padding-top: 15px;">
+            <h3 style="color: #5dade2;">Verlauf der Kontrollen:</h3>
+            <ul id="historyList" style="list-style-type: none; padding: 0;">
+                </ul>
         </div>
     </div>
 </div>
@@ -60,7 +61,11 @@
 
     async function fillFields() {
         const idx = document.getElementById("editDropdown").value;
-        if(idx === "") return;
+        if(idx === "") {
+            document.getElementById("editForm").style.display = "none";
+            return;
+        }
+        
         const d = blacklistData[idx];
         document.getElementById("editForm").style.display = "block";
         document.getElementById("fFall").value = d.gameNumber;
@@ -69,10 +74,32 @@
         const res = await fetch(API + "?action=getSpielerHistorie&fallNr=" + d.gameNumber);
         const hist = await res.json();
         const list = document.getElementById("historyList");
-        list.innerHTML = "";
+        list.innerHTML = ""; // Liste leeren
+        
+        const jetzt = new Date();
+        const dreiMonateInMs = 90 * 24 * 60 * 60 * 1000;
+
+        // Daten sortieren: Die neuesten Einträge zuerst (oder wie du magst)
         hist.daten.forEach(b => {
             if(b.punkte) {
-                list.innerHTML += `<li>${b.datum ? new Date(b.datum).toLocaleDateString() : 'N/A'}: ${b.punkte} Punkte (${b.allianz})</li>`;
+                const controlDate = new Date(b.datum);
+                const istAlt = (jetzt - controlDate) > dreiMonateInMs;
+                
+                // Wir bauen ein schönes Listen-Element
+                const li = document.createElement("li");
+                li.style.padding = "8px";
+                li.style.borderBottom = "1px solid #222";
+                
+                if (istAlt) {
+                    li.style.color = "#ff3131";
+                    li.style.fontWeight = "bold";
+                    li.innerHTML = `⚠️ ${controlDate.toLocaleDateString()} | <b>${b.punkte} Punkte</b> | Allianz: ${b.allianz} (ÜBERFÄLLIG)`;
+                } else {
+                    li.style.color = "#ffffff";
+                    li.innerHTML = `✅ ${controlDate.toLocaleDateString()} | <b>${b.punkte} Punkte</b> | Allianz: ${b.allianz}`;
+                }
+                
+                list.appendChild(li);
             }
         });
     }
