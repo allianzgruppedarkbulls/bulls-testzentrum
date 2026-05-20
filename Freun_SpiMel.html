@@ -163,16 +163,19 @@
 <script>
     const API = window.BULLS_CONFIG.SCRIPT_URL;
 
-    function setMeta() {
+    async function setMeta() {
         document.getElementById("reporterName").value = localStorage.getItem("bulls_user") || "Unbekannt";
         const heute = new Date();
         document.getElementById("reportDate").value = heute.toLocaleDateString("de-DE");
-        loadDropdowns();
+        
+        // Dropdowns laden und auf Abschluss warten
+        await loadDropdowns(); 
     }
 
     async function loadDropdowns() {
         try {
             const res = await fetch(API + "?action=getDropdownData");
+            if (!res.ok) throw new Error("Netzwerkfehler");
             const data = await res.json();
             
             const alliSel = document.getElementById("targetAlli");
@@ -195,7 +198,9 @@
                     let o = document.createElement("option"); o.value = v; o.innerText = v; reasonSel.appendChild(o);
                 });
             }
-        } catch(e) { console.log("Fehler beim Abruf der Dropdown-Strukturen."); }
+        } catch(e) { 
+            console.error("Fehler beim Abruf der Dropdown-Strukturen:", e); 
+        }
     }
 
     async function submitReport(e) {
@@ -214,7 +219,7 @@
             playerMap: document.getElementById("playerMap").value,
             reason: document.getElementById("reason").value,
             proof: document.getElementById("proof").value,
-            gameNumber: document.getElementById("gameNumber").value.trim(), // NEU IM PAYLOAD
+            gameNumber: document.getElementById("gameNumber").value.trim(),
             reportDate: document.getElementById("reportDate").value,
             description: document.getElementById("description").value.trim(),
             reporter: document.getElementById("reporterName").value,
@@ -237,7 +242,9 @@
         }
     }
 
-    window.onload = setMeta;
+    window.onload = async function() {
+        await setMeta();
+    };
 </script>
 </body>
 </html>
