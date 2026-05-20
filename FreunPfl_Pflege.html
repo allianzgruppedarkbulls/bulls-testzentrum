@@ -64,17 +64,36 @@
     const API = window.BULLS_CONFIG.SCRIPT_URL;
     let blacklistData = [];
 
-    async function loadBlacklist() {
-        const res = await fetch(API + "?action=getBlacklist");
-        blacklistData = await res.json();
-        const body = document.getElementById("playerBody");
-        blacklistData.forEach((d, i) => {
-            let row = `<tr onclick="selectPlayer(${i})">
-                <td>${d.gameNumber}</td><td>${d.target}</td><td>${d.alli}</td>
-            </tr>`;
-            body.innerHTML += row;
-        });
-    }
+   async function loadBlacklist() {
+    const res = await fetch(API + "?action=getBlacklist");
+    blacklistData = await res.json();
+    const body = document.getElementById("playerBody");
+    body.innerHTML = ""; // Vorher leeren
+
+    const heute = new Date();
+
+    blacklistData.forEach((d, i) => {
+        // Angenommen, du hast ein Feld "lastDate" oder berechnest es aus den 9 Blöcken
+        const lastDate = new Date(d.letzteKontrolle); // Dein Datum aus dem Sheet
+        const diffMonate = (heute - lastDate) / (1000 * 60 * 60 * 24 * 30);
+        
+        let status = "🟢"; // Standard
+        if(diffMonate > 3) status = "🔴";
+        else if(diffMonate > 2) status = "🟡";
+
+        let nextDate = new Date(lastDate);
+        nextDate.setMonth(nextDate.getMonth() + 3); // Geplante Kontrolle in 3 Monaten
+
+        let row = `<tr onclick="selectPlayer(${i})">
+            <td>${d.gameNumber}</td>
+            <td>${d.target}</td>
+            <td>${lastDate.toLocaleDateString()}</td>
+            <td>${status}</td>
+            <td>${nextDate.toLocaleDateString()}</td>
+        </tr>`;
+        body.innerHTML += row;
+    });
+}
 
     function selectPlayer(i) {
         const d = blacklistData[i];
