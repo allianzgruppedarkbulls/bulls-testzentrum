@@ -15,12 +15,16 @@
         .form-group { display: flex; flex-direction: column; text-align: left; }
         label { color: #fff; font-size: 16px; margin-bottom: 5px; font-weight: bold; }
         input[type="text"], select, textarea { width: 100%; padding: 10px; background: #000; color: #39d353; border: 1px solid #444; font-family: 'Almendra'; font-size: 16px; border-radius: 5px; box-sizing: border-box; outline: none; }
+        input:focus, select:focus, textarea:focus { border-color: #ff3131; }
+        .desc-label { color: #ffd600; font-size: 18px; font-weight: bold; margin-bottom: 5px; display: block; text-align: left;}
+        .info-box-text { color: #888; font-size: 14px; font-style: italic; text-align: left; margin-bottom: 8px; }
         textarea { width: 100%; height: 140px; resize: none; background: #000; border: 1px solid #444; color: #39d353; padding: 15px; font-size: 16px; border-radius: 5px; box-sizing: border-box; }
         .button-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 30px; }
         .btn-action { padding: 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: 'Almendra'; font-size: 18px; text-transform: uppercase; transition: 0.2s; text-align: center; text-decoration: none; }
         .btn-yellow { background: #ffd600; color: #000; }
+        .btn-yellow:hover { background: #fff; transform: scale(1.02); }
         .btn-red { background: #ff3131; color: #000; }
-        .btn-action:hover { background: #fff; transform: scale(1.02); }
+        .btn-red:hover { background: #fff; transform: scale(1.02); }
     </style>
 </head>
 <body>
@@ -28,42 +32,43 @@
 <div class="modal-box">
     <h1>Dark Bulls Black Liste - Eintragung</h1>
     <form id="reportForm" onsubmit="submitReport(event)">
-        <div class="section-title">Spielerdaten</div>
+        <div class="section-title">Spielerdaten vom gemeldeten Spieler</div>
         <div class="grid-3">
-            <div class="form-group"><label>Spieler ID</label><input type="text" id="targetID" placeholder="ID..."></div>
-            <div class="form-group"><label>Spielername</label><input type="text" id="targetUser" required placeholder="Name..."></div>
-            <div class="form-group"><label>Angemeldet am</label><input type="text" id="regDate" placeholder="Datum..."></div>
+            <div class="form-group"><label>Spielername ID</label><input type="text" id="targetID" placeholder="ID falls vorhanden..."></div>
+            <div class="form-group"><label>Spielername</label><input type="text" id="targetUser" placeholder="In-Game Name..." required></div>
+            <div class="form-group"><label>Spieler angemeldet am</label><input type="text" id="regDate" placeholder="Z.B. 14.05.2026..."></div>
         </div>
         <div class="grid-3">
-            <div class="form-group"><label>Allianz</label><select id="targetAlli"><option value="">-- Allianz wählen --</option></select></div>
-            <div class="form-group"><label>Punktestand</label><input type="text" id="playerPoints"></div>
-            <div class="form-group"><label>Map</label><select id="playerMap"><option value="">-- Map wählen --</option></select></div>
+            <div class="form-group"><label>Allianz bei Erstkontakt</label><select id="targetAlli"><option value="">-- Allianz wählen --</option></select></div>
+            <div class="form-group"><label>Punktestand</label><input type="text" id="playerPoints" placeholder="Z.B. 4.500.000..."></div>
+            <div class="form-group"><label>Meistgespielte Map</label><select id="playerMap"><option value="">-- Map wählen --</option></select></div>
         </div>
         <div class="grid-3">
             <div class="form-group"><label>Verstoß</label><select id="reason" required><option value="">-- Verstoß wählen --</option></select></div>
-            <div class="form-group"><label>Beweise</label><select id="proof"><option value="Ja">Ja</option><option value="Nein">Nein</option><option value="Auf Anfrage">Auf Anfrage</option></select></div>
-            <div class="form-group"><label>Spielnummer</label><input type="text" id="gameNumber"></div>
+            <div class="form-group"><label>Beweise vorhanden?</label><select id="proof"><option value="Ja">Ja</option><option value="Nein">Nein</option><option value="Auf Anfrage">Auf Anfrage</option></select></div>
+            <div class="form-group"><label>Spielnummer</label><input type="text" id="gameNumber" placeholder="Z.B. Game-ID 837462..."></div>
         </div>
 
-        <div class="section-title">Fallbeschreibung</div>
-        <textarea id="description" required placeholder="Details hier dokumentieren..."></textarea>
+        <div class="section-title" style="margin-top: 25px;">Fallbeschreibung</div>
+        <span class="desc-label">Was ist passiert / Beschreibung:</span>
+        <textarea id="description" placeholder="Details, Zeiten und Vorfälle hier lückenlos dokumentieren..." required></textarea>
 
         <div class="section-title">Zeugen & Melder</div>
         <div class="grid-3">
             <div class="form-group"><label>Melder</label><input type="text" id="reporterName" readonly></div>
             <div class="form-group"><label>Zeuge 1</label><select id="witness1"><option value="">-- Zeuge 1 --</option></select></div>
-            <div class="form-group"><label>Zeuge 2</label><select id="witness2"><option value="">-- Zeuge 2 --</option></select></div>
+            <div class="form-group"><label>Zeuge 3</label><select id="witness3"><option value="">-- Zeuge 3 --</option></select></div>
         </div>
         <div class="grid-3">
-            <div class="form-group"><label>Datum</label><input type="text" id="reportDate" readonly></div>
-            <div class="form-group"><label>Zeuge 3</label><select id="witness3"><option value="">-- Zeuge 3 --</option></select></div>
+            <div class="form-group"><label>Datum der Meldung</label><input type="text" id="reportDate" readonly></div>
+            <div class="form-group"><label>Zeuge 2</label><select id="witness2"><option value="">-- Zeuge 2 --</option></select></div>
             <div class="form-group"><label>Zeuge 4</label><select id="witness4"><option value="">-- Zeuge 4 --</option></select></div>
         </div>
 
         <div class="button-row">
             <a href="dashboard.html" class="btn-action btn-yellow">Zurück</a>
             <button type="submit" class="btn-action btn-red" id="submitBtn">Spieler melden</button>
-            <a href="Per_Supp.html" class="btn-action btn-yellow">Support</a>
+            <a href="Per_Supp.html" class="btn-action btn-yellow">Freundes listen support</a>
         </div>
     </form>
 </div>
@@ -71,46 +76,52 @@
 <script>
     const API = window.BULLS_CONFIG.SCRIPT_URL;
 
-    async function initForm() {
+    function setMeta() {
         document.getElementById("reporterName").value = localStorage.getItem("bulls_user") || "Unbekannt";
         document.getElementById("reportDate").value = new Date().toLocaleDateString("de-DE");
+        loadDropdowns();
+    }
 
+    async function loadDropdowns() {
         try {
             const res = await fetch(API + "?action=getDropdownData");
             const data = await res.json();
             
             const fill = (id, arr) => {
                 const el = document.getElementById(id);
-                arr.sort().forEach(val => el.innerHTML += `<option value="${val}">${val}</option>`);
+                if(el && arr) arr.sort().forEach(val => {
+                    let o = document.createElement("option"); o.value = val; o.innerText = val; el.appendChild(o);
+                });
             };
 
-            fill("targetAlli", data.allianzen || []);
-            fill("playerMap", data.maps || []);
-            fill("reason", data.verstoesse || []);
+            fill("targetAlli", data.allianzen);
+            fill("playerMap", data.maps);
+            fill("reason", data.verstoesse);
             
             const witnesses = data.user ? data.user.map(u => u.name) : [];
             ["witness1", "witness2", "witness3", "witness4"].forEach(id => fill(id, witnesses));
-        } catch(e) { console.error("Daten konnten nicht geladen werden."); }
+            
+        } catch(e) { console.log("Fehler beim Abruf der Dropdown-Strukturen."); }
     }
 
     async function submitReport(e) {
         e.preventDefault();
         const btn = document.getElementById("submitBtn");
-        btn.disabled = true; btn.innerText = "SENDET...";
+        btn.innerText = "SENDER LÄDT..."; btn.disabled = true;
 
         const payload = {
             action: "submitPlayerReport",
-            targetID: document.getElementById("targetID").value,
-            targetUser: document.getElementById("targetUser").value,
-            regDate: document.getElementById("regDate").value,
+            targetID: document.getElementById("targetID").value.trim(),
+            targetUser: document.getElementById("targetUser").value.trim(),
+            regDate: document.getElementById("regDate").value.trim(),
             targetAlli: document.getElementById("targetAlli").value,
-            playerPoints: document.getElementById("playerPoints").value,
+            playerPoints: document.getElementById("playerPoints").value.trim(),
             playerMap: document.getElementById("playerMap").value,
             reason: document.getElementById("reason").value,
             proof: document.getElementById("proof").value,
-            gameNumber: document.getElementById("gameNumber").value,
+            gameNumber: document.getElementById("gameNumber").value.trim(),
             reportDate: document.getElementById("reportDate").value,
-            description: document.getElementById("description").value,
+            description: document.getElementById("description").value.trim(),
             reporter: document.getElementById("reporterName").value,
             witness1: document.getElementById("witness1").value,
             witness2: document.getElementById("witness2").value,
@@ -120,12 +131,12 @@
 
         try {
             await fetch(API, { method: "POST", body: JSON.stringify(payload) });
-            alert("✓ AKTE ÜBERMITTELT!");
+            alert("✓ AKTE ERFOLGREICH AN DIE ZENTRALE ÜBERMITTELT!");
             document.getElementById("reportForm").reset();
-            initForm();
-        } catch(e) { alert("Fehler!"); } finally { btn.disabled = false; btn.innerText = "Spieler melden"; }
+            setMeta();
+        } catch(e) { alert("Fehler!"); } finally { btn.innerText = "Spieler melden"; btn.disabled = false; }
     }
-    window.onload = initForm;
+    window.onload = setMeta;
 </script>
 </body>
 </html>
