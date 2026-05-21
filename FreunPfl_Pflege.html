@@ -54,10 +54,12 @@
 
 <div id="infoModal">
     <h2 id="modalTitle">Historie & Verlauf</h2>
-    <div id="modalContent" style="width: 100%; height: 300px;">
-        <canvas id="myChart"></canvas>
+    <div style="margin-bottom:15px; text-align:center;">
+        <button class="action-btn" onclick="updateChart('punkte')">Punkte</button>
+        <button class="action-btn" onclick="updateChart('zeit')">Zeitverlauf</button>
     </div>
-    <br><br>
+    <div style="width: 100%; height: 250px;"><canvas id="myChart"></canvas></div>
+    <br>
     <button class="action-btn" onclick="document.getElementById('infoModal').style.display='none'">Schließen</button>
 </div>
 
@@ -67,32 +69,26 @@
     let blacklistData = [];
     let selectedPlayer = null;
     let myChart = null;
+    let currentHistoryData = []; // Hier speichern wir die Daten für das Diagramm global
 
-    // 1. Initialisierung: Daten laden
     async function loadBlacklist() {
         try {
             const res = await fetch(API + "?action=getBlacklist");
             const data = await res.json();
-            
             blacklistData = data.map(d => {
                 const lastDate = new Date(d.letzteKontrolle);
                 const nextDate = new Date(lastDate);
                 nextDate.setMonth(nextDate.getMonth() + 3);
-                
                 const diff = (new Date() - nextDate) / (1000 * 60 * 60 * 24);
                 let status = "🟢";
                 if (diff > 14) status = "🔴";
                 else if (diff > -14) status = "🟡";
-                
                 return { ...d, nextDate, status };
             });
             renderTable(blacklistData);
-        } catch (e) {
-            console.error("Fehler beim Laden:", e);
-        }
+        } catch (e) { console.error("Fehler beim Laden:", e); }
     }
 
-    // 2. Tabelle rendern
     function renderTable(data) {
         const body = document.getElementById("playerBody");
         body.innerHTML = "";
@@ -109,56 +105,54 @@
         });
     }
 
-    // 3. Diagramm rendern mit Chart.js
+    // Diagramm anzeigen und Daten berechnen
     async function openDiagram() {
         if (!selectedPlayer) return;
         const res = await fetch(API + "?action=getSpielerHistorie&fallNr=" + selectedPlayer.gameNumber);
-        const data = await res.json();
+        const json = await res.json();
+        currentHistoryData = json.daten; // Daten global für Umschalter speichern
+
+        // Differenz berechnen
+        const first = currentHistoryData[0];
+        const last = currentHistoryData[currentHistoryData.length - 1];
+        const ptsDiff = last.punkte - first.punkte;
+        const dayDiff = Math.round((new Date(last.datum) - new Date(first.datum)) / (1000 * 60 * 60 * 24));
         
+        document.getElementById('modalTitle').innerHTML = `Historie: ${selectedPlayer.target} <br><small style="font-size:14px; color:#f23f43;">${ptsDiff} Pkt in ${dayDiff} Tagen</small>`;
         document.getElementById('infoModal').style.display = 'block';
         
+        updateChart('punkte');
+    }
+
+    function updateChart(mode) {
         const ctx = document.getElementById('myChart').getContext('2d');
         if (myChart) myChart.destroy();
         
         myChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: data.daten.map(d => new Date(d.datum).toLocaleDateString()),
+                labels: currentHistoryData.map(d => new Date(d.datum).toLocaleDateString()),
                 datasets: [{
-                    label: 'Punkteverlauf',
-                    data: data.daten.map(d => d.punkte),
+                    label: mode === 'punkte' ? 'Punkte' : 'Tage seit Start',
+                    data: currentHistoryData.map(d => mode === 'punkte' ? d.punkte : Math.round((new Date(d.datum) - new Date(currentHistoryData[0].datum))/(1000*60*60*24))),
                     borderColor: '#f23f43',
-                    tension: 0.1
+                    backgroundColor: 'rgba(242, 63, 67, 0.2)',
+                    fill: true
                 }]
-            }
+            },
+            options: { responsive: true, maintainAspectRatio: false }
         });
     }
 
-    // 4. Intervall
-    function openIntervall() {
-        const val = prompt("Neues Intervall (Monate):", "3");
-        if(val) alert("Intervall-Update wird gespeichert...");
-    }
-
-    // 5. Bearbeiten
-    function bearbeitenSpieler() {
-        if (!selectedPlayer) return alert("Wähle einen Spieler!");
-        window.open("https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/edit#gid=191665260", "_blank");
-    }
-
-    // 6. Löschen
+    // Löschen, Intervall, Bearbeiten (wie gehabt) ...
     async function loescheSpieler() {
-        if (!selectedPlayer) return alert("Wähle einen Spieler!");
         if (!confirm("Wirklich löschen?")) return;
-        const res = await fetch(API, {
-            method: "POST",
-            body: JSON.stringify({ action: "deletePflege", fallNr: selectedPlayer.gameNumber })
-        });
-        if ((await res.json()).success) {
-            document.getElementById("actionPanel").style.display = "none";
-            loadBlacklist();
-        }
+        const res = await fetch(API, { method: "POST", body: JSON.stringify({ action: "deletePflege", fallNr: selectedPlayer.gameNumber }) });
+        if ((await res.json()).success) { document.getElementById("actionPanel").style.display = "none"; loadBlacklist(); }
     }
+    
+    function bearbeitenSpieler() { window.open("https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/edit#gid=191665260", "_blank"); }
+    function openIntervall() { alert("Intervall-Funktion noch in Arbeit."); }
 
     window.onload = loadBlacklist;
 </script>
