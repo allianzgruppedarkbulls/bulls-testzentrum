@@ -68,17 +68,46 @@
     const SPREADSHEET_ID = "1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ";
     let blacklistData = [], selectedPlayer = null, myChart = null, currentHistoryData = [];
 
-    async function loadBlacklist() {
-        const res = await fetch(API + "?action=getBlacklist");
-        const data = await res.json();
-        const body = document.getElementById("playerBody");
-        body.innerHTML = "";
-        data.forEach(d => {
-            const tr = document.createElement("tr");
-            tr.onclick = () => { selectedPlayer = d; document.getElementById("actionPanel").style.display = "flex"; };
-            tr.innerHTML = `<td>${d.gameNumber}</td><td>${d.target}</td><td>🟢</td><td>...</td>`;
-            body.appendChild(tr);
-        });
+   async function loadBlacklist() {
+        try {
+            const res = await fetch(API + "?action=getBlacklist");
+            const data = await res.json();
+            
+            const body = document.getElementById("playerBody");
+            body.innerHTML = "";
+            
+            data.forEach(d => {
+                // Berechnungen für Datum & Ampel
+                const lastDate = new Date(d.letzteKontrolle);
+                const nextDate = new Date(lastDate);
+                nextDate.setMonth(nextDate.getMonth() + 3); // 3 Monate Intervall
+                
+                // Differenz in Tagen zum heutigen Tag
+                const diff = (new Date() - nextDate) / (1000 * 60 * 60 * 24);
+                
+                let status = "🟢"; // Standard: Gut
+                if (diff > 14) status = "🔴";      // Überfällig
+                else if (diff > -14) status = "🟡"; // Kurz vor Fällig
+
+                const tr = document.createElement("tr");
+                tr.onclick = () => { 
+                    selectedPlayer = d; 
+                    document.getElementById("actionPanel").style.display = "flex"; 
+                    document.querySelectorAll('tr').forEach(r => r.style.backgroundColor = '');
+                    tr.style.backgroundColor = '#2b2d31';
+                };
+                
+                tr.innerHTML = `
+                    <td>${d.gameNumber}</td>
+                    <td>${d.target}</td>
+                    <td>${status}</td>
+                    <td>${nextDate.toLocaleDateString()}</td>
+                `;
+                body.appendChild(tr);
+            });
+        } catch (e) {
+            console.error("Fehler beim Laden der Liste:", e);
+        }
     }
 
     async function openDiagram() {
