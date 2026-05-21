@@ -9,22 +9,21 @@
     <style>
         body { background-color: #0c0c0e; color: #dbdee1; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
         .container { width: 1100px; background: #1e1f22; border: 1px solid #f23f43; border-radius: 8px; padding: 25px; box-shadow: 0 0 20px rgba(242, 63, 67, 0.2); }
-        h1 { color: #f23f43; text-align: center; text-transform: uppercase; letter-spacing: 2px; margin-top: 0; font-size: 32px; }
-        .table-wrapper { max-height: 480px; overflow-y: auto; border: 1px solid #333; background: #111214; border-radius: 4px; margin-top: 20px; }
+        h1 { color: #f23f43; text-align: center; text-transform: uppercase; margin-top: 0; }
+        .table-wrapper { max-height: 400px; overflow-y: auto; background: #111214; }
         table { width: 100%; border-collapse: collapse; }
-        th { position: sticky; top: 0; background: #111214; color: #f23f43; text-align: left; padding: 12px; font-size: 16px; border-bottom: 2px solid #f23f43; }
-        td { padding: 12px; border-bottom: 1px solid #2b2d31; font-size: 16px; }
+        th { color: #f23f43; padding: 12px; border-bottom: 2px solid #f23f43; }
+        td { padding: 12px; border-bottom: 1px solid #2b2d31; text-align: center; }
         tr:hover { background: #2b2d31; cursor: pointer; }
-        .action-tray { display: flex; justify-content: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #2b2d31; gap: 10px; }
-        .action-btn { background: #f23f43; color: #fff; border: none; padding: 12px 30px; font-family: 'Almendra'; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
-        #infoModal { display:none; position:fixed; top:10%; left:20%; width:60%; height:80%; background:#1e1f22; border:2px solid #f23f43; padding:20px; z-index:1000; color:white; border-radius:8px; overflow-y: auto;}
-        .input-group { margin-bottom: 10px; }
-        .input-group label { display: block; margin-bottom: 5px; }
-        .input-group input { width: 100%; padding: 8px; background: #2b2d31; border: 1px solid #444; color: white; }
+        .action-tray { display: flex; justify-content: center; margin-top: 20px; gap: 10px; }
+        .action-btn { background: #f23f43; color: #fff; border: none; padding: 10px 20px; cursor: pointer; font-family: 'Almendra'; }
+        #infoModal { display:none; position:fixed; top:10%; left:20%; width:60%; background:#1e1f22; border:2px solid #f23f43; padding:20px; z-index:1000; }
+        .input-group { margin: 10px 0; }
+        input { width: 90%; padding: 8px; }
     </style>
 </head>
+<body>
 
-    <body>
 <div class="container">
     <h1>Blacklist Pflege</h1>
     <div class="table-wrapper">
@@ -41,19 +40,18 @@
 </div>
 
 <div id="infoModal">
-    <h2 id="modalTitle">Pflege-Eintrag erstellen</h2>
-    <div class="input-group"><label>Punkte:</label><input type="number" id="fPunkte"></div>
-    <div class="input-group"><label>Allianz:</label><input type="text" id="fAlli"></div>
-    <div class="input-group"><label>Monats-Intervall:</label><input type="number" id="fMonate" value="3"></div>
+    <h2>Pflege & Historie</h2>
+    <div class="input-group"><input type="number" id="fPunkte" placeholder="Punkte"></div>
+    <div class="input-group"><input type="text" id="fAlli" placeholder="Allianz"></div>
+    <div class="input-group"><input type="number" id="fMonate" value="3" placeholder="Intervall (Monate)"></div>
     <button class="action-btn" onclick="savePflege()">Speichern</button>
-    <hr>
     <div style="width: 100%; height: 200px;"><canvas id="myChart"></canvas></div>
     <button class="action-btn" onclick="document.getElementById('infoModal').style.display='none'">Schließen</button>
 </div>
 
 <script>
     const API = window.BULLS_CONFIG.SCRIPT_URL;
-    let selectedPlayer = null;
+    let selectedPlayer = null, myChart = null;
 
     async function loadBlacklist() {
         const res = await fetch(API + "?action=getBlacklist");
@@ -61,34 +59,38 @@
         const body = document.getElementById("playerBody");
         body.innerHTML = "";
         data.forEach(d => {
+            const lastDate = new Date(d.letzteKontrolle);
+            const diff = (new Date() - lastDate) / (1000 * 60 * 60 * 24);
+            let status = (diff > 90) ? "🔴" : (diff > 60) ? "🟡" : "🟢";
             const tr = document.createElement("tr");
             tr.onclick = () => { selectedPlayer = d; document.getElementById("actionPanel").style.display = "flex"; };
-            tr.innerHTML = `<td>${d.gameNumber}</td><td>${d.target}</td><td>-</td><td>${new Date(d.letzteKontrolle).toLocaleDateString()}</td>`;
+            tr.innerHTML = `<td>${d.gameNumber}</td><td>${d.target}</td><td>${status}</td><td>${lastDate.toLocaleDateString()}</td>`;
             body.appendChild(tr);
         });
     }
 
-    async function openDetails() { document.getElementById('infoModal').style.display = 'block'; }
+    async function openDetails() {
+        document.getElementById('infoModal').style.display = 'block';
+        const res = await fetch(API + "?action=getSpielerHistorie&fallNr=" + selectedPlayer.gameNumber);
+        const json = await res.json();
+        const ctx = document.getElementById('myChart').getContext('2d');
+        if(myChart) myChart.destroy();
+        myChart = new Chart(ctx, { type: 'line', data: { labels: json.daten.map(d => new Date(d.datum).toLocaleDateString()), datasets: [{ label: 'Punkte', data: json.daten.map(d => d.punkte), borderColor: '#f23f43' }] } });
+    }
 
     async function savePflege() {
-        const payload = {
-            action: "updatePflege",
-            fallNr: selectedPlayer.gameNumber,
-            punkte: document.getElementById('fPunkte').value,
-            alli: document.getElementById('fAlli').value,
-            monate: document.getElementById('fMonate').value
-        };
-        await fetch(API, { method: "POST", body: JSON.stringify(payload) });
+        await fetch(API, { method: "POST", body: JSON.stringify({ action: "updatePflege", fallNr: selectedPlayer.gameNumber, punkte: document.getElementById('fPunkte').value, alli: document.getElementById('fAlli').value, monate: document.getElementById('fMonate').value }) });
         alert("Daten gespeichert!");
         document.getElementById('infoModal').style.display = 'none';
         loadBlacklist();
     }
 
-    function exportBericht() { alert("Export-Funktion aktiv"); }
+    function exportBericht() { alert("Bericht wird generiert..."); }
     async function loescheSpieler() {
-        if (!confirm("Wirklich löschen?")) return;
-        await fetch(API, { method: "POST", body: JSON.stringify({ action: "deletePflege", fallNr: selectedPlayer.gameNumber }) });
-        location.reload();
+        if(confirm("Wirklich löschen?")) {
+            await fetch(API, { method: "POST", body: JSON.stringify({ action: "deletePflege", fallNr: selectedPlayer.gameNumber }) });
+            location.reload();
+        }
     }
     window.onload = loadBlacklist;
 </script>
