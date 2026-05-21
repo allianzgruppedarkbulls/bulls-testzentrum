@@ -15,11 +15,9 @@
         th { position: sticky; top: 0; background: #111214; color: #f23f43; text-align: left; padding: 12px; font-size: 16px; border-bottom: 2px solid #f23f43; cursor: pointer; }
         td { padding: 12px; border-bottom: 1px solid #2b2d31; font-size: 16px; }
         tr:hover { background: #2b2d31; cursor: pointer; }
-
         .action-tray { display: flex; justify-content: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #2b2d31; gap: 10px; }
         .action-btn { background: #f23f43; color: #fff; border: none; padding: 12px 30px; font-family: 'Almendra'; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
         .action-btn:hover { background: #ff3131; box-shadow: 0 0 10px #ff3131; }
-        
         #infoModal { display:none; position:fixed; top:10%; left:20%; width:60%; height:80%; background:#1e1f22; border:2px solid #f23f43; padding:20px; z-index:1000; color:white; border-radius:8px; overflow-y: auto;}
     </style>
 </head>
@@ -40,7 +38,6 @@
             <tbody id="playerBody"></tbody>
         </table>
     </div>
-
     <div class="action-tray" id="actionPanel" style="display:none;">
         <button class="action-btn" onclick="openDiagram()">Diagramm</button>
         <button class="action-btn" onclick="openIntervall()">Intervall</button>
@@ -62,52 +59,26 @@
 </div>
 
 <script>
-    // ... Dein restlicher JavaScript-Code bleibt exakt wie er war, 
-    // er wird jetzt automatisch den Button im actionPanel finden!
     const API = window.BULLS_CONFIG.SCRIPT_URL;
-    const SPREADSHEET_ID = "1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ";
     let blacklistData = [], selectedPlayer = null, myChart = null, currentHistoryData = [];
 
-   async function loadBlacklist() {
-        try {
-            const res = await fetch(API + "?action=getBlacklist");
-            const data = await res.json();
-            
-            const body = document.getElementById("playerBody");
-            body.innerHTML = "";
-            
-            data.forEach(d => {
-                // Berechnungen für Datum & Ampel
-                const lastDate = new Date(d.letzteKontrolle);
-                const nextDate = new Date(lastDate);
-                nextDate.setMonth(nextDate.getMonth() + 3); // 3 Monate Intervall
-                
-                // Differenz in Tagen zum heutigen Tag
-                const diff = (new Date() - nextDate) / (1000 * 60 * 60 * 24);
-                
-                let status = "🟢"; // Standard: Gut
-                if (diff > 14) status = "🔴";      // Überfällig
-                else if (diff > -14) status = "🟡"; // Kurz vor Fällig
-
-                const tr = document.createElement("tr");
-                tr.onclick = () => { 
-                    selectedPlayer = d; 
-                    document.getElementById("actionPanel").style.display = "flex"; 
-                    document.querySelectorAll('tr').forEach(r => r.style.backgroundColor = '');
-                    tr.style.backgroundColor = '#2b2d31';
-                };
-                
-                tr.innerHTML = `
-                    <td>${d.gameNumber}</td>
-                    <td>${d.target}</td>
-                    <td>${status}</td>
-                    <td>${nextDate.toLocaleDateString()}</td>
-                `;
-                body.appendChild(tr);
-            });
-        } catch (e) {
-            console.error("Fehler beim Laden der Liste:", e);
-        }
+    async function loadBlacklist() {
+        const res = await fetch(API + "?action=getBlacklist");
+        const data = await res.json();
+        const body = document.getElementById("playerBody");
+        body.innerHTML = "";
+        blacklistData = data;
+        data.forEach(d => {
+            const lastDate = new Date(d.letzteKontrolle);
+            const nextDate = new Date(lastDate);
+            nextDate.setMonth(nextDate.getMonth() + 3);
+            const diff = (new Date() - nextDate) / (1000 * 60 * 60 * 24);
+            let status = (diff > 14) ? "🔴" : (diff > -14) ? "🟡" : "🟢";
+            const tr = document.createElement("tr");
+            tr.onclick = () => { selectedPlayer = d; document.getElementById("actionPanel").style.display = "flex"; };
+            tr.innerHTML = `<td>${d.gameNumber}</td><td>${d.target}</td><td>${status}</td><td>${nextDate.toLocaleDateString()}</td>`;
+            body.appendChild(tr);
+        });
     }
 
     async function openDiagram() {
@@ -130,24 +101,23 @@
         });
     }
 
-    function exportBericht() {
-        const win = window.open('', '_blank');
-        win.document.write(`
-            <style>
-                body { background: #0c0c0e; color: #fff; font-family: sans-serif; padding: 50px; }
-                h1 { color: #f23f43; }
-                .box { border: 1px solid #f23f43; padding: 20px; border-radius: 10px; }
-            </style>
-            <div class="box">
-                <h1>DARK BULLS REPORT: ${selectedPlayer.target}</h1>
-                <p>Status: ${selectedPlayer.status} | Fall: ${selectedPlayer.gameNumber}</p>
-                <hr>
-                <button onclick="window.print()">Als PDF drucken / speichern</button>
-            </div>
-        `);
+    function openIntervall() {
+        const monate = prompt("Neues Intervall (Monate):", "3");
+        if (!monate) return;
+        fetch(API, { method: "POST", body: JSON.stringify({ action: "updateIntervall", fallNr: selectedPlayer.gameNumber, monate: monate }) })
+        .then(() => { alert("Intervall gespeichert!"); loadBlacklist(); });
     }
 
-    // ... Restliche Funktionen (loescheSpieler, bearbeitenSpieler)
+    async function loescheSpieler() {
+        if (!confirm("Wirklich löschen?")) return;
+        const res = await fetch(API, { method: "POST", body: JSON.stringify({ action: "deletePflege", fallNr: selectedPlayer.gameNumber }) });
+        const result = await res.json();
+        if (result.success) { document.getElementById("actionPanel").style.display = "none"; loadBlacklist(); }
+    }
+
+    function bearbeitenSpieler() { alert("Funktion in Arbeit"); }
+    function exportBericht() { alert("Export in Arbeit"); }
+
     window.onload = loadBlacklist;
 </script>
 </body>
