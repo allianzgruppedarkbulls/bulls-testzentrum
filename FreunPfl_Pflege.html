@@ -10,154 +10,86 @@
         body { background-color: #0c0c0e; color: #dbdee1; font-family: 'Almendra', serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
         .container { width: 1100px; background: #1e1f22; border: 1px solid #f23f43; border-radius: 8px; padding: 25px; box-shadow: 0 0 20px rgba(242, 63, 67, 0.2); }
         h1 { color: #f23f43; text-align: center; text-transform: uppercase; letter-spacing: 2px; margin-top: 0; font-size: 32px; }
-        
         .table-wrapper { max-height: 480px; overflow-y: auto; border: 1px solid #333; background: #111214; border-radius: 4px; margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; }
-        th { position: sticky; top: 0; background: #111214; color: #f23f43; text-align: left; padding: 12px; font-size: 16px; border-bottom: 2px solid #f23f43; cursor: pointer; }
-        th:hover { color: #ff3131; }
+        th { position: sticky; top: 0; background: #111214; color: #f23f43; text-align: left; padding: 12px; font-size: 16px; border-bottom: 2px solid #f23f43; }
         td { padding: 12px; border-bottom: 1px solid #2b2d31; font-size: 16px; }
         tr:hover { background: #2b2d31; cursor: pointer; }
-
         .action-tray { display: flex; justify-content: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #2b2d31; gap: 10px; }
         .action-btn { background: #f23f43; color: #fff; border: none; padding: 12px 30px; font-family: 'Almendra'; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
-        .action-btn:hover { background: #ff3131; box-shadow: 0 0 10px #ff3131; }
-        
-        /* Modal Style */
-        #infoModal { display:none; position:fixed; top:10%; left:20%; width:60%; height: 80%; background:#1e1f22; border:2px solid #f23f43; padding:20px; z-index:1000; color:white; border-radius:8px; overflow-y: auto;}
+        #infoModal { display:none; position:fixed; top:10%; left:20%; width:60%; height:80%; background:#1e1f22; border:2px solid #f23f43; padding:20px; z-index:1000; color:white; border-radius:8px; overflow-y: auto;}
+        .input-group { margin-bottom: 10px; }
+        .input-group label { display: block; margin-bottom: 5px; }
+        .input-group input { width: 100%; padding: 8px; background: #2b2d31; border: 1px solid #444; color: white; }
     </style>
 </head>
-<body>
 
+    <body>
 <div class="container">
     <h1>Blacklist Pflege</h1>
     <div class="table-wrapper">
         <table id="playerTable">
-            <thead>
-                <tr>
-                    <th onclick="sortTable('gameNumber')">Fall ↕</th>
-                    <th onclick="sortTable('target')">Name ↕</th>
-                    <th onclick="sortTable('status')">Status ↕</th>
-                    <th onclick="sortTable('nextDate')">Nächste Kontrolle ↕</th>
-                </tr>
-            </thead>
+            <thead><tr><th>Fall</th><th>Name</th><th>Status</th><th>Kontrolle</th></tr></thead>
             <tbody id="playerBody"></tbody>
         </table>
     </div>
-
     <div class="action-tray" id="actionPanel" style="display:none;">
-        <button class="action-btn" onclick="openDiagram()">Diagramm</button>
-        <button class="action-btn" onclick="openIntervall()">Intervall</button>
-        <button class="action-btn" onclick="bearbeitenSpieler()">Bearbeiten</button>
+        <button class="action-btn" onclick="openDetails()">Pflege & Historie</button>
+        <button class="action-btn" onclick="exportBericht()" style="background:#28a745;">Bericht</button>
         <button class="action-btn" onclick="loescheSpieler()" style="background:#b32424;">Löschen</button>
     </div>
 </div>
 
 <div id="infoModal">
-    <h2 id="modalTitle">Historie & Verlauf</h2>
-    <div id="modalContent" style="width: 100%; height: 300px;">
-        <canvas id="myChart"></canvas>
-    </div>
-    <br><br>
+    <h2 id="modalTitle">Pflege-Eintrag erstellen</h2>
+    <div class="input-group"><label>Punkte:</label><input type="number" id="fPunkte"></div>
+    <div class="input-group"><label>Allianz:</label><input type="text" id="fAlli"></div>
+    <div class="input-group"><label>Monats-Intervall:</label><input type="number" id="fMonate" value="3"></div>
+    <button class="action-btn" onclick="savePflege()">Speichern</button>
+    <hr>
+    <div style="width: 100%; height: 200px;"><canvas id="myChart"></canvas></div>
     <button class="action-btn" onclick="document.getElementById('infoModal').style.display='none'">Schließen</button>
 </div>
 
 <script>
     const API = window.BULLS_CONFIG.SCRIPT_URL;
-    const SPREADSHEET_ID = "1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ";
-    let blacklistData = [];
-    let sortDir = 1;
     let selectedPlayer = null;
-    let myChart = null;
 
     async function loadBlacklist() {
         const res = await fetch(API + "?action=getBlacklist");
         const data = await res.json();
-        blacklistData = data.map(d => {
-            const lastDate = new Date(d.letzteKontrolle);
-            const nextDate = new Date(lastDate);
-            nextDate.setMonth(nextDate.getMonth() + 3);
-            const diff = (new Date() - nextDate) / (1000 * 60 * 60 * 24);
-            let status = "🟢";
-            if (diff > 14) status = "🔴";
-            else if (diff > -14) status = "🟡";
-            return { ...d, nextDate, status };
-        });
-        renderTable(blacklistData);
-    }
-
-    function renderTable(data) {
         const body = document.getElementById("playerBody");
         body.innerHTML = "";
-        data.forEach((d) => {
+        data.forEach(d => {
             const tr = document.createElement("tr");
-            tr.onclick = () => {
-                selectedPlayer = d;
-                document.getElementById("actionPanel").style.display = "flex";
-                document.querySelectorAll('tr').forEach(r => r.style.backgroundColor = '');
-                tr.style.backgroundColor = '#2b2d31';
-            };
-            tr.innerHTML = `<td>${d.gameNumber}</td><td>${d.target}</td><td>${d.status}</td><td>${d.nextDate.toLocaleDateString()}</td>`;
+            tr.onclick = () => { selectedPlayer = d; document.getElementById("actionPanel").style.display = "flex"; };
+            tr.innerHTML = `<td>${d.gameNumber}</td><td>${d.target}</td><td>-</td><td>${new Date(d.letzteKontrolle).toLocaleDateString()}</td>`;
             body.appendChild(tr);
         });
     }
 
-    function bearbeitenSpieler() {
-        if (!selectedPlayer) return alert("Wähle einen Spieler!");
-        window.open("https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/edit#gid=191665260", "_blank");
+    async function openDetails() { document.getElementById('infoModal').style.display = 'block'; }
+
+    async function savePflege() {
+        const payload = {
+            action: "updatePflege",
+            fallNr: selectedPlayer.gameNumber,
+            punkte: document.getElementById('fPunkte').value,
+            alli: document.getElementById('fAlli').value,
+            monate: document.getElementById('fMonate').value
+        };
+        await fetch(API, { method: "POST", body: JSON.stringify(payload) });
+        alert("Daten gespeichert!");
+        document.getElementById('infoModal').style.display = 'none';
+        loadBlacklist();
     }
 
+    function exportBericht() { alert("Export-Funktion aktiv"); }
     async function loescheSpieler() {
-        if (!selectedPlayer) return alert("Wähle erst einen Spieler aus!");
-        if (!confirm("Soll der Eintrag für " + selectedPlayer.target + " wirklich gelöscht werden?")) return;
-        const res = await fetch(API, {
-            method: "POST",
-            body: JSON.stringify({ action: "deletePflege", fallNr: selectedPlayer.gameNumber })
-        });
-        const result = await res.json();
-        if (result.success) {
-            alert("Erfolgreich gelöscht.");
-            document.getElementById("actionPanel").style.display = "none";
-            loadBlacklist();
-        }
+        if (!confirm("Wirklich löschen?")) return;
+        await fetch(API, { method: "POST", body: JSON.stringify({ action: "deletePflege", fallNr: selectedPlayer.gameNumber }) });
+        location.reload();
     }
-
-    async function openDiagram() {
-        if (!selectedPlayer) return;
-        const res = await fetch(API + "?action=getSpielerHistorie&fallNr=" + selectedPlayer.gameNumber);
-        const data = await res.json();
-        
-        document.getElementById('infoModal').style.display = 'block';
-        
-        const ctx = document.getElementById('myChart').getContext('2d');
-        if (myChart) myChart.destroy();
-        
-        myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: data.daten.map(d => new Date(d.datum).toLocaleDateString()),
-                datasets: [{
-                    label: 'Punkteverlauf',
-                    data: data.daten.map(d => d.punkte),
-                    borderColor: '#f23f43',
-                    backgroundColor: 'rgba(242, 63, 67, 0.2)',
-                    fill: true
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
-    }
-
-    function openIntervall() { 
-        const val = prompt("Neues Intervall (in Monaten) festlegen:", "3");
-        if(val) alert("Funktion für Intervall-Update (Server-Side) muss in Hauptsteuerung.gs noch definiert werden!");
-    }
-
-    function sortTable(key) {
-        sortDir *= -1;
-        blacklistData.sort((a, b) => (a[key] > b[key] ? 1 : -1) * sortDir);
-        renderTable(blacklistData);
-    }
-
     window.onload = loadBlacklist;
 </script>
 </body>
