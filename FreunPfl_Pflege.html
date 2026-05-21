@@ -63,6 +63,13 @@
     <button class="action-btn" onclick="document.getElementById('infoModal').style.display='none'">Schließen</button>
 </div>
 
+    <div class="action-tray" id="actionPanel" style="display:none;">
+    <button class="action-btn" onclick="openDiagram()">Diagramm</button>
+    <button class="action-btn" onclick="openIntervall()">Intervall</button>
+    <button class="action-btn" onclick="bearbeitenSpieler()">Bearbeiten</button>
+    <button class="action-btn" onclick="exportBericht()" style="background:#28a745;">Bericht</button> <button class="action-btn" onclick="loescheSpieler()" style="background:#b32424;">Löschen</button>
+</div>
+
 <script>
     const API = window.BULLS_CONFIG.SCRIPT_URL;
     const SPREADSHEET_ID = "1Gjnhol0ou63xW20OnbTo_wugzpOTgBP2yjnx3Qzg4bQ";
@@ -144,6 +151,38 @@
         });
     }
 
+
+    function exportBericht() {
+    if (!selectedPlayer) return;
+    
+    // Wir bauen ein neues Fenster auf
+    const win = window.open('', '_blank', 'width=800,height=600');
+    win.document.write(`
+        <html>
+            <head>
+                <title>Bericht: ${selectedPlayer.target}</title>
+                <style>
+                    body { font-family: sans-serif; padding: 40px; color: #333; }
+                    h1 { color: #f23f43; text-transform: uppercase; }
+                    .info { margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                </style>
+            </head>
+            <body>
+                <h1>Dark Bulls - Statusbericht</h1>
+                <div class="info">
+                    <p><strong>Spieler:</strong> ${selectedPlayer.target}</p>
+                    <p><strong>Fallnummer:</strong> ${selectedPlayer.gameNumber}</p>
+                    <p><strong>Status:</strong> ${selectedPlayer.status}</p>
+                </div>
+                <h3>Historie</h3>
+                <p>Hier könnte die gesamte Historie-Tabelle stehen...</p>
+                <button onclick="window.print()">Als PDF speichern</button>
+            </body>
+        </html>
+    `);
+}
     // Löschen, Intervall, Bearbeiten (wie gehabt) ...
     async function loescheSpieler() {
         if (!confirm("Wirklich löschen?")) return;
