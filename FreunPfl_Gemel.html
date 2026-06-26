@@ -1,164 +1,3 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <title>DARK BULLS - BLACKLIST WARTESCHLANGE</title>
-    <script src="config.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body { 
-            background-color: #050505; 
-            color: #ffffff; 
-            font-family: 'Almendra', serif; 
-            margin: 0; 
-            padding: 20px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh;
-        }
-
-        .container { 
-            width: 950px; 
-            background-color: #0f0f0f; 
-            border: 1px solid #333; 
-            border-radius: 15px; 
-            padding: 40px; 
-            box-shadow: 0 0 60px 10px rgba(255, 49, 49, 0.2); 
-            position: relative;
-        }
-
-        h1 { 
-            color: #ff3131; 
-            text-align: center; 
-            text-transform: uppercase; 
-            margin-bottom: 30px; 
-            letter-spacing: 3px; 
-            font-size: 32px;
-            text-shadow: 0 0 10px rgba(255, 49, 49, 0.5);
-        }
-
-        /* Liste Design */
-        .list-section { 
-            background: #000; 
-            border: 1px solid #222; 
-            border-radius: 8px; 
-            overflow: hidden; 
-            margin-bottom: 30px;
-        }
-        
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #111; color: #5dade2; padding: 15px; text-align: left; text-transform: uppercase; font-size: 14px; border-bottom: 2px solid #ff3131; }
-        td { padding: 12px 15px; border-bottom: 1px solid #111; cursor: pointer; transition: 0.3s; font-size: 16px; }
-        tr:hover td { background: #1a1a1a; color: #ff3131; }
-
-        /* Maske (Detail-Ansicht) */
-        #editMask { 
-            display: none; 
-            border-top: 1px solid #333; 
-            padding-top: 30px; 
-            animation: fadeIn 0.5s ease;
-        }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .section-title { color: #5dade2; font-size: 22px; margin-bottom: 25px; text-align: center; border-bottom: 1px solid #222; padding-bottom: 10px; }
-
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-        .field { display: flex; flex-direction: column; margin-bottom: 15px; }
-        .field label { color: #888; font-size: 13px; margin-bottom: 6px; text-transform: uppercase; }
-        
-        input, textarea { 
-            background: #000; border: 1px solid #444; color: #39d353; 
-            padding: 12px; font-family: 'Almendra'; font-size: 18px; 
-            border-radius: 6px; outline: none; transition: 0.3s;
-        }
-        input:focus, textarea:focus { border-color: #ff3131; box-shadow: 0 0 10px rgba(255, 49, 49, 0.2); }
-
-        textarea { height: 120px; resize: none; grid-column: span 3; }
-
-        .btn-row { display: flex; justify-content: center; gap: 15px; margin-top: 30px; }
-        .btn { 
-            padding: 15px 25px; border-radius: 6px; font-weight: bold; cursor: pointer; 
-            font-family: 'Almendra'; text-transform: uppercase; border: none; font-size: 16px; transition: 0.3s;
-        }
-        .btn-approve { background: #39d353; color: #000; box-shadow: 0 4px 15px rgba(57, 211, 83, 0.2); }
-        .btn-delete { background: #ff3131; color: #fff; }
-        .btn-contact { background: #f1c40f; color: #000; }
-        .btn-back { background: #444; color: #fff; }
-        .btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
-
-        /* Erfolgs-Overlay */
-        #successBox { 
-            display: none; background: #0f0f0f; position: absolute; top: 0; left: 0; 
-            width: 100%; height: 100%; border-radius: 15px; flex-direction: column; 
-            justify-content: center; align-items: center; padding: 40px; z-index: 20;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div id="mainContent">
-        <h1>BULLS WARTESCHLANGE</h1>
-
-        <div class="list-section">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Gegner (ID | Name)</th>
-                        <th>Verstoß</th>
-                        <th>Melder</th>
-                        <th>Datum</th>
-                    </tr>
-                </thead>
-                <tbody id="queueBody">
-                    <tr><td colspan="4" style="text-align:center; padding:30px;">Suche nach neuen Sündern...</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div id="editMask">
-            <div class="section-title">FALLÜBERNAHME & PRÜFUNG</div>
-            <div class="info-grid">
-                <div class="field"><label>Gegner Identität</label><input type="text" id="mTarget"></div>
-                <div class="field"><label>Allianz-Zugehörigkeit</label><input type="text" id="mAlli"></div>
-                <div class="field"><label>Kampf-Punkte</label><input type="text" id="mPunkte"></div>
-                <div class="field"><label>Operations-Map</label><input type="text" id="mMap"></div>
-                <div class="field"><label>Haupt-Verstoß</label><input type="text" id="mVerstoss"></div>
-                <div class="field"><label>Beweis-Status</label><input type="text" id="mBeweise"></div>
-                
-                <div class="field" style="grid-column: span 3;">
-                    <label>Tatgang / Beschreibung</label>
-                    <textarea id="mDesc"></textarea>
-                </div>
-
-                <div class="field"><label>Melder</label><input type="text" id="mMelder" readonly></div>
-                <div class="field" style="grid-column: span 2;"><label>Bestätigte Zeugen</label><input type="text" id="mZeugen"></div>
-            </div>
-
-            <div class="btn-row">
-                <button class="btn btn-approve" onclick="runAction('approveMeldung')">In Blacklist eintragen</button>
-                <button class="btn btn-contact" onclick="contactMelder()">Melder kontaktieren</button>
-                <button class="btn btn-delete" onclick="runAction('rejectMeldung')">Löschen</button>
-                <button class="btn btn-back" onclick="location.reload()">Abbrechen</button>
-            </div>
-        </div>
-        <div style="text-align: center; margin-top: 20px;">
-            <a href="dashboard.html" style="color: #666; text-decoration: none; font-size: 14px;">ZURÜCK ZUM HAUPTMENÜ</a>
-        </div>
-    </div>
-
-    <div id="successBox">
-        <div style="font-size: 80px; color: #39d353; margin-bottom: 20px;">✓</div>
-        <div style="color: #39d353; font-size: 28px; font-weight: bold; text-transform: uppercase;">Aktion erfolgreich</div>
-        <div id="successMessage" style="color: #eee; font-size: 18px; text-align: center; margin: 20px 0 35px; line-height: 1.5;">
-            Die Akte wurde erfolgreich verarbeitet und der Status der Blacklist aktualisiert.
-        </div>
-        <button class="btn btn-approve" onclick="location.reload()">WEITERARBEITEN</button>
-    </div>
-</div>
-
 <script>
     const API = window.BULLS_CONFIG.SCRIPT_URL;
     let selectedMeldung = null;
@@ -178,24 +17,30 @@
             data.forEach(m => {
                 const tr = document.createElement("tr");
                 tr.onclick = () => openEdit(m);
-                tr.innerHTML = `<td>${m.target}</td><td>${m.verstoss}</td><td>${m.melder}</td><td>${new Date(m.datum).toLocaleDateString()}</td>`;
+                tr.innerHTML = `<td>${m.target || m.targetUser || ''}</td><td>${m.verstoss || ''}</td><td>${m.melder || ''}</td><td>${m.datum ? new Date(m.datum).toLocaleDateString() : ''}</td>`;
                 tbody.appendChild(tr);
             });
-        } catch(e) { console.error("Ladefehler"); }
+        } catch(e) { console.error("Ladefehler", e); }
     }
 
     function openEdit(m) {
         selectedMeldung = m;
         document.getElementById("editMask").style.display = "block";
-        document.getElementById("mTarget").value = m.target;
-        document.getElementById("mAlli").value = m.alli || "";
-        document.getElementById("mPunkte").value = m.punkte || "";
-        document.getElementById("mMap").value = m.map || "";
-        document.getElementById("mVerstoss").value = m.verstoss;
+        
+        // Mapping: Wir nutzen Fallbacks (||), damit leere Daten nicht zum Absturz führen
+        document.getElementById("mTarget").value = m.target || m.targetUser || "";
+        document.getElementById("mAlli").value = m.alli || m.targetAlli || "";
+        document.getElementById("mPunkte").value = m.punkte || m.playerPoints || "";
+        document.getElementById("mMap").value = m.map || m.playerMap || "";
+        document.getElementById("mVerstoss").value = m.verstoss || "";
         document.getElementById("mBeweise").value = m.beweise || "Ja";
-        document.getElementById("mDesc").value = m.desc || m.beschreibung;
-        document.getElementById("mMelder").value = m.melder;
+        
+        // Beschreibung/Tatgang
+        document.getElementById("mDesc").value = m.desc || m.beschreibung || m.description || "";
+        
+        document.getElementById("mMelder").value = m.melder || "";
         document.getElementById("mZeugen").value = m.zeugen || "";
+        
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
 
@@ -217,10 +62,11 @@
         };
 
         try {
-            await fetch(API, { method: "POST", body: JSON.stringify(payload) });
+            const response = await fetch(API, { method: "POST", body: JSON.stringify(payload) });
+            const result = await response.json();
             document.getElementById('mainContent').style.display = 'none';
             document.getElementById('successBox').style.display = 'flex';
-        } catch(e) { alert("Übertragungsfehler!"); }
+        } catch(e) { alert("Übertragungsfehler! Bitte prüfe die Verbindung."); }
     }
 
     function contactMelder() {
@@ -230,5 +76,3 @@
 
     window.onload = loadQueue;
 </script>
-</body>
-</html>
