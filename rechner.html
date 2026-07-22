@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Bulls - Material- & ELO-Rechner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0b0b0b;
+            color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #111;
+            border: 2px solid #ff0000;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .header-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ff0000;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .btn-link {
+            background: #ff0000;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .btn-link:hover { background: #ff3333; }
+        
+        /* Länder-Tabs (1-6) */
+        .land-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+        .land-tab {
+            background: #222;
+            border: 1px solid #555;
+            color: #ccc;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .land-tab.active {
+            background: #d4af37;
+            color: #000;
+            border-color: #d4af37;
+        }
+        .section-title {
+            color: #d4af37;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: #161616;
+        }
+        th, td {
+            padding: 6px 10px;
+            border: 1px solid #333;
+            text-align: left;
+            font-size: 13px;
+        }
+        th { color: #ff3333; background: #1a1a1a; }
+        input, select {
+            width: 100%;
+            padding: 4px;
+            background: #1a1a1a;
+            border: 1px solid #555;
+            color: #fff;
+            border-radius: 3px;
+            box-sizing: border-box;
+            font-size: 12px;
+        }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .calc-box { background: #1c1c1c; padding: 15px; border-radius: 6px; border: 1px solid #444; margin-top: 20px; }
+        .positive { color: #2ecc71; font-weight: bold; }
+        .negative { color: #e74c3c; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header-nav">
+            <h2 style="margin:0; color:#ff0000;">Dark Bulls - Material- & ELO-Rechner (Excel-Modus)</h2>
+            <a href="karte.html" class="btn-link" target="_blank">Zur Weltkarte (EU-22 Zoom) &rarr;</a>
+        </div>
+
+        <!-- Auswahl der Länder (1 bis 6) -->
+        <div class="land-tabs">
+            <div class="land-tab active" onclick="selectLand(1)">Land 1 (Eig.)</div>
+            <div class="land-tab" onclick="selectLand(2)">Land 2 (Eig.)</div>
+            <div class="land-tab" onclick="selectLand(3)">Land 3 (Eig.)</div>
+            <div class="land-tab" onclick="selectLand(4)">Land 4 (Eig.)</div>
+            <div class="land-tab" onclick="selectLand(5)">Land 5 (Eig.)</div>
+            <div class="land-tab" onclick="selectLand(6)">Land 6 (Eig.)</div>
+        </div>
+
+        <div id="landFormContainer">
+            <!-- Wird dynamisch geladen entsprechend der Screenshots -->
+        </div>
+    </div>
+
+    <script>
+        // Datenstruktur für die 6 Länder im exakten Excel-Stil
+        let landData = {};
+        for(let i=1; i<=6; i++) {
+            landData[i] = {
+                nation: i === 1 ? "Deutschland" : (i === 2 ? "Ukraine" : "Frei / Leer"),
+                doktrin: "Achse",
+                infAnzahl: i === 1 ? 18 : 10,
+                pakAnzahl: i === 1 ? 3 : 1,
+                flakAnzahl: 1,
+                pzwAnzahl: 1,
+                anzPzWerk: 1,
+                anzFlugFab: 1,
+                anzRekruB: 2,
+                leichtePzProd: 20,
+                taktBomberProd: 0,
+                schlachtBomberProd: 1,
+                rakAriUp: 0,
+                infUp: i === 1 ? 20 : 0
+            };
+        }
+
+        let currentLandId = 1;
+
+        function selectLand(id) {
+            currentLandId = id;
+            document.querySelectorAll('.land-tab').forEach((t, idx) => {
+                t.classList.toggle('active', idx + 1 === id);
+            });
+            renderLandForm();
+        }
+
+        function renderLandForm() {
+            let d = landData[currentLandId];
+            let html = `
+                <div class="grid-2">
+                    <div>
+                        <h3 class="section-title">Grunddaten & Nation</h3>
+                        <table>
+                            <tr><td>Land / Nation</td><td><input type="text" id="f_nation" value="${d.nation}" onchange="updateVal('nation', this.value)"></td></tr>
+                            <tr><td>Doktrin</td><td>
+                                <select id="f_doktrin" onchange="updateVal('doktrin', this.value)">
+                                    <option value="Achse" ${d.doktrin==='Achse'?'selected':''}>Achse</option>
+                                    <option value="Allierte" ${d.doktrin==='Allierte'?'selected':''}>Allierte</option>
+                                    <option value="Pan-Asien" ${d.doktrin==='Pan-Asien'?'selected':''}>Pan-Asien</option>
+                                    <option value="Komintern" ${d.doktrin==='Komintern'?'selected':''}>Komintern</option>
+                                </select>
+                            </td></tr>
+                        </table>
+
+                        <h3 class="section-title">Starteinheiten</h3>
+                        <table>
+                            <tr><th>Einheit</th><th>Anzahl</th></tr>
+                            <tr><td>Infanterie 1</td><td><input type="number" value="${d.infAnzahl}" onchange="updateVal('infAnzahl', this.value)"></td></tr>
+                            <tr><td>Panzerabwehr 1</td><td><input type="number" value="${d.pakAnzahl}" onchange="updateVal('pakAnzahl', this.value)"></td></tr>
+                            <tr><td>Flak 1</td><td><input type="number" value="${d.flakAnzahl}" onchange="updateVal('flakAnzahl', this.value)"></td></tr>
+                            <tr><td>Panzerwagen 1</td><td><input type="number" value="${d.pzwAnzahl}" onchange="updateVal('pzwAnzahl', this.value)"></td></tr>
+                        </table>
+
+                        <h3 class="section-title">Gebäude</h3>
+                        <table>
+                            <tr><th>Gebäude</th><th>Anzahl</th></tr>
+                            <tr><td>Panzerwerk 1</td><td><input type="number" value="${d.anzPzWerk}" onchange="updateVal('anzPzWerk', this.value)"></td></tr>
+                            <tr><td>Flugzeugfabrik 1</td><td><input type="number" value="${d.anzFlugFab}" onchange="updateVal('anzFlugFab', this.value)"></td></tr>
+                            <tr><td>Rekrutierungsbüro 3</td><td><input type="number" value="${d.anzRekruB}" onchange="updateVal('anzRekruB', this.value)"></td></tr>
+                        </table>
+                    </div>
+
+                    <div>
+                        <h3 class="section-title">Einheitenproduktion & Upgrades</h3>
+                        <table>
+                            <tr><th>Produktion / Upgrade</th><th>Anzahl</th></tr>
+                            <tr><td>Leichte Panzer 1 (Prod.)</td><td><input type="number" value="${d.leichtePzProd}" onchange="updateVal('leichtePzProd', this.value)"></td></tr>
+                            <tr><td>Takt. Bomber 1 (Prod.)</td><td><input type="number" value="${d.taktBomberProd}" onchange="updateVal('taktBomberProd', this.value)"></td></tr>
+                            <tr><td>Schlachtbomber 1 (Prod.)</td><td><input type="number" value="${d.schlachtBomberProd}" onchange="updateVal('schlachtBomberProd', this.value)"></td></tr>
+                            <tr><td>Infanterie 1-2 (Upgrade)</td><td><input type="number" value="${d.infUp}" onchange="updateVal('infUp', this.value)"></td></tr>
+                        </table>
+
+                        <div class="calc-box">
+                            <h3 style="margin-top:0; color:#d4af37;">Kosten- & Rest-Berechnung (Tag 3 Bilanz)</h3>
+                            <table>
+                                <tr><th>Ressource</th><th>Gesamtkosten</th><th>Rest im Lager</th></tr>
+                                <tr><td>Getreide</td><td>43.131</td><td class="positive">3.055</td></tr>
+                                <tr><td>Stahl</td><td>45.952</td><td class="positive">4.145</td></tr>
+                                <tr><td>Öl</td><td>53.862</td><td class="negative">-3.765</td></tr>
+                                <tr><td>Helme</td><td>40.950</td><td class="positive">381</td></tr>
+                                <tr><td>Geld (Kasse)</td><td>92.879</td><td class="positive">96.288</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('landFormContainer').innerHTML = html;
+        }
+
+        function updateVal(key, val) {
+            landData[currentLandId][key] = isNaN(val) ? val : Number(val);
+        }
+
+        window.onload = renderLandForm;
+    </script>
+</body>
+</html>
