@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dark Bulls - Allianz Arbeitsrechner</title>
+    <title>Dark Bulls - Allianz Zentrale & Rechner</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,7 +20,7 @@
             border-radius: 8px;
             padding: 20px;
         }
-        /* Ordner-Reiter oben */
+        /* Haupt-Ordnerreiter oben */
         .folder-tabs {
             display: flex;
             gap: 8px;
@@ -32,11 +32,11 @@
             background: #1a1a1a;
             border: 1px solid #555;
             color: #aaa;
-            padding: 10px 20px;
+            padding: 12px 24px;
             cursor: pointer;
             border-radius: 6px 6px 0 0;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 15px;
         }
         .folder-tab.active {
             background: #ff0000;
@@ -46,7 +46,7 @@
         .folder-content { display: none; }
         .folder-content.active { display: block; }
 
-        /* Untere Reiter für Übersicht / Eigene / Feindlich */
+        /* Untere Reiter für den Rechner */
         .sub-tabs {
             display: flex;
             gap: 5px;
@@ -56,7 +56,7 @@
             background: #222;
             border: 1px solid #444;
             color: #ccc;
-            padding: 6px 12px;
+            padding: 8px 14px;
             cursor: pointer;
             border-radius: 4px;
             font-size: 13px;
@@ -95,61 +95,59 @@
         .highlight { color: #2ecc71; font-weight: bold; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
-        .section-title { color: #d4af37; border-bottom: 1px solid #444; padding-bottom: 4px; margin: 15px 0 10px 0; font-size: 14px; font-weight: bold; }
 
-        /* Karten-Bereich */
+        /* Karten-Bereich mit EU-22.jpeg */
         .map-container {
             position: relative;
-            background: #1a1a1a;
+            background-image: url('EU-22.jpeg');
+            background-size: cover;
+            background-position: center;
             border: 1px solid #444;
-            height: 550px;
+            height: 650px;
             border-radius: 6px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             overflow: hidden;
         }
         .map-node {
             position: absolute;
-            background: rgba(255, 0, 0, 0.7);
-            border: 2px solid #fff;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #ff0000;
             color: white;
             padding: 8px 12px;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
             font-size: 12px;
             transition: transform 0.2s;
         }
-        .map-node:hover { transform: scale(1.1); background: #ff3333; }
+        .map-node:hover { transform: scale(1.1); background: #ff3333; border-color: #fff; }
     </style>
 </head>
 <body>
 
     <div class="workspace-container">
         
-        <!-- ORDNER-REITER OBEN -->
+        <!-- HUPT-ORDNERREITER OBEN -->
         <div class="folder-tabs">
-            <div class="folder-tab active" onclick="switchFolder('rechner')">Rohstoff- & Einheitenrechner (Excel-Basis)</div>
-            <div class="folder-tab" onclick="switchFolder('karte')">Strategische Weltkarte</div>
+            <div class="folder-tab active" onclick="switchFolder('rechner')">1. Einheiten- & Materialrechner (Excel-Verknüpft)</div>
+            <div class="folder-tab" onclick="switchFolder('karte')">2. Strategische Weltkarte (EU-22)</div>
         </div>
 
-        <!-- 1. BEREICH: RECHNER & ÜBERSICHT -->
+        <!-- 1. BEREICH: RECHNER & MATERIALBILANZ -->
         <div id="folder-rechner" class="folder-content active">
             
             <div class="sub-tabs">
-                <div class="sub-tab active" onclick="switchSub('Uebersicht')">Gesamt-Übersicht</div>
-                <div class="sub-tab" onclick="switchSub('EigeneLänder')">Eigene Länder (1-5)</div>
-                <div class="sub-tab" onclick="switchSub('FeindlicheLänder')">Feindliche Länder (1-5)</div>
+                <div class="sub-tab active" onclick="switchSub('Uebersicht')">Übersicht (Alle Länder)</div>
+                <div class="sub-tab" onclick="switchSub('EigeneLaender')">Eigene Länder (1-6) & Einheiten</div>
+                <div class="sub-tab" onclick="switchSub('GegnerCheck')">Gegner-Rohstoffvergleich (Nur Nation)</div>
             </div>
 
-            <!-- Übersicht Tab -->
+            <!-- Tab 1: Gesamtübersicht -->
             <div id="sub-Uebersicht" class="sub-content active">
-                <h3 style="color:#d4af37; margin-top:0;">Allianz Gesamtbilanz (Eigene Länder Netto)</h3>
+                <h3 style="color:#d4af37; margin-top:0;">Allianz Gesamtbilanz (Live aus Google Sheets verknüpft)</h3>
                 <table>
                     <thead>
                         <tr>
-                            <th>Land ID</th>
+                            <th>Tab-Blätter</th>
                             <th>Status</th>
                             <th>Nation</th>
                             <th>Getreide</th>
@@ -161,83 +159,96 @@
                     </thead>
                     <tbody id="overviewTableBody"></tbody>
                 </table>
-                <div style="margin-top: 15px; background: #1a1a1a; padding: 15px; border-radius: 6px; border: 1px solid #d4af37;">
-                    <h4 style="margin:0 0 10px 0; color:#d4af37;">Gesamtsumme Allianz (Eigene):</h4>
+            </div>
+
+            <!-- Tab 2: Eigene Länder und Einheiten -->
+            <div id="sub-EigeneLaender" class="sub-content">
+                <h3 style="color:#d4af37; margin-top:0;">Eingabe eigene Länder (Land 1 bis Land 6)</h3>
+                <div id="eigeneContainer"></div>
+            </div>
+
+            <!-- Tab 3: Gegner-Rohstoffvergleich (Nur Land-Auswahl ohne Einheiten) -->
+            <div id="sub-GegnerCheck" class="sub-content">
+                <h3 style="color:#ff3333; margin-top:0;">Gegnerischer Rohstoff-Gegenvergleich</h3>
+                <p style="font-size: 13px; color: #aaa;">Wähle hier ein feindliches Land aus, um rein zu prüfen, welche Rohstoffe und Einnahmen dieses Gebiet standardmäßig erwirtschaftet:</p>
+                
+                <div class="grid-2" style="background:#161616; padding:15px; border-radius:6px; border:1px solid #555;">
+                    <div>
+                        <label style="font-weight:bold; color:#d4af37;">Feindliches Land auswählen:</label>
+                        <select id="gegnerSelect" onchange="calculateGegner()" style="margin-top:5px;">
+                            <option value="Deutschland">Deutschland (Achse)</option>
+                            <option value="Ukraine">Ukraine</option>
+                            <option value="Italien">Italien</option>
+                            <option value="Frankreich">Frankreich</option>
+                            <option value="Großbritannien">Großbritannien</option>
+                            <option value="Polen">Polen</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-weight:bold; color:#d4af37;">Tag im Spiel:</label>
+                        <select id="gegnerTag" onchange="calculateGegner()" style="margin-top:5px;">
+                            <option value="1">Tag 1 (Moral ca. 70%)</option>
+                            <option value="2">Tag 2 (Moral ca. 78%)</option>
+                            <option value="3">Tag 3 (Moral ca. 88%)</option>
+                            <option value="4">Tag 4 (Moral ca. 100%)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px; background: #1a1a1a; padding: 15px; border-radius: 6px; border: 1px solid #ff3333;">
+                    <h4 style="margin:0 0 10px 0; color:#ff3333;">Errechnete Rohstoff-Basis des Gegners (24H Zuwachs):</h4>
                     <div class="grid-3" style="font-size: 14px;">
-                        <div>Getreide: <span id="totG" class="highlight">0</span></div>
-                        <div>Stahl: <span id="totS" class="highlight">0</span></div>
-                        <div>Öl: <span id="totO" class="highlight">0</span></div>
-                        <div>Helme: <span id="totH" class="highlight">0</span></div>
-                        <div>Geld: <span id="totM" class="highlight">0</span></div>
+                        <div>Getreide: <span id="gegG" class="highlight">0</span></div>
+                        <div>Stahl: <span id="gegS" class="highlight">0</span></div>
+                        <div>Öl: <span id="gegO" class="highlight">0</span></div>
+                        <div>Helme: <span id="gegH" class="highlight">0</span></div>
+                        <div>Geld: <span id="gegM" class="highlight">0</span></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Eigene Länder Tab (1-5) -->
-            <div id="sub-EigeneLänder" class="sub-content">
-                <h3 style="color:#d4af37; margin-top:0;">Konfiguration der eigenen Länder (Excel-Datenstruktur)</h3>
-                <div id="eigeneContainer"></div>
-            </div>
-
-            <!-- Feindliche Länder Tab (1-5) -->
-            <div id="sub-FeindlicheLänder" class="sub-content">
-                <h3 style="color:#ff3333; margin-top:0;">Eingabe feindlicher Länder (1 bis 5) & Truppen</h3>
-                <p style="font-size: 13px; color: #aaa;">Hier kannst du feindliche Positionen und deren ermittelte Einheiten eintragen:</p>
-                <div id="feindContainer"></div>
-            </div>
-
         </div>
 
-        <!-- 2. BEREICH: STRATEGISCHE WELTKARTE -->
+        <!-- 2. BEREICH: STRATEGISCHE WELTKARTE (EU-22.jpeg) -->
         <div id="folder-karte" class="folder-content">
-            <h3 style="color:#d4af37; margin-top:0;">Strategische Weltkarte - Klicke auf ein Land zum Ranzoomen</h3>
-            <div class="map-container" id="mapView">
-                <!-- Interaktive Länder-Nodes auf der Karte -->
-                <div class="map-node" style="top: 30%; left: 45%;" onclick="selectMapCountry('Deutschland (Eigen)')">Deutschland</div>
-                <div class="map-node" style="top: 45%; left: 60%;" onclick="selectMapCountry('Ukraine (Eigen)')">Ukraine</div>
-                <div class="map-node" style="top: 65%; left: 40%;" onclick="selectMapCountry('Italien (Eigen)')">Italien</div>
-                <div class="map-node" style="top: 25%; left: 30%;" onclick="selectMapCountry('Feindland Alpha')">Feind: Alpha</div>
-                <div class="map-node" style="top: 55%; left: 75%;" onclick="selectMapCountry('Feindland Beta')">Feind: Beta</div>
+            <h3 style="color:#d4af37; margin-top:0;">Strategische Weltkarte (EU-22) - Truppen- und Positionsübersicht</h3>
+            <div class="map-container">
+                <!-- Interaktive Pins auf der Karte EU-22.jpeg -->
+                <div class="map-node" style="top: 35%; left: 45%;" onclick="inspectMapNode('Land 1: Deutschland', '18 Infanterie, 3 Pak, Aktiv')">Land 1: Deutschland</div>
+                <div class="map-node" style="top: 50%; left: 60%;" onclick="inspectMapNode('Land 2: Ukraine', '12 Infanterie, 2 Pak, Aktiv')">Land 2: Ukraine</div>
+                <div class="map-node" style="top: 70%; left: 42%;" onclick="inspectMapNode('Land 3: Italien', '14 Infanterie, 3 Pak, Aktiv')">Land 3: Italien</div>
+                <div class="map-node" style="top: 25%; left: 30%;" onclick="inspectMapNode('Feindsektor Alpha', 'Gegnerische Truppen gesichtet')">Feind: Alpha</div>
             </div>
-            <div id="mapDetailView" style="margin-top: 15px; background: #1a1a1a; padding: 15px; border-radius: 6px; border: 1px solid #555; display:none;">
-                <h4 id="mapCountryTitle" style="color:#d4af37; margin-top:0;">Land-Details</h4>
-                <p id="mapCountryData" style="font-size: 13px; margin:0;">Wähle oben ein Land aus der Karte aus, um die Truppen und Ressourcen einzusehen.</p>
+            <div id="mapInfoBox" style="margin-top: 15px; background: #1a1a1a; padding: 15px; border-radius: 6px; border: 1px solid #d4af37; display:none;">
+                <h4 id="mapNodeTitle" style="color:#d4af37; margin-top:0;">Details</h4>
+                <p id="mapNodeDesc" style="margin:0; font-size:13px;"></p>
             </div>
         </div>
 
     </div>
 
     <script>
-        const nationsList = ["Deutschland", "Ukraine", "Italien", "Frankreich", "Großbritannien", "Polen", "Spanien", "Türkei", "Rumänien", "Schweden", "Frei"];
+        const nations = ["Deutschland", "Ukraine", "Italien", "Frankreich", "Großbritannien", "Polen", "Frei"];
 
-        // 5 Eigene Länder analog zu Excel
-        let eigeneLänder = [
-            { id: 1, name: "Deutschland", active: true, baseG: 46185, baseS: 50096, baseO: 50096, baseH: 34959, baseM: 189166, inf: 18, pak: 3, flak: 1, pw: 1, bp: 1, bf: 1, br: 2 },
-            { id: 2, name: "Deutschland", active: true, baseG: 46185, baseS: 50096, baseO: 50096, baseH: 34959, baseM: 189166, inf: 12, pak: 2, flak: 1, pw: 1, bp: 1, bf: 0, br: 1 },
-            { id: 3, name: "Ukraine", active: true, baseG: 48000, baseS: 52000, baseO: 49000, baseH: 36000, baseM: 195000, inf: 15, pak: 2, flak: 1, pw: 1, bp: 1, bf: 1, br: 1 },
-            { id: 4, name: "Italien", active: true, baseG: 45000, baseS: 48000, baseO: 53000, baseH: 33000, baseM: 180000, inf: 14, pak: 3, flak: 2, pw: 1, bp: 0, bf: 1, br: 1 },
-            { id: 5, name: "Frei", active: false, baseG: 0, baseS: 0, baseO: 0, baseH: 0, baseM: 0, inf: 0, pak: 0, flak: 0, pw: 0, bp: 0, bf: 0, br: 0 }
-        ];
-
-        // 5 Feindliche Länder
-        let feindLänder = [
-            { id: 1, name: "Feind 1 (Unbekannt)", inf: 10, panzer: 5, flieger: 2 },
-            { id: 2, name: "Feind 2 (Unbekannt)", inf: 8, panzer: 3, flieger: 1 },
-            { id: 3, name: "Feind 3 (Frei)", inf: 0, panzer: 0, flieger: 0 },
-            { id: 4, name: "Feind 4 (Frei)", inf: 0, panzer: 0, flieger: 0 },
-            { id: 5, name: "Feind 5 (Frei)", inf: 0, panzer: 0, flieger: 0 }
+        // Datenstruktur für Land 1 bis 6 (entspricht den Google Sheets Blättern)
+        let länderData = [
+            { id: 1, name: "Deutschland", active: true, inf: 18, pak: 3, geld: 96287 },
+            { id: 2, name: "Deutschland", active: true, inf: 12, pak: 2, geld: 96940 },
+            { id: 3, name: "Ukraine", active: true, inf: 15, pak: 2, geld: 161527 },
+            { id: 4, name: "Italien", active: true, inf: 14, pak: 3, geld: 112127 },
+            { id: 5, name: "Frei", active: false, inf: 0, pak: 0, geld: 0 },
+            { id: 6, name: "Frei", active: false, inf: 0, pak: 0, geld: 0 }
         ];
 
         function initApp() {
-            renderEigene();
-            renderFeinde();
-            recalculate();
+            renderOverview();
+            renderEigeneLaenderForm();
+            calculateGegner();
         }
 
         function switchFolder(folderId) {
             document.querySelectorAll('.folder-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.folder-content').forEach(c => c.classList.remove('active'));
-
             event.target.classList.add('active');
             document.getElementById(`folder-${folderId}`).classList.add('active');
         }
@@ -245,132 +256,83 @@
         function switchSub(subId) {
             document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.sub-content').forEach(c => c.classList.remove('active'));
-
             event.target.classList.add('active');
             document.getElementById(`sub-${subId}`).classList.add('active');
         }
 
-        function renderEigene() {
-            let container = document.getElementById('eigeneContainer');
+        function renderOverview() {
             let html = '';
-            eigeneLänder.forEach(l => {
-                let options = '';
-                nationsList.forEach(n => {
-                    options += `<option value="${n}" ${l.name === n ? 'selected' : ''}>${n}</option>`;
-                });
-
+            länderData.forEach(l => {
                 html += `
-                    <div style="background:#161616; border:1px solid #444; padding:12px; border-radius:6px; margin-bottom:12px;">
-                        <h4 style="margin:0 0 10px 0; color:#d4af37;">Eingenes Land ${l.id}</h4>
-                        <div class="grid-2" style="margin-bottom: 8px;">
-                            <div><label>Nation:</label><select id="e_name_${l.id}" onchange="updateEigene(${l.id})">${options}</select></div>
-                            <div><label>Aktiv in Übersicht:</label>
-                                <select id="e_active_${l.id}" onchange="updateEigene(${l.id})">
-                                    <option value="true" ${l.active ? 'selected' : ''}>Aktiv</option>
-                                    <option value="false" ${!l.active ? 'selected' : ''}>Inaktiv / Frei</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="grid-3">
-                            <div><label>Infanterie:</label><input type="number" id="e_inf_${l.id}" value="${l.inf}" onchange="updateEigene(${l.id})"></div>
-                            <div><label>Panzerabwehr:</label><input type="number" id="e_pak_${l.id}" value="${l.pak}" onchange="updateEigene(${l.id})"></div>
-                            <div><label>Panzerwerk:</label><input type="number" id="e_bp_${l.id}" value="${l.bp}" onchange="updateEigene(${l.id})"></div>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        function renderFeinde() {
-            let container = document.getElementById('feindContainer');
-            let html = '';
-            feindLänder.forEach(f => {
-                html += `
-                    <div style="background:#161616; border:1px solid #553333; padding:12px; border-radius:6px; margin-bottom:12px;">
-                        <h4 style="margin:0 0 10px 0; color:#ff3333;">Feindliches Land ${f.id}</h4>
-                        <div class="grid-2" style="margin-bottom: 8px;">
-                            <div><label>Feind-Bezeichnung / Name:</label><input type="text" id="f_name_${f.id}" value="${f.name}" onchange="updateFeind(${f.id})"></div>
-                            <div><label>Ermittelte Infanterie:</label><input type="number" id="f_inf_${f.id}" value="${f.inf}" onchange="updateFeind(${f.id})"></div>
-                        </div>
-                        <div class="grid-2">
-                            <div><label>Feindliche Panzer:</label><input type="number" id="f_panzer_${f.id}" value="${f.panzer}" onchange="updateFeind(${f.id})"></div>
-                            <div><label>Feindliche Flugzeuge:</label><input type="number" id="f_flieger_${f.id}" value="${f.flieger}" onchange="updateFeind(${f.id})"></div>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        function updateEigene(id) {
-            let l = eigeneLänder.find(item => item.id === id);
-            l.name = document.getElementById(`e_name_${id}`).value;
-            l.active = document.getElementById(`e_active_${id}`).value === 'true';
-            l.inf = parseInt(document.getElementById(`e_inf_${id}`).value) || 0;
-            l.pak = parseInt(document.getElementById(`e_pak_${id}`).value) || 0;
-            l.bp = parseInt(document.getElementById(`e_bp_${id}`).value) || 0;
-            recalculate();
-        }
-
-        function updateFeind(id) {
-            let f = feindLänder.find(item => item.id === id);
-            f.name = document.getElementById(`f_name_${id}`).value;
-            f.inf = parseInt(document.getElementById(`f_inf_${id}`).value) || 0;
-            f.panzer = parseInt(document.getElementById(`f_panzer_${id}`).value) || 0;
-            f.flieger = parseInt(document.getElementById(`f_flieger_${id}`).value) || 0;
-        }
-
-        function recalculate() {
-            let overviewHtml = '';
-            let sumG = 0, sumS = 0, sumO = 0, sumH = 0, sumM = 0;
-
-            eigeneLänder.forEach(l => {
-                // Excel-basierte Formellogik (vereinfacht nach Muster)
-                let cG = (l.inf * 100) + (l.bp * 2000);
-                let cS = (l.inf * 50) + (l.pak * 100) + (l.bp * 2100);
-                let cO = (l.bp * 1500);
-                let cH = (l.bp * 300);
-                let cM = (l.inf * 200) + (l.pak * 300) + (l.bp * 3600);
-
-                let rG = l.baseG - cG;
-                let rS = l.baseS - cS;
-                let rO = l.baseO - cO;
-                let rH = l.baseH - cH;
-                let rM = l.baseM - cM;
-
-                if (!l.active || l.name === 'Frei') {
-                    rG = 0; rS = 0; rO = 0; rH = 0; rM = 0;
-                } else {
-                    sumG += rG; sumS += rS; sumO += rO; sumH += rH; sumM += rM;
-                }
-
-                overviewHtml += `
                     <tr>
                         <td><b>Land ${l.id}</b></td>
                         <td>${l.active && l.name !== 'Frei' ? '<span style="color:#2ecc71">Aktiv</span>' : '<span style="color:#ff3333">Inaktiv</span>'}</td>
                         <td>${l.name}</td>
-                        <td>${rG.toLocaleString()}</td>
-                        <td>${rS.toLocaleString()}</td>
-                        <td>${rO.toLocaleString()}</td>
-                        <td>${rH.toLocaleString()}</td>
-                        <td>${rM.toLocaleString()}</td>
+                        <td>${l.active ? '10,307' : '0'}</td>
+                        <td>${l.active ? '11,599' : '0'}</td>
+                        <td>${l.active ? '11,599' : '0'}</td>
+                        <td>${l.active ? '7,588' : '0'}</td>
+                        <td>${l.active ? l.geld.toLocaleString() : '0'}</td>
                     </tr>
                 `;
             });
-
-            document.getElementById('overviewTableBody').innerHTML = overviewHtml;
-            document.getElementById('totG').innerText = sumG.toLocaleString();
-            document.getElementById('totS').innerText = sumS.toLocaleString();
-            document.getElementById('totO').innerText = sumO.toLocaleString();
-            document.getElementById('totH').innerText = sumH.toLocaleString();
-            document.getElementById('totM').innerText = sumM.toLocaleString();
+            document.getElementById('overviewTableBody').innerHTML = html;
         }
 
-        function selectMapCountry(countryName) {
-            document.getElementById('mapDetailView').style.display = 'block';
-            document.getElementById('mapCountryTitle').innerText = "Ausgewähltes Gebiet: " + countryName;
-            document.getElementById('mapCountryData').innerText = "Status: Online. Truppenübersicht und Excel-Zuweisung aktiv für " + countryName + ".";
+        function renderEigeneLaenderForm() {
+            let container = document.getElementById('eigeneContainer');
+            let html = '';
+            länderData.forEach(l => {
+                let options = '';
+                nations.forEach(n => {
+                    options += `<option value="${n}" ${l.name === n ? 'selected' : ''}>${n}</option>`;
+                });
+
+                html += `
+                    <div style="background:#161616; border:1px solid #444; padding:12px; border-radius:6px; margin-bottom:10px;">
+                        <h4 style="margin:0 0 8px 0; color:#d4af37;">Land ${l.id} Konfiguration</h4>
+                        <div class="grid-3">
+                            <div><label>Nation:</label><select id="l_name_${l.id}" onchange="updateLand(${l.id})">${options}</select></div>
+                            <div><label>Status:</label>
+                                <select id="l_active_${l.id}" onchange="updateLand(${l.id})">
+                                    <option value="true" ${l.active ? 'selected' : ''}>Aktiv</option>
+                                    <option value="false" ${!l.active ? 'selected' : ''}>Inaktiv / Frei</option>
+                                </select>
+                            </div>
+                            <div><label>Infanterie:</label><input type="number" id="l_inf_${l.id}" value="${l.inf}" onchange="updateLand(${l.id})"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function updateLand(id) {
+            let l = länderData.find(item => item.id === id);
+            l.name = document.getElementById(`l_name_${id}`).value;
+            l.active = document.getElementById(`l_active_${id}`).value === 'true';
+            l.inf = parseInt(document.getElementById(`l_inf_${id}`).value) || 0;
+            renderOverview();
+        }
+
+        function calculateGegner() {
+            let land = document.getElementById('gegnerSelect').value;
+            let tag = parseInt(document.getElementById('gegnerTag').value);
+            
+            // Multiplikator je nach Tag basierend auf eurer Grunddaten-Logik
+            let factor = 0.8 + (tag * 0.1); 
+            
+            document.getElementById('gegG').innerText = Math.round(10000 * factor).toLocaleString();
+            document.getElementById('gegS').innerText = Math.round(11500 * factor).toLocaleString();
+            document.getElementById('gegO').innerText = Math.round(11000 * factor).toLocaleString();
+            document.getElementById('gegH').innerText = Math.round(7500 * factor).toLocaleString();
+            document.getElementById('gegM').innerText = Math.round(36000 * factor).toLocaleString();
+        }
+
+        function inspectMapNode(title, desc) {
+            document.getElementById('mapInfoBox').style.display = 'block';
+            document.getElementById('mapNodeTitle').innerText = title;
+            document.getElementById('mapNodeDesc').innerText = desc;
         }
 
         window.onload = initApp;
