@@ -12,7 +12,6 @@
             margin: 0;
             padding: 20px;
         }
-        /* Top Bar */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -33,19 +32,15 @@
             border-radius: 4px;
             cursor: pointer;
         }
-        
-        /* Layout Hauptbereich */
         .main-layout {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             flex-wrap: wrap;
             gap: 20px;
-            max-width: 1500px;
+            max-width: 1600px;
             margin: 0 auto;
         }
-
-        /* Boxen im Dark Bulls Stil */
         .panel-box {
             background: #111;
             border: 2px solid #ff0000;
@@ -53,6 +48,7 @@
             padding: 15px;
             width: 280px;
             box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+            box-sizing: border-box;
         }
         .panel-box h3 {
             color: #ff3333;
@@ -79,34 +75,34 @@
             background: #27ae60;
             color: #fff;
         }
-
-        /* Center Logo Container */
         .center-screen {
             flex: 1;
-            min-width: 500px;
+            min-width: 650px;
             background: #111;
             border: 2px solid #ff0000;
             border-radius: 8px;
             padding: 20px;
             box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
+            box-sizing: border-box;
         }
-
-        /* Reiter / Tabs für den Rechner */
         .calc-tabs {
             display: flex;
-            gap: 10px;
+            gap: 5px;
             margin-bottom: 15px;
+            flex-wrap: wrap;
         }
         .calc-tab {
             flex: 1;
+            min-width: 100px;
             background: #222;
             border: 1px solid #555;
             color: #fff;
-            padding: 10px;
+            padding: 8px;
             text-align: center;
             cursor: pointer;
             border-radius: 4px;
             font-weight: bold;
+            font-size: 13px;
         }
         .calc-tab.active {
             background: #ff0000;
@@ -118,7 +114,6 @@
         .calc-content.active {
             display: block;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
@@ -128,6 +123,7 @@
             padding: 8px;
             border-bottom: 1px solid #333;
             text-align: left;
+            font-size: 14px;
         }
         th {
             color: #ff3333;
@@ -177,22 +173,27 @@
             </div>
         </div>
 
-        <!-- MITTLERE SPALTE: Das Rechner & Allianz Dashboard (Ersetzt die reine Grafik, bindet alles ein) -->
+        <!-- MITTLERE SPALTE: Die Excel-Reiter & Auswertung -->
         <div class="center-screen">
             <div class="calc-tabs">
-                <div class="calc-tab active" onclick="switchCalcTab(1)">1. Gesamt-Übersicht</div>
-                <div class="calc-tab" onclick="switchCalcTab(2)">2. Rohstoffrechner</div>
-                <div class="calc-tab" onclick="switchCalcTab(3)">3. Einheitenrechner</div>
+                <div class="calc-tab active" onclick="switchCalcTab(1)">Übersicht</div>
+                <div class="calc-tab" onclick="switchCalcTab(2)">Land 1</div>
+                <div class="calc-tab" onclick="switchCalcTab(3)">Land 2</div>
+                <div class="calc-tab" onclick="switchCalcTab(4)">Land 3</div>
+                <div class="calc-tab" onclick="switchCalcTab(5)">Land 4</div>
+                <div class="calc-tab" onclick="switchCalcTab(6)">Land 5</div>
+                <div class="calc-tab" onclick="switchCalcTab(7)">Land 6</div>
             </div>
 
-            <!-- REITER 1: GESAMT-ÜBERSICHT -->
+            <!-- TAB 1: ÜBERSICHT -->
             <div id="cTab1" class="calc-content active">
-                <h3 style="color:#d4af37;">Allianz Wirtschafts-Bilanz (Tag 3 Basis)</h3>
-                <p>Live-Zusammenfassung aller aktiven Länder und verbleibender Ressourcen nach Abzug von Gebäuden & Einheiten:</p>
+                <h3 style="color:#d4af37;">Nur Übersicht (Alle Länder im Vergleich)</h3>
+                <p>Zusammenfassung der Rest-Rohstoffe nach Abzug von Gebäuden und Einheiten aus den Excel-Blättern:</p>
                 <table>
                     <thead>
                         <tr>
-                            <th>Land / Slot</th>
+                            <th>Slot / Land</th>
+                            <th>Aktiv</th>
                             <th>Getreide</th>
                             <th>Stahl</th>
                             <th>Öl</th>
@@ -201,54 +202,80 @@
                         </tr>
                     </thead>
                     <tbody id="overviewBody">
-                        <tr><td><b>Slot 1: Deutschland</b></td><td class="highlight">31,735</td><td class="highlight">39,096</td><td class="highlight">48,596</td><td class="highlight">34,428</td><td class="highlight">159,766</td></tr>
-                        <tr><td><b>Slot 2: Ukraine</b></td><td class="highlight">42,100</td><td class="highlight">45,000</td><td class="highlight">44,200</td><td class="highlight">30,100</td><td class="highlight">165,000</td></tr>
+                        <!-- Wird dynamisch berechnet -->
                     </tbody>
                 </table>
             </div>
 
-            <!-- REITER 2: ROHSTOFFRECHNER -->
-            <div id="cTab2" class="calc-content">
-                <h3 style="color:#d4af37;">Rohstoff- & Moralrechner</h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div>
-                        <label>Spieltag:</label>
-                        <select id="rDay" onchange="calcRess()">
-                            <option value="1">Tag 1 (70% Moral)</option>
-                            <option value="2">Tag 2 (78% Moral)</option>
-                            <option value="3" selected>Tag 3 (88% Moral)</option>
-                            <option value="4">Tag 4+ (100% Moral)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label>Eroberte Hauptstädte (+10% Moral):</label>
-                        <input type="number" id="hsCount" value="0" min="0" max="5" onchange="calcRess()">
-                    </div>
-                </div>
-                <div style="margin-top: 15px; background: #1a1a1a; padding: 10px; border-radius: 4px;">
-                    <p>Produktionsfaktor: <span id="factorOut" class="highlight">88%</span></p>
-                </div>
-            </div>
+            <!-- TABS 2-7: LÄNDER 1 BIS 6 -->
+            <script>
+                const nationsList = ["Deutschland", "Ukraine", "Italien", "Frankreich", "Großbritannien", "Polen", "Spanien", "Türkei", "Rumänien", "Schweden", "Frei"];
+                
+                // Initialwerte angelehnt an die Excel-Tabellen
+                const initialSlots = [
+                    { id: 1, land: "Deutschland", active: true, inf: 18, pak: 3, flak: 1, pw: 1, bp: 1, bf: 1, br: 2 },
+                    { id: 2, land: "Deutschland", active: true, inf: 12, pak: 2, flak: 1, pw: 1, bp: 1, bf: 0, br: 1 },
+                    { id: 3, land: "Ukraine", active: true, inf: 15, pak: 2, flak: 1, pw: 1, bp: 1, bf: 1, br: 1 },
+                    { id: 4, land: "Italien", active: true, inf: 14, pak: 3, flak: 2, pw: 1, bp: 0, bf: 1, br: 1 },
+                    { id: 5, land: "Frei", active: false, inf: 0, pak: 0, flak: 0, pw: 0, bp: 0, bf: 0, br: 0 },
+                    { id: 6, land: "Frei", active: false, inf: 0, pak: 0, flak: 0, pw: 0, bp: 0, bf: 0, br: 0 }
+                ];
 
-            <!-- REITER 3: EINHEITENRECHNER -->
-            <div id="cTab3" class="calc-content">
-                <h3 style="color:#d4af37;">Einheiten- & Gebäudeplanung</h3>
-                <p>Trage hier die Anzahl ein, um die Materialkosten direkt zu berechnen:</p>
-                <table>
-                    <tr>
-                        <td>Infanterie (Anzahl):</td>
-                        <td><input type="number" id="infInput" value="18" onchange="calcUnits()"></td>
-                    </tr>
-                    <tr>
-                        <td>Panzerwerk (Anzahl):</td>
-                        <td><input type="number" id="panzerInput" value="1" onchange="calcUnits()"></td>
-                    </tr>
-                </table>
-                <div style="margin-top: 15px; background: #1a1a1a; padding: 10px; border-radius: 4px;">
-                    <p>Gesamtkosten Stahl: <span id="costStahl" class="highlight">2,100</span></p>
-                    <p>Gesamtkosten Geld: <span id="costGeld" class="highlight">7,200</span></p>
-                </div>
-            </div>
+                const bodyRef = document.currentScript.parentElement;
+
+                initialSlots.forEach((slot, index) => {
+                    const tabNum = index + 2;
+                    let optionsHtml = '';
+                    nationsList.forEach(n => {
+                        optionsHtml += `<option value="${n}" ${slot.land === n ? 'selected' : ''}>${n}</option>`;
+                    });
+
+                    const div = document.createElement('div');
+                    div.id = `cTab${tabNum}`;
+                    div.className = 'calc-content';
+                    div.innerHTML = `
+                        <h3 style="color:#d4af37;">Land ${slot.id} - Konfiguration</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div>
+                                <label>Land auswählen:</label>
+                                <select id="s${slot.id}_land" onchange="recalculateAll()">${optionsHtml}</select>
+                            </div>
+                            <div>
+                                <label>Aktiv (Übersicht einbeziehen):</label>
+                                <select id="s${slot.id}_active" onchange="recalculateAll()">
+                                    <option value="true" ${slot.active ? 'selected' : ''}>JA (Aktiv)</option>
+                                    <option value="false" ${!slot.active ? 'selected' : ''}>NEIN (Inaktiv)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <h4>Starteinheiten</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div><label>Infanterie:</label><input type="number" id="s${slot.id}_inf" value="${slot.inf}" onchange="recalculateAll()"></div>
+                            <div><label>Panzerabwehr:</label><input type="number" id="s${slot.id}_pak" value="${slot.pak}" onchange="recalculateAll()"></div>
+                            <div><label>Flak:</label><input type="number" id="s${slot.id}_flak" value="${slot.flak}" onchange="recalculateAll()"></div>
+                            <div><label>Panzerwagen:</label><input type="number" id="s${slot.id}_pw" value="${slot.pw}" onchange="recalculateAll()"></div>
+                        </div>
+
+                        <h4 style="margin-top: 15px;">Gebäude</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                            <div><label>Panzerwerk 1:</label><input type="number" id="s${slot.id}_bp" value="${slot.bp}" onchange="recalculateAll()"></div>
+                            <div><label>Flugzeugfabrik 1:</label><input type="number" id="s${slot.id}_bf" value="${slot.bf}" onchange="recalculateAll()"></div>
+                            <div><label>Rekrutierungsbüro:</label><input type="number" id="s${slot.id}_br" value="${slot.br}" onchange="recalculateAll()"></div>
+                        </div>
+
+                        <div style="margin-top: 20px; background: #1a1a1a; padding: 12px; border-radius: 6px; border: 1px solid #444;">
+                            <h4 style="margin:0 0 10px 0; color:#ff3333;">Rest-Rohstoffe (Berechnet):</h4>
+                            <p style="margin: 4px 0;">Getreide Rest: <span id="s${slot.id}_rg" class="highlight">0</span></p>
+                            <p style="margin: 4px 0;">Stahl Rest: <span id="s${slot.id}_rs" class="highlight">0</span></p>
+                            <p style="margin: 4px 0;">Öl Rest: <span id="s${slot.id}_ro" class="highlight">0</span></p>
+                            <p style="margin: 4px 0;">Helme Rest: <span id="s${slot.id}_rh" class="highlight">0</span></p>
+                            <p style="margin: 4px 0;">Geld Rest: <span id="s${slot.id}_rm" class="highlight">0</span></p>
+                        </div>
+                    `;
+                    bodyRef.appendChild(div);
+                });
+            </script>
         </div>
 
         <!-- RECHTE SPALTE: Admin & ELO Bereich -->
@@ -262,8 +289,8 @@
 
             <div class="panel-box" style="border-color: #d4af37;">
                 <h3 style="color: #d4af37;">Elo Bereich</h3>
-                <button class="dark-btn" style="background:#d4af37; color:#000;">ROHSTOFFRECHNER</button>
-                <button class="dark-btn" style="background:#d4af37; color:#000;">EINHEITEN RECHNER</button>
+                <button class="dark-btn" style="background:#d4af37; color:#000;" onclick="switchCalcTab(1)">ÜBERSICHT</button>
+                <button class="dark-btn" style="background:#d4af37; color:#000;" onclick="switchCalcTab(2)">LAND 1 CONFIG</button>
             </div>
         </div>
 
@@ -279,27 +306,72 @@
             });
         }
 
-        function calcRess() {
-            let day = document.getElementById('rDay').value;
-            let hs = document.getElementById('hsCount').value;
-            let base = 88;
-            if(day == 1) base = 70;
-            if(day == 2) base = 78;
-            if(day >= 4) base = 100;
-            let total = parseInt(base) + (parseInt(hs) * 10);
-            document.getElementById('factorOut').innerText = total + '%';
+        function recalculateAll() {
+            let overviewHTML = '';
+
+            for (let i = 1; i <= 6; i++) {
+                let land = document.getElementById(`s${i}_land`).value;
+                let active = document.getElementById(`s${i}_active`).value === 'true';
+                
+                if (!active || land === 'Frei') {
+                    document.getElementById(`s${i}_rg`).innerText = "0";
+                    document.getElementById(`s${i}_rs`).innerText = "0";
+                    document.getElementById(`s${i}_ro`).innerText = "0";
+                    document.getElementById(`s${i}_rh`).innerText = "0";
+                    document.getElementById(`s${i}_rm`).innerText = "0";
+
+                    overviewHTML += `<tr><td><b>Land ${i}</b> (${land})</td><td><span style="color:#ff3333">Inaktiv</span></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>`;
+                    continue;
+                }
+
+                // Basiswerte aus Excel (Tag 3 Standard ca. Werte)
+                let baseG = 46185, baseS = 50096, baseO = 50096, baseH = 34959, baseM = 189166;
+
+                let inf = parseInt(document.getElementById(`s${i}_inf`).value) || 0;
+                let pak = parseInt(document.getElementById(`s${i}_pak`).value) || 0;
+                let flak = parseInt(document.getElementById(`s${i}_flak`).value) || 0;
+                let pw = parseInt(document.getElementById(`s${i}_pw`).value) || 0;
+                let bp = parseInt(document.getElementById(`s${i}_bp`).value) || 0;
+                let bf = parseInt(document.getElementById(`s${i}_bf`).value) || 0;
+                let br = parseInt(document.getElementById(`s${i}_br`).value) || 0;
+
+                // Kosten abziehen
+                let cG = (inf * 100) + (bp * 0) + (bf * 1250) + (br * 3300);
+                let cS = (inf * 50) + (pak * 100) + (bp * 2100) + (br * 2250);
+                let cO = (bp * 1500) + (bf * 2350);
+                let cH = (br * 531);
+                let cM = (inf * 200) + (pak * 300) + (bp * 3600) + (bf * 3600) + (br * 5550);
+
+                let rG = baseG - cG;
+                let rS = baseS - cS;
+                let rO = baseO - cO;
+                let rH = baseH - cH;
+                let rM = baseM - cM;
+
+                document.getElementById(`s${i}_rg`).innerText = rG.toLocaleString();
+                document.getElementById(`s${i}_rs`).innerText = rS.toLocaleString();
+                document.getElementById(`s${i}_ro`).innerText = rO.toLocaleString();
+                document.getElementById(`s${i}_rh`).innerText = rH.toLocaleString();
+                document.getElementById(`s${i}_rm`).innerText = rM.toLocaleString();
+
+                overviewHTML += `
+                    <tr>
+                        <td><b>Land ${i}</b> (${land})</td>
+                        <td><span style="color:#2ecc71">Aktiv</span></td>
+                        <td>${rG.toLocaleString()}</td>
+                        <td>${rS.toLocaleString()}</td>
+                        <td>${rO.toLocaleString()}</td>
+                        <td>${rH.toLocaleString()}</td>
+                        <td>${rM.toLocaleString()}</td>
+                    </tr>
+                `;
+            }
+
+            document.getElementById('overviewBody').innerHTML = overviewHTML;
         }
 
-        function calcUnits() {
-            let inf = parseInt(document.getElementById('infInput').value) || 0;
-            let panzer = parseInt(document.getElementById('panzerInput').value) || 0;
-            
-            let stahl = (inf * 50) + (panzer * 2100);
-            let geld = (inf * 200) + (panzer * 3600);
-
-            document.getElementById('costStahl').innerText = stahl.toLocaleString();
-            document.getElementById('costGeld').innerText = geld.toLocaleString();
-        }
+        // Beim Laden initial berechnen
+        window.onload = recalculateAll;
     </script>
 </body>
 </html>
