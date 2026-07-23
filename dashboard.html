@@ -21,7 +21,7 @@
         .left-side { justify-content: space-between; } 
         .right-side { justify-content: space-between; align-items: flex-end; }
 
-        /* KORREKTUR: Alle Boxen und Steuerungselemente starten standardmäßig unsichtbar */
+        /* Alle Boxen und Steuerungselemente starten standardmäßig unsichtbar */
         .card, .chat-btn-container { 
             background: rgba(0, 0, 0, 0.9); padding: 18px; border: 2px solid #ff3131; border-radius: 12px; 
             box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); width: 100%; box-sizing: border-box; 
@@ -35,7 +35,7 @@
         .btn-stack { display: flex; flex-direction: column; gap: 10px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         
-        /* KORREKTUR: Alle Buttons starten ebenfalls unsichtbar */
+        /* Alle Buttons starten ebenfalls unsichtbar */
         .card-btn, .admin-btn { 
             display: none;
             background: #39d353; color: black; border: none; padding: 12px; 
@@ -103,11 +103,11 @@
             </div>
         </div>
 
+        <!-- ANGEPASSTER ELO-BEREICH: Auf 1 Rechner-Button reduziert -->
         <div class="card" id="box-elo"> 
             <h2>Elo Bereich</h2>
             <div class="btn-stack">
-                <button class="card-btn" id="btn-rohstoffe" onclick="window.location.href='Elo_RohRech.html'">Rohstoffrechner</button>
-                <button class="card-btn" id="btn-einheiten" onclick="window.location.href='Elo_EinRech.html'">Einheiten Rechner</button>
+                <button class="card-btn" id="btn-rechner" onclick="window.location.href='Elo_Rechner.html'">Rechner</button>
                 <button class="card-btn" id="btn-groupchat" onclick="window.location.href='Chat_Group.html'">Taktische Gruppen</button>
             </div>
         </div>
@@ -165,9 +165,6 @@
             if (overlay) overlay.remove();
         }
 
-        // ===================================================
-        // DYNAMISCHER AUTOPILOT MIT ABSOLUTEM BLITZ-SCHUTZ
-        // ===================================================
         async function applyDashboardPermissions() {
             const userRole = localStorage.getItem('bulls_role') || 'Mitglied';
             const userExtra = localStorage.getItem('bulls_extra') || ''; 
@@ -195,14 +192,12 @@
                     }
                 });
 
-                // Prüfe die Boxen-Rahmen und schalte sie erst ein, wenn sie erlaubte Inhalte enthalten
                 checkCardVisibility('box-perso');
                 checkCardVisibility('box-blacklist');
                 checkCardVisibility('box-pflege');
                 checkCardVisibility('box-admin');
                 checkCardVisibility('box-elo');
                 
-                // Allianz-Chat Kachel am Ende aktivieren
                 document.getElementById('box-allichat').classList.add('visible-flex');
 
             } catch (e) {
