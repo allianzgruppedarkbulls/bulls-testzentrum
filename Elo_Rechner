@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dark Bulls - ELO & Rechner Zentrale</title>
+    <script src="config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 0; width: 100%; height: 100vh; background-color: black; font-family: 'Almendra', serif; color: white; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        #dashboard-bg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 750px; max-width: 95vw; filter: drop-shadow(0 0 50px rgba(255, 0, 0, 0.8)); z-index: 1; }
+        
+        .header { position: absolute; top: 15px; right: 20px; display: flex; align-items: center; gap: 15px; z-index: 100; }
+        .back-btn { background: #39d353; color: black; border: none; padding: 8px 15px; cursor: pointer; font-weight: bold; font-family: 'Almendra'; border-radius: 4px; text-transform: uppercase; }
+        
+        .card { 
+            position: relative; z-index: 10; background: rgba(0, 0, 0, 0.9); padding: 30px; border: 2px solid #ff3131; border-radius: 12px; 
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.4); width: 400px; text-align: center; box-sizing: border-box; 
+        }
+        .card h2 { color: #ff3131; margin-top: 0; font-size: 26px; text-decoration: underline; margin-bottom: 25px; }
+        .btn-stack { display: flex; flex-direction: column; gap: 15px; }
+        
+        .sub-btn { 
+            background: #39d353; color: black; border: none; padding: 15px; 
+            cursor: pointer; font-family: 'Almendra'; font-weight: bold; 
+            border-radius: 5px; font-size: 18px; width: 100%; transition: 0.2s; 
+            text-transform: uppercase; outline: none;
+        }
+        .sub-btn:hover { background: #2fb145; transform: scale(1.02); }
+    </style>
+</head>
+<body>
+
+    <img src="bulls_dashboard.jpg" id="dashboard-bg">
+
+    <div class="header">
+        <button class="back-btn" onclick="window.location.href='Dashboard.html'">Zurück zum Dashboard</button>
+    </div>
+
+    <div class="card">
+        <h2>ELO & Kartenzentrale</h2>
+        <div class="btn-stack">
+            <!-- Verweis auf deinen Rechner (z.B. die zusammengelegten Rohstoff-/Einheitenrechner) -->
+            <button class="sub-btn" onclick="window.location.href='Elo_RohRech.html'">Rechner</button>
+            
+            <!-- Verweis auf die Karte / taktische Übersicht -->
+            <button class="sub-btn" onclick="window.location.href='Elo_Karte.html'">Karte</button>
+            
+            <!-- Platzhalter, falls in Zukunft noch mehr Skripte/Bereiche dazukommen -->
+            <!-- <button class="sub-btn" onclick="window.location.href='Elo_Neu.html'">Neues Tool</button> -->
+        </div>
+    </div>
+
+</body>
+</html>
