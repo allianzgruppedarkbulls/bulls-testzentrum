@@ -14,20 +14,18 @@
         .user-info { color: #ff3131; font-size: 20px; }
         .logout-btn { background: #ff0000; color: white; border: none; padding: 8px 15px; cursor: pointer; font-weight: bold; font-family: 'Almendra'; border-radius: 4px; text-transform: uppercase; }
         
-        /* Haupt-Container Logik */
         .side-container { position: absolute; width: 100%; height: 100%; display: flex; justify-content: space-between; padding: 40px; box-sizing: border-box; z-index: 10; }
         .left-side, .right-side { display: flex; flex-direction: column; width: 320px; height: 90vh; }
         
         .left-side { justify-content: space-between; } 
         .right-side { justify-content: space-between; align-items: flex-end; }
 
-        /* Standardmäßig sichtbar, damit nichts unsichtbar bleibt, falls die API hängt */
         .card, .chat-btn-container { 
             background: rgba(0, 0, 0, 0.9); padding: 18px; border: 2px solid #ff3131; border-radius: 12px; 
             box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); width: 100%; box-sizing: border-box; 
-            display: block; 
+            display: none; 
         }
-        .chat-btn-container { display: flex; width: 100%; justify-content: flex-end; border: none; background: none; box-shadow: none; padding: 0; }
+        .chat-btn-container { display: none; width: 100%; justify-content: flex-end; border: none; background: none; box-shadow: none; padding: 0; }
         
         #box-admin { margin-top: 45px; } 
 
@@ -35,9 +33,8 @@
         .btn-stack { display: flex; flex-direction: column; gap: 10px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         
-        /* Buttons standardmäßig anzeigen */
         .card-btn, .admin-btn { 
-            display: block;
+            display: none;
             background: #39d353; color: black; border: none; padding: 12px; 
             cursor: pointer; font-family: 'Almendra'; font-weight: bold; 
             border-radius: 5px; font-size: 15px; width: 100%; transition: 0.2s; 
@@ -101,10 +98,11 @@
             </div>
         </div>
 
+        <!-- SAUBERE ZENTRALE STRUKTUR: Nur noch 1 Button für den ELO-Rechner -->
         <div class="card" id="box-elo"> 
             <h2>Elo Bereich</h2>
             <div class="btn-stack">
-                <button class="card-btn" id="btn-rechner" onclick="window.location.href='Elo_Rechner.html'">Rechner</button>
+                <button class="card-btn" id="btn-elo-rechner" onclick="window.location.href='Elo_Rechner.html'">ELO-Rechner</button>
                 <button class="card-btn" id="btn-groupchat" onclick="window.location.href='Chat_Group.html'">Taktische Gruppen</button>
             </div>
         </div>
@@ -138,8 +136,8 @@
         async function checkNews() {
             if (sessionStorage.getItem('bulls_news_seen') === 'true') return;
             try {
-                const res = await fetch(window.BULLS_CONFIG.SCRIPT_URL + "?action=getGlobalSettings");
-                const s = await res.json();
+                const res = abrufMitTimeout(window.BULLS_CONFIG.SCRIPT_URL + "?action=getGlobalSettings");
+                const s = await (await res).json();
                 if (s.newsActive && s.newsMsg) {
                     const newsDiv = document.createElement("div");
                     newsDiv.id = "newsOverlay";
@@ -157,6 +155,7 @@
         }
 
         function confirmNews() {
+            sessionStorage.getItem('bulls_news_seen', 'true') === 'true'; // korrigiert
             sessionStorage.setItem('bulls_news_seen', 'true');
             const overlay = document.getElementById('newsOverlay');
             if (overlay) overlay.remove();
@@ -172,22 +171,62 @@
                 const matrix = await res.json();
 
                 matrix.forEach(item => {
-                    const element = document.getElementById(item.id);
+                    // Falls in der Google Tabelle noch die alten IDs stehen, mappen wir sie abfangend:
+                    let targetId = item.id;
+                    if(targetId === "btn-rohstoffe" || targetId === "btn-einheiten") {
+                        targetId = "btn-elo-rechner";
+                    }
+
+                    const element = document.getElementById(targetId);
                     if (element) {
                         if (item.status === "Deaktiviert") {
-                            element.classList.add('hidden'); 
+                            element.className = "card-btn hidden"; 
                             return;
                         }
 
                         const hasAccess = userPrivileges.includes("Admin") || item.allowed.some(role => userPrivileges.includes(role));
 
-                        if (!hasAccess) {
-                            element.classList.add('hidden');
+                        if (hasAccess) {
+                            element.style.display = "block";
+                        } else {
+                            element.className = "card-btn hidden";
                         }
                     }
                 });
+
+                checkCardVisibility('box-perso');
+                checkCardVisibility('box-blacklist');
+                checkCardVisibility('box-pflege');
+                checkCardVisibility('box-admin');
+                checkCardVisibility('box-elo');
+                
+                document.getElementById('box-allichat').classList.add('visible-flex');
+
             } catch (e) {
-                console.error("Fehler im Dashboard-Autopiloten (Fallback aktiv):", e);
+                console.error("Fehler im Dashboard-Autopiloten:", e);
+                // Fallback: Damit bei einem API-Hänger nicht alles schwarz bleibt, alles anzeigen
+                document.querySelectorAll('.card, .card-btn, .admin-btn').forEach(el => {
+                    el.style.display = "block";
+                    el.classList.remove('hidden');
+                });
+                document.getElementById('box-allichat').classList.add('visible-flex');
+            }
+        }
+
+        function checkCardVisibility(cardId) {
+            const card = document.getElementById(cardId);
+            if (!card) return;
+            const buttons = card.querySelectorAll('.card-btn, .admin-btn');
+            let visibleButtons = 0;
+            buttons.forEach(btn => {
+                if (btn.style.display === "block" && !btn.classList.contains('hidden')) {
+                    visibleButtons++;
+                }
+            });
+            if (visibleButtons > 0) {
+                card.classList.add('visible-block');
+            } else {
+                card.className = "card hidden";
             }
         }
 
