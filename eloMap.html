@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Dark Bulls - Europakarte & Lagebild</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --panel-bg: #1e1e1e;
+            --card-bg: #252525;
+            --text-color: #e0e0e0;
+            --accent-green: #2e7d32;
+            --accent-red: #c62828;
+            --border-color: #333;
+            --highlight: #d4af37;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Haupt-Navigation (Wechsel zwischen Rechner und Karte) */
+        .main-nav {
+            background-color: #000;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--highlight);
+        }
+
+        .main-nav h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--highlight);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 8px 16px;
+            background: #333;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .nav-links a.active, .nav-links a:hover {
+            background: var(--highlight);
+            color: #000;
+        }
+
+        .content-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .content-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .section-title {
+            color: var(--highlight);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+            margin-top: 0;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+        }
+
+        /* Karten-Container (Platzhalter für die Europakarte / SVG / Bild) */
+        .map-viewport {
+            width: 100%;
+            height: 550px;
+            background: #181818;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .map-placeholder-text {
+            color: #666;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* Beispiel-Länder-Buttons auf der Karte (Simuliert) */
+        .map-node {
+            position: absolute;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: 1px solid #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+            transition: transform 0.2s;
+        }
+
+        .map-node:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        /* Farbcodierung */
+        .node-own { background-color: var(--accent-green); color: #fff; }
+        .node-enemy { background-color: var(--accent-red); color: #fff; }
+        .node-neutral { background-color: #444; color: #ccc; }
+
+        /* Positionen beispielhaft auf der Karte verteilt */
+        #node-germany { top: 40%; left: 45%; }
+        #node-france { top: 55%; left: 30%; }
+        #node-ukraine { top: 45%; left: 70%; }
+        #node-italy { top: 70%; left: 50%; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: #2c2c2c;
+            color: var(--highlight);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Haupt-Navigation oben -->
+    <div class="main-nav">
+        <h1>Dark Bulls - Europakarte & Lagebild</h1>
+        <div class="nav-links">
+            <a href="Elo_Rechner.html">📊 Rechner</a>
+            <a href="eloMap.html" class="active">🗺️ Europakarte</a>
+        </div>
+    </div>
+
+    <div class="content-container">
+        
+        <!-- Linke Spalte: Interaktive Karte -->
+        <div class="panel">
+            <h2 class="section-title">Strategische Übersichtskarte</h2>
+            <p style="font-size: 0.9rem; color: #aaa;">Klicke auf ein Land, um die Starteinheiten und den Status einzusehen.</p>
+            
+            <div class="map-viewport" id="mapViewport">
+                <!-- Hier kannst du später auch ein echtes Kartenbild (PNG/SVG) hinterlegen -->
+                <div class="map-placeholder-text">🗺️ [ Europakarte / Vektorgrafik ]</div>
+
+                <!-- Interaktive Länder-Punkte als Beispiel -->
+                <div id="node-germany" class="map-node node-own" onclick="selectCountry('Deutschland', 'Eigene Allianz', 'Infanterie: 18, Panzerwerk: 1, Flugzeugfabrik: 1')">Deutschland (Eigene)</div>
+                <div id="node-france" class="map-node node-enemy" onclick="selectCountry('Frankreich', 'Feind / Gegner', 'Unbekannt (Aufklärung läuft)')">Frankreich (Feind)</div>
+                <div id="node-ukraine" class="map-node node-neutral" onclick="selectCountry('Ukraine', 'Neutral / Puffer', 'Miliz: 5, Kaserne: 1')">Ukraine (Neutral)</div>
+                <div id="node-italy" class="map-node node-own" onclick="selectCountry('Italien', 'Eigene Allianz', 'Infanterie: 12, Panzer: 2')">Italien (Eigene)</div>
+            </div>
+        </div>
+
+        <!-- Rechte Spalte: Detail-Ansicht des ausgewählten Landes -->
+        <div class="panel">
+            <h2 class="section-title">Länder-Details</h2>
+            <div id="countryDetails">
+                <p><i>Wähle links auf der Karte ein Land aus, um Details und Starteinheiten anzuzeigen.</i></p>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <h3 class="section-title">Legende</h3>
+                <table>
+                    <tr>
+                        <td style="width: 20px; background: var(--accent-green);"></td>
+                        <td>Eigene Allianz-Länder (Grün)</td>
+                    </tr>
+                    <tr>
+                        <td style="background: var(--accent-red);"></td>
+                        <td>Feindliche Nationen (Rot)</td>
+                    </tr>
+                    <tr>
+                        <td style="background: #444;"></td>
+                        <td>Neutrale / Freie Länder (Neutral)</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function selectCountry(name, status, units) {
+            let container = document.getElementById('countryDetails');
+            let statusColor = status.includes('Eigene') ? 'positive' : (status.includes('Feind') ? 'negative' : '');
+            
+            container.innerHTML = `
+                <h3 style="color: var(--highlight); margin-top:0;">${name}</h3>
+                <p><b>Status:</b> <span class="${statusColor}">${status}</span></p>
+                <p><b>Bekannte Starteinheiten / Gebäude:</b></p>
+                <div style="background: #111; padding: 10px; border-radius: 4px; border: 1px solid #333; font-family: monospace;">
+                    ${units}
+                </div>
+                <p style="font-size: 0.85rem; color: #888; margin-top: 15px;">Tipp: Du kannst die Werte im <a href="Elo_Rechner.html" style="color: var(--highlight);">Rechner</a> anpassen.</p>
+            `;
+        }
+    </script>
+</body>
+</html>
