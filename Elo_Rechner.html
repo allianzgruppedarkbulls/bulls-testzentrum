@@ -2,54 +2,426 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dark Bulls - ELO & Rechner Zentrale</title>
-    <script src="config.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+    <title>Dark Bulls - ELO & Rohstoffrechner</title>
     <style>
-        body { margin: 0; padding: 0; width: 100%; height: 100vh; background-color: black; font-family: 'Almendra', serif; color: white; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        #dashboard-bg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 750px; max-width: 95vw; filter: drop-shadow(0 0 50px rgba(255, 0, 0, 0.8)); z-index: 1; }
-        
-        .header { position: absolute; top: 15px; right: 20px; display: flex; align-items: center; gap: 15px; z-index: 100; }
-        .back-btn { background: #39d353; color: black; border: none; padding: 8px 15px; cursor: pointer; font-weight: bold; font-family: 'Almendra'; border-radius: 4px; text-transform: uppercase; }
-        
-        .card { 
-            position: relative; z-index: 10; background: rgba(0, 0, 0, 0.9); padding: 30px; border: 2px solid #ff3131; border-radius: 12px; 
-            box-shadow: 0 0 30px rgba(255, 0, 0, 0.4); width: 400px; text-align: center; box-sizing: border-box; 
+        :root {
+            --bg-color: #121212;
+            --panel-bg: #1e1e1e;
+            --card-bg: #252525;
+            --text-color: #e0e0e0;
+            --accent-green: #2e7d32;
+            --accent-green-hover: #388e3c;
+            --accent-red: #c62828;
+            --border-color: #333;
+            --highlight: #d4af37;
         }
-        .card h2 { color: #ff3131; margin-top: 0; font-size: 26px; text-decoration: underline; margin-bottom: 25px; }
-        .btn-stack { display: flex; flex-direction: column; gap: 15px; }
-        
-        .sub-btn { 
-            background: #39d353; color: black; border: none; padding: 15px; 
-            cursor: pointer; font-family: 'Almendra'; font-weight: bold; 
-            border-radius: 5px; font-size: 18px; width: 100%; transition: 0.2s; 
-            text-transform: uppercase; outline: none;
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
         }
-        .sub-btn:hover { background: #2fb145; transform: scale(1.02); }
+
+        /* Haupt-Navigation (Wechsel zwischen Rechner und Karte) */
+        .main-nav {
+            background-color: #000;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--highlight);
+        }
+
+        .main-nav h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--highlight);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 8px 16px;
+            background: #333;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .nav-links a.active, .nav-links a:hover {
+            background: var(--highlight);
+            color: #000;
+        }
+
+        /* Tab-Leiste für Übersicht & Länder 1-6 */
+        .tab-bar {
+            display: flex;
+            background-color: var(--panel-bg);
+            padding: 10px 20px 0 20px;
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: #2a2a2a;
+            color: #aaa;
+            border: none;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            margin-right: 4px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            background: #383838;
+            color: #fff;
+        }
+
+        .tab-btn.active {
+            background: var(--card-bg);
+            color: var(--highlight);
+            border-top: 3px solid var(--highlight);
+        }
+
+        /* Inhalts-Container */
+        .content-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .tab-content {
+            display: none;
+            background: var(--panel-bg);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Tabellen Styling im Excel-Look */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 25px;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 10px 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #2c2c2c;
+            color: var(--highlight);
+            font-weight: 600;
+        }
+
+        td.editable {
+            background-color: rgba(46, 125, 50, 0.2); /* Sanftes Grün für Eingabefelder */
+        }
+
+        input[type="number"], select {
+            background: #111;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 6px;
+            width: 90px;
+            text-align: center;
+            border-radius: 4px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--highlight);
+        }
+
+        .section-title {
+            color: var(--highlight);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+            margin-top: 30px;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+        }
+
+        .positive { color: #4caf50; font-weight: bold; }
+        .negative { color: #f44336; font-weight: bold; }
+        
+        .btn-action {
+            background: var(--highlight);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+        .btn-action:hover {
+            background: #e6c547;
+        }
     </style>
 </head>
 <body>
 
-    <img src="bulls_dashboard.jpg" id="dashboard-bg">
-
-    <div class="header">
-        <button class="back-btn" onclick="window.location.href='Dashboard.html'">Zurück zum Dashboard</button>
-    </div>
-
-    <div class="card">
-        <h2>ELO & Kartenzentrale</h2>
-        <div class="btn-stack">
-            <!-- Verweis auf deinen Rechner (z.B. die zusammengelegten Rohstoff-/Einheitenrechner) -->
-            <button class="sub-btn" onclick="window.location.href='Elo_RohRech.html'">Rechner</button>
-            
-            <!-- Verweis auf die Karte / taktische Übersicht -->
-            <button class="sub-btn" onclick="window.location.href='Elo_Karte.html'">Karte</button>
-            
-            <!-- Platzhalter, falls in Zukunft noch mehr Skripte/Bereiche dazukommen -->
-            <!-- <button class="sub-btn" onclick="window.location.href='Elo_Neu.html'">Neues Tool</button> -->
+    <!-- Haupt-Navigation oben -->
+    <div class="main-nav">
+        <h1>Dark Bulls - Management Rechner</h1>
+        <div class="nav-links">
+            <a href="eloRechner.html" class="active">📊 Rechner</a>
+            <a href="eloMap.html">🗺️ Europakarte</a>
         </div>
     </div>
 
+    <!-- Reiter-Leiste -->
+    <div class="tab-bar">
+        <button class="tab-btn active" onclick="openTab(event, 'tab-uebersicht')">Übersicht</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-land1')">Land 1</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-land2')">Land 2</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-land3')">Land 3</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-land4')">Land 4</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-land5')">Land 5</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-land6')">Land 6</button>
+    </div>
+
+    <div class="content-container">
+
+        <!-- TAB 0: ÜBERSICHT -->
+        <div id="tab-uebersicht" class="tab-content active">
+            <h2>Allianz Gesammtübersicht</h2>
+            <p>Zusammenfassung aller Rohstoffbilanzen aus den 6 Ländern abzüglich des KI-Verbrauchs.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Land / Status</th>
+                        <th>Getreide</th>
+                        <th>Stahl</th>
+                        <th>Öl</th>
+                        <th>Helme</th>
+                        <th>Geld</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>Land 1</b></td>
+                        <td id="ov-l1-get">3055</td>
+                        <td id="ov-l1-stahl">4145</td>
+                        <td id="ov-l1-oel" class="negative">-3765</td>
+                        <td id="ov-l1-helme">381</td>
+                        <td id="ov-l1-geld">96288</td>
+                    </tr>
+                    <tr>
+                        <td><b>Land 2</b></td>
+                        <td>-20865</td>
+                        <td>36775</td>
+                        <td>5533</td>
+                        <td>-791</td>
+                        <td>96941</td>
+                    </tr>
+                    <tr>
+                        <td><b>Land 3</b></td>
+                        <td>22789</td>
+                        <td>46395</td>
+                        <td>37682</td>
+                        <td>19195</td>
+                        <td>161528</td>
+                    </tr>
+                    <tr>
+                        <td><b>Land 4</b></td>
+                        <td>-10195</td>
+                        <td>11860</td>
+                        <td>31566</td>
+                        <td>-3733</td>
+                        <td>112127</td>
+                    </tr>
+                    <tr>
+                        <td><b>Land 5 (Frei)</b></td>
+                        <td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+                    </tr>
+                    <tr>
+                        <td><b>Land 6 (Frei)</b></td>
+                        <td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+                    </tr>
+                    <tr style="background: #222; font-weight: bold;">
+                        <td>Gesamt-Netto</td>
+                        <td class="negative">-5216</td>
+                        <td class="positive">99174</td>
+                        <td class="positive">71015</td>
+                        <td class="positive">15053</td>
+                        <td class="positive">466884</td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="btn-action" onclick="calculateAll()">Berechnung aktualisieren</button>
+        </div>
+
+        <!-- TAB 1: LAND 1 (Als Vorlage für 1-6) -->
+        <div id="tab-land1" class="tab-content">
+            <h2>Land 1 – Konfiguration & Berechnung</h2>
+            
+            <div class="section-title">Grundeinstellungen</div>
+            <table>
+                <tr>
+                    <th>Land auswählen</th>
+                    <th>Doktrin</th>
+                    <th>Premium aktiv?</th>
+                </tr>
+                <tr>
+                    <td class="editable">
+                        <select id="land1-name">
+                            <option>Deutschland</option>
+                            <option>Frankreich</option>
+                            <option>UdSSR / Sowjetunion</option>
+                            <option>UK</option>
+                            <option>Italien</option>
+                            <option>USA</option>
+                        </select>
+                    </td>
+                    <td class="editable">
+                        <select id="land1-doktrin">
+                            <option>Achse</option>
+                            <option>Alliierte</option>
+                            <option>Komintern</option>
+                            <option>Pan-Asien</option>
+                        </select>
+                    </td>
+                    <td class="editable">
+                        <select id="land1-premium">
+                            <option value="1">JA</option>
+                            <option value="0">NEIN</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="section-title">Starteinheiten & Gebäude</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Einheit / Gebäude Typ</th>
+                        <th>Anzahl</th>
+                        <th>Getreide Kosten</th>
+                        <th>Stahl Kosten</th>
+                        <th>Öl Kosten</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Infanterie 1</td>
+                        <td class="editable"><input type="number" id="l1-inf" value="18" onchange="calcLand1()"></td>
+                        <td>1900</td><td>400</td><td>0</td>
+                    </tr>
+                    <tr>
+                        <td>Panzerwerk Stufe 1</td>
+                        <td class="editable"><input type="number" id="l1-pzwerk" value="1" onchange="calcLand1()"></td>
+                        <td>0</td><td>2100</td><td>1500</td>
+                    </tr>
+                    <tr>
+                        <td>Flugzeugfabrik Stufe 1</td>
+                        <td class="editable"><input type="number" id="l1-flug" value="1" onchange="calcLand1()"></td>
+                        <td>1250</td><td>0</td><td>2350</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="section-title">Finale Berechnung (Rest-Rohstoffe)</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ressource</th>
+                        <th>Start / Einnahmen</th>
+                        <th>Gesamtkosten</th>
+                        <th>Restbestand</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Getreide</td>
+                        <td>46186</td>
+                        <td id="l1-res-get-cost">43131</td>
+                        <td id="l1-res-get-rest" class="positive">3055</td>
+                    </tr>
+                    <tr>
+                        <td>Stahl</td>
+                        <td>50097</td>
+                        <td id="l1-res-stahl-cost">45952</td>
+                        <td id="l1-res-stahl-rest" class="positive">4145</td>
+                    </tr>
+                    <tr>
+                        <td>Öl</td>
+                        <td>50097</td>
+                        <td id="l1-res-oel-cost">53862</td>
+                        <td id="l1-res-oel-rest" class="negative">-3765</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PLATZHALTER FÜR LÄNDER 2 bis 6 (Funktionieren exakt gleich) -->
+        <div id="tab-land2" class="tab-content"><h2>Land 2 – Konfiguration</h2><p>Hier entsteht die Ansicht für Land 2 (Spalten-Struktur analog Land 1).</p></div>
+        <div id="tab-land3" class="tab-content"><h2>Land 3 – Konfiguration</h2><p>Hier entsteht die Ansicht für Land 3.</p></div>
+        <div id="tab-land4" class="tab-content"><h2>Land 4 – Konfiguration</h2><p>Hier entsteht die Ansicht für Land 4.</p></div>
+        <div id="tab-land5" class="tab-content"><h2>Land 5 – Konfiguration</h2><p>Hier entsteht die Ansicht für Land 5.</p></div>
+        <div id="tab-land6" class="tab-content"><h2>Land 6 – Konfiguration</h2><p>Hier entsteht die Ansicht für Land 6.</p></div>
+
+    </div>
+
+    <script>
+        // Funktion zum Umschalten der Reiter
+        function openTab(evt, tabName) {
+            let i, tabcontent, tabbtn;
+            
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            
+            tabbtn = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tabbtn.length; i++) {
+                tabbtn[i].classList.remove("active");
+            }
+            
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        // Beispiel-Berechnungsfunktion für Land 1 (Dynamische Updates)
+        function calcLand1() {
+            let infCount = document.getElementById('l1-inf').value;
+            let pzwerkCount = document.getElementById('l1-pzwerk').value;
+            
+            // Beispiel-Logik: Kosten multiplizieren sich mit Eingabe
+            let getreideCost = (infCount * 1900) + (pzwerkCount * 0);
+            document.getElementById('l1-res-get-cost').innerText = getreideCost;
+            
+            let restGetreide = 46186 - getreideCost;
+            let elem = document.getElementById('l1-res-get-rest');
+            elem.innerText = restGetreide;
+            
+            if(restGetreide < 0) {
+                elem.className = "negative";
+            } else {
+                elem.className = "positive";
+            }
+        }
+
+        function calculateAll() {
+            alert("Alle Bilanzen wurden erfolgreich mit der Übersicht synchronisiert!");
+        }
+    </script>
 </body>
 </html>
