@@ -21,13 +21,13 @@
         .left-side { justify-content: space-between; } 
         .right-side { justify-content: space-between; align-items: flex-end; }
 
-        /* Alle Boxen und Steuerungselemente starten standardmäßig unsichtbar */
+        /* Standardmäßig sichtbar, damit nichts unsichtbar bleibt, falls die API hängt */
         .card, .chat-btn-container { 
             background: rgba(0, 0, 0, 0.9); padding: 18px; border: 2px solid #ff3131; border-radius: 12px; 
             box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); width: 100%; box-sizing: border-box; 
-            display: none; 
+            display: block; 
         }
-        .chat-btn-container { display: none; width: 100%; justify-content: flex-end; border: none; background: none; box-shadow: none; padding: 0; }
+        .chat-btn-container { display: flex; width: 100%; justify-content: flex-end; border: none; background: none; box-shadow: none; padding: 0; }
         
         #box-admin { margin-top: 45px; } 
 
@@ -35,9 +35,9 @@
         .btn-stack { display: flex; flex-direction: column; gap: 10px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         
-        /* Alle Buttons starten ebenfalls unsichtbar */
+        /* Buttons standardmäßig anzeigen */
         .card-btn, .admin-btn { 
-            display: none;
+            display: block;
             background: #39d353; color: black; border: none; padding: 12px; 
             cursor: pointer; font-family: 'Almendra'; font-weight: bold; 
             border-radius: 5px; font-size: 15px; width: 100%; transition: 0.2s; 
@@ -47,9 +47,7 @@
         
         .chat-btn { display: block; background: #ff8c00; color: black; border: none; padding: 15px 45px; font-size: 24px; font-weight: bold; border-radius: 8px; cursor: pointer; font-family: 'Almendra'; box-shadow: 0 0 25px rgba(255, 140, 0, 0.5); }
         
-        /* Macht das Element unwiderruflich unsichtbar */
         .hidden { display: none !important; }
-        /* Macht das Element sichtbar, wenn die Berechtigung erteilt wurde */
         .visible-block { display: block !important; }
         .visible-flex { display: flex !important; }
     </style>
@@ -103,7 +101,6 @@
             </div>
         </div>
 
-        <!-- ANGEPASSTER ELO-BEREICH: Auf 1 Rechner-Button reduziert -->
         <div class="card" id="box-elo"> 
             <h2>Elo Bereich</h2>
             <div class="btn-stack">
@@ -178,48 +175,19 @@
                     const element = document.getElementById(item.id);
                     if (element) {
                         if (item.status === "Deaktiviert") {
-                            element.className = "card-btn hidden"; 
+                            element.classList.add('hidden'); 
                             return;
                         }
 
                         const hasAccess = userPrivileges.includes("Admin") || item.allowed.some(role => userPrivileges.includes(role));
 
-                        if (hasAccess) {
-                            element.style.display = "block";
-                        } else {
-                            element.className = "card-btn hidden";
+                        if (!hasAccess) {
+                            element.classList.add('hidden');
                         }
                     }
                 });
-
-                checkCardVisibility('box-perso');
-                checkCardVisibility('box-blacklist');
-                checkCardVisibility('box-pflege');
-                checkCardVisibility('box-admin');
-                checkCardVisibility('box-elo');
-                
-                document.getElementById('box-allichat').classList.add('visible-flex');
-
             } catch (e) {
-                console.error("Fehler im Dashboard-Autopiloten:", e);
-                document.getElementById('box-allichat').classList.add('visible-flex');
-            }
-        }
-
-        function checkCardVisibility(cardId) {
-            const card = document.getElementById(cardId);
-            if (!card) return;
-            const buttons = card.querySelectorAll('.card-btn, .admin-btn');
-            let visibleButtons = 0;
-            buttons.forEach(btn => {
-                if (btn.style.display === "block") {
-                    visibleButtons++;
-                }
-            });
-            if (visibleButtons > 0) {
-                card.classList.add('visible-block');
-            } else {
-                card.className = "card hidden";
+                console.error("Fehler im Dashboard-Autopiloten (Fallback aktiv):", e);
             }
         }
 
