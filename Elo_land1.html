@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Bulls - ELO Land 1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #000;
+            --panel-bg: rgba(0, 0, 0, 0.9);
+            --border-color: #ff3131;
+            --text-color: #fff;
+            --highlight: #ff3131;
+            --input-bg: #111;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            font-family: 'Almendra', serif;
+            color: var(--text-color);
+        }
+
+        /* Top-Navigation / Zurück zur Weiche */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 0 20px rgba(255, 49, 49, 0.3);
+        }
+
+        .top-nav h1 {
+            margin: 0;
+            color: var(--highlight);
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-btn {
+            background: #ff3131;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            font-family: 'Almendra', serif;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: #d92525;
+            transform: scale(1.02);
+        }
+
+        /* Hauptcontainer & Panels */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(255, 49, 49, 0.2);
+        }
+
+        .panel h2 {
+            color: var(--highlight);
+            margin-top: 0;
+            font-size: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        /* Tabellen im edlen Look */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #444;
+            padding: 10px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        th {
+            background-color: #1a0000;
+            color: var(--highlight);
+        }
+
+        td.editable {
+            background-color: rgba(255, 49, 49, 0.05);
+        }
+
+        select, input[type="number"] {
+            background: var(--input-bg);
+            color: white;
+            border: 1px solid var(--border-color);
+            padding: 6px;
+            font-family: 'Almendra', serif;
+            font-size: 15px;
+            text-align: center;
+            border-radius: 4px;
+            width: 90%;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            box-shadow: 0 0 8px var(--highlight);
+        }
+
+        .positive { color: #39d353; font-weight: bold; }
+        .negative { color: #ff3131; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Top Navigation -->
+        <div class="top-nav">
+            <h1>ELO Prototyp – Land 1</h1>
+            <a href="Elo_weiche.html" class="nav-btn">⬅ Zurück zur Weiche</a>
+        </div>
+
+        <!-- Sektion 1: Grundeinstellungen -->
+        <div class="panel">
+            <h2>Grundeinstellungen Land 1</h2>
+            <table>
+                <tr>
+                    <th>Land auswählen</th>
+                    <th>Doktrin</th>
+                    <th>Premium aktiv?</th>
+                </tr>
+                <tr>
+                    <td class="editable">
+                        <select>
+                            <option>Deutschland</option>
+                            <option>Frankreich</option>
+                            <option>UdSSR</option>
+                            <option>UK</option>
+                            <option>Italien</option>
+                            <option>USA</option>
+                        </select>
+                    </td>
+                    <td class="editable">
+                        <select>
+                            <option>Achse</option>
+                            <option>Alliierte</option>
+                            <option>Komintern</option>
+                            <option>Pan-Asien</option>
+                        </select>
+                    </td>
+                    <td class="editable">
+                        <select>
+                            <option>JA</option>
+                            <option>NEIN</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Sektion 2: Starteinheiten & Gebäude -->
+        <div class="panel">
+            <h2>Starteinheiten & Gebäude</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Einheit / Gebäude Typ</th>
+                        <th>Anzahl</th>
+                        <th>Getreide</th>
+                        <th>Stahl</th>
+                        <th>Öl</th>
+                        <th>Geld</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Infanterie 1</td>
+                        <td class="editable"><input type="number" value="18"></td>
+                        <td>1900</td><td>400</td><td>0</td><td>1600</td>
+                    </tr>
+                    <tr>
+                        <td>Panzerwerk Stufe 1</td>
+                        <td class="editable"><input type="number" value="1"></td>
+                        <td>0</td><td>2100</td><td>1500</td><td>3600</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sektion 3: Unterer Bereich (Zusatzinfos / Moral / Entwicklung) -->
+        <div class="panel">
+            <h2>Entwicklung & Unterhalt (Unterer Bereich)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktor / Tag</th>
+                        <th>Getreide</th>
+                        <th>Stahl</th>
+                        <th>Öl</th>
+                        <th>Helme</th>
+                        <th>Geld</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Tag 1 (Startwerte)</td>
+                        <td>15000</td><td>15000</td><td>15000</td><td>12000</td><td>80000</td>
+                    </tr>
+                    <tr>
+                        <td>Tag 2 (Moral 78%)</td>
+                        <td class="positive">10307</td><td class="positive">11600</td><td class="positive">11600</td><td class="positive">7588</td><td class="positive">36080</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>
