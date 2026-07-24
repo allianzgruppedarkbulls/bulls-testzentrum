@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Bulls - Land 1</title>
+    <style>
+        :root {
+            --bg-color: #0b0b0b;
+            --panel-bg: #141414;
+            --border-color: #ff1a1a;
+            --text-main: #f0f0f0;
+            --text-muted: #aaaaaa;
+            --neon-red: #ff0033;
+            --neon-glow: 0 0 10px rgba(255, 0, 51, 0.6), 0 0 20px rgba(255, 0, 51, 0.3);
+            --tab-active-bg: #ff0033;
+            --tab-inactive-bg: #1f1f1f;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: var(--neon-red);
+            text-shadow: var(--neon-glow);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Haupt-Navigation / Reiter oben */
+        .main-nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            background: #111;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        .tab-btn {
+            background-color: var(--tab-inactive-bg);
+            color: var(--text-main);
+            border: 1px solid #444;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--neon-red);
+        }
+
+        .tab-btn.active {
+            background-color: var(--tab-active-bg);
+            color: white;
+            border-color: var(--neon-red);
+            box-shadow: var(--neon-glow);
+        }
+
+        .card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--neon-glow);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            border: 1px solid #333;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #1a0000;
+            color: var(--neon-red);
+            border-bottom: 2px solid var(--neon-red);
+        }
+
+        tr:nth-child(even) {
+            background-color: #111111;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Dark Bulls Alliance Dashboard</h1>
+    
+    <!-- ZENTRALE NAVIGATION -->
+    <div class="main-nav">
+        <a href="Elo_uebersicht.html" class="tab-btn">📊 Übersicht</a>
+        <a href="Elo_land1.html" class="tab-btn active">Land 1</a>
+        <a href="Elo_land2.html" class="tab-btn">Land 2</a>
+        <a href="Elo_land3.html" class="tab-btn">Land 3</a>
+        <a href="Elo_land4.html" class="tab-btn">Land 4</a>
+        <a href="Elo_land5.html" class="tab-btn">Land 5</a>
+        <a href="Elo_land6.html" class="tab-btn">Land 6</a>
+        <a href="Elo_map.html" class="tab-btn">🗺️ Map</a>
+        <a href="Elo_feinde.html" class="tab-btn" style="border-color: #ff4d4d; color: #ff9999;">⚠️ Feinde</a>
+    </div>
+
+    <!-- LAND 1 SPEZIFISCHER BEREICH -->
+    <div class="card">
+        <h2>Land 1 – Detailansicht & Verwaltung</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">Individuelle Rohstoff- und Einheitenübersicht für Land 1.</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Ressource / Einheit</th>
+                    <th>Produktion / Bestand</th>
+                    <th>Verbrauch / Bedarf</th>
+                    <th>Netto-Bilanz</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Getreide</td>
+                    <td>12,000</td>
+                    <td>5,824</td>
+                    <td style="color: #2ecc71;">+ 6,176</td>
+                </tr>
+                <tr>
+                    <td>Stahl</td>
+                    <td>9,500</td>
+                    <td>2,452</td>
+                    <td style="color: #2ecc71;">+ 7,048</td>
+                </tr>
+                <tr>
+                    <td>Öl</td>
+                    <td>1,200</td>
+                    <td>4,965</td>
+                    <td style="color: #ff4d4d;">- 3,765</td>
+                </tr>
+                <tr>
+                    <td>Geld</td>
+                    <td>15,000</td>
+                    <td>8,308</td>
+                    <td style="color: #2ecc71;">+ 6,692</td>
+                </tr>
+                <tr>
+                    <td>Arbeitskraft</td>
+                    <td>4,000</td>
+                    <td>2,782</td>
+                    <td style="color: #2ecc71;">+ 1,218</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer-note">
+        Dark Bulls Alliance Control Panel &bull; Elo_land1 v1.0
+    </div>
+</div>
+
+</body>
+</html>
