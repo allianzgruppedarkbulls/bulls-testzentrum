@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Bulls - Gegnerverwaltung</title>
+    <style>
+        :root {
+            --bg-color: #0b0b0b;
+            --panel-bg: #141414;
+            --border-color: #ff1a1a;
+            --text-main: #f0f0f0;
+            --text-muted: #aaaaaa;
+            --neon-red: #ff0033;
+            --neon-glow: 0 0 10px rgba(255, 0, 51, 0.6), 0 0 20px rgba(255, 0, 51, 0.3);
+            --green-btn: #2ecc71;
+            --green-hover: #27ae60;
+            --red-btn: #ff4d4d;
+            --red-hover: #cc0000;
+            --tab-active-bg: #ff0033;
+            --tab-inactive-bg: #1f1f1f;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: var(--neon-red);
+            text-shadow: var(--neon-glow);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Haupt-Navigation / Reiter oben */
+        .main-nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            background: #111;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        .tab-btn {
+            background-color: var(--tab-inactive-bg);
+            color: var(--text-main);
+            border: 1px solid #444;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--neon-red);
+        }
+
+        .tab-btn.active {
+            background-color: var(--tab-active-bg);
+            color: white;
+            border-color: var(--neon-red);
+            box-shadow: var(--neon-glow);
+        }
+
+        .card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--neon-glow);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .enemy-card {
+            border-color: var(--red-btn);
+            box-shadow: 0 0 10px rgba(255, 77, 77, 0.4);
+        }
+
+        select, input {
+            background-color: #1f1f1f;
+            color: var(--text-main);
+            border: 1px solid #444;
+            padding: 6px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--neon-red);
+            outline: none;
+            box-shadow: 0 0 5px var(--neon-red);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            border: 1px solid #333;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #1a0000;
+            color: var(--neon-red);
+            border-bottom: 2px solid var(--neon-red);
+        }
+
+        tr:nth-child(even) {
+            background-color: #111111;
+        }
+
+        .editable-enemy {
+            background-color: #2b1c1c;
+            border: 1px dashed var(--red-btn);
+            color: #fff;
+            text-align: center;
+        }
+
+        .btn {
+            background-color: var(--neon-red);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: var(--neon-glow);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #ff1a4d;
+        }
+
+        .btn-green {
+            background-color: var(--green-btn);
+            box-shadow: 0 0 8px rgba(46, 204, 113, 0.4);
+            margin-top: 15px;
+            display: inline-block;
+        }
+        .btn-green:hover {
+            background-color: var(--green-hover);
+        }
+
+        .btn-x {
+            background-color: var(--red-btn);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        .btn-x:hover {
+            background-color: var(--red-hover);
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Dark Bulls Alliance Dashboard</h1>
+    
+    <!-- ZENTRALE NAVIGATION -->
+    <div class="main-nav">
+        <a href="Elo_uebersicht.html" class="tab-btn">📊 Übersicht</a>
+        <a href="Elo_land1.html" class="tab-btn">Land 1</a>
+        <a href="Elo_land2.html" class="tab-btn">Land 2</a>
+        <a href="Elo_land3.html" class="tab-btn">Land 3</a>
+        <a href="Elo_land4.html" class="tab-btn">Land 4</a>
+        <a href="Elo_land5.html" class="tab-btn">Land 5</a>
+        <a href="Elo_land6.html" class="tab-btn">Land 6</a>
+        <a href="Elo_map.html" class="tab-btn">🗺️ Map</a>
+        <a href="Elo_feinde.html" class="tab-btn active" style="border-color: #ff4d4d; color: #ff9999;">⚠️ Feinde</a>
+    </div>
+
+    <!-- GEGNER EINGABE BEREICH -->
+    <div class="card enemy-card">
+        <h2 style="color: #ff4d4d;">⚠️ Gegnerische Rohstoffrechnung (Eingabe)</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">Trage hier die Feinde und deren Bilanzen ein. Die Daten werden automatisch auf die Hauptübersicht übertragen.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Feindliches Land</th>
+                    <th>Getreide</th>
+                    <th>Stahl</th>
+                    <th>Öl</th>
+                    <th>Geld</th>
+                    <th>Arbeitskraft</th>
+                    <th style="width: 50px; text-align: center;">X</th>
+                </tr>
+            </thead>
+            <tbody id="enemyTableBody">
+                <!-- Dynamische Zeilen -->
+            </tbody>
+        </table>
+        <button class="btn btn-green" onclick="addEnemyRow()">+ Feindliches Land hinzufügen</button>
+    </div>
+
+    <div class="footer-note">
+        Dark Bulls Alliance Control Panel &bull; Elo_feinde v1.0
+    </div>
+</div>
+
+<script>
+    // Standard-Feinde falls noch nichts gespeichert ist
+    const defaultEnemies = [
+        { country: "Frankreich", getreide: "+ 4,200", stahl: "- 1,100", oel: "+ 2,300", geld: "+ 3,100", arbeitskraft: "- 400" },
+        { country: "Großbritannien", getreide: "- 800", stahl: "+ 3,500", oel: "+ 1,800", geld: "- 500", arbeitskraft: "+ 600" }
+    ];
+
+    function loadEnemies() {
+        const savedData = localStorage.getItem('darkBullsEnemies');
+        const enemies = savedData ? JSON.parse(savedData) : defaultEnemies;
+        const tbody = document.getElementById('enemyTableBody');
+        tbody.innerHTML = "";
+
+        enemies.forEach(enemy => {
+            appendRow(enemy);
+        });
+    }
+
+    function appendRow(data = { country: "Frankreich", getreide: "0", stahl: "0", oel: "0", geld: "0", arbeitskraft: "0" }) {
+        const tbody = document.getElementById('enemyTableBody');
+        const row = document.createElement('tr');
+        
+        const countries = ["Frankreich", "Großbritannien", "Deutschland", "Polen", "Sowjetunion", "Italien"];
+        let optionsHTML = countries.map(c => `<option value="${c}" ${c === data.country ? 'selected' : ''}>${c}</option>`).join('');
+
+        row.innerHTML = `
+            <td>
+                <select class="editable-enemy enemy-select" style="width: 100%;" onchange="saveAndSync()">
+                    ${optionsHTML}
+                </select>
+            </td>
+            <td><input type="text" class="editable-enemy enemy-val" value="${data.getreide}" style="width: 90px;" oninput="saveAndSync()"></td>
+            <td><input type="text" class="editable-enemy enemy-val" value="${data.stahl}" style="width: 90px;" oninput="saveAndSync()"></td>
+            <td><input type="text" class="editable-enemy enemy-val" value="${data.oel}" style="width: 90px;" oninput="saveAndSync()"></td>
+            <td><input type="text" class="editable-enemy enemy-val" value="${data.geld}" style="width: 90px;" oninput="saveAndSync()"></td>
+            <td><input type="text" class="editable-enemy enemy-val" value="${data.arbeitskraft}" style="width: 90px;" oninput="saveAndSync()"></td>
+            <td><button class="btn-x" onclick="removeEnemyRow(this)">×</button></td>
+        `;
+        tbody.appendChild(row);
+    }
+
+    function addEnemyRow() {
+        appendRow();
+        saveAndSync();
+    }
+
+    function removeEnemyRow(btn) {
+        btn.closest('tr').remove();
+        saveAndSync();
+    }
+
+    // Daten im LocalStorage sichern, damit Elo_uebersicht darauf zugreifen kann
+    function saveAndSync() {
+        const rows = document.querySelectorAll('#enemyTableBody tr');
+        let enemies = [];
+
+        rows.forEach(row => {
+            const country = row.querySelector('.enemy-select').value;
+            const inputs = row.querySelectorAll('.enemy-val');
+            
+            enemies.push({
+                country: country,
+                getreide: inputs[0].value,
+                stahl: inputs[1].value,
+                oel: inputs[2].value,
+                geld: inputs[3].value,
+                arbeitskraft: inputs[4].value
+            });
+        });
+
+        localStorage.setItem('darkBullsEnemies', JSON.stringify(enemies));
+    }
+
+    window.onload = function() {
+        loadEnemies();
+    };
+</script>
+
+</body>
+</html>
