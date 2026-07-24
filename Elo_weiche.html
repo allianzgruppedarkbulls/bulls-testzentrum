@@ -2,103 +2,126 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Dark Bulls - Allianz Management Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Bulls - Allianz Weiche</title>
     <style>
         :root {
-            --bg-color: #121212;
-            --panel-bg: #1e1e1e;
-            --card-bg: #252525;
-            --text-color: #e0e0e0;
-            --border-color: #333;
-            --highlight: #d4af37;
+            --bg-color: #0b0b0b;
+            --panel-bg: #141414;
+            --border-color: #ff1a1a;
+            --text-main: #f0f0f0;
+            --text-muted: #aaaaaa;
+            --neon-red: #ff0033;
+            --neon-glow: 0 0 10px rgba(255, 0, 51, 0.6), 0 0 20px rgba(255, 0, 51, 0.3);
+            --tab-active-bg: #ff0033;
+            --tab-inactive-bg: #1f1f1f;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            padding: 20px;
         }
 
-        .hub-container {
-            background: var(--panel-bg);
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.7);
-            text-align: center;
-            max-width: 600px;
-            width: 100%;
-            border-top: 4px solid var(--highlight);
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
         }
 
         h1 {
-            color: var(--highlight);
+            text-align: center;
+            color: var(--neon-red);
+            text-shadow: var(--neon-glow);
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 10px;
         }
 
-        p {
-            color: #aaa;
-            margin-bottom: 30px;
-        }
-
-        .hub-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .hub-btn {
-            background: var(--card-bg);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            padding: 25px 20px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.1rem;
-            transition: all 0.2s;
+        /* Haupt-Navigation / Reiter oben */
+        .main-nav {
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            justify-content: center;
             gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            background: #111;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #333;
         }
 
-        .hub-btn:hover {
-            background: var(--highlight);
-            color: #000;
-            border-color: var(--highlight);
-            transform: translateY(-3px);
+        .tab-btn {
+            background-color: var(--tab-inactive-bg);
+            color: var(--text-main);
+            border: 1px solid #444;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
         }
 
-        .hub-btn span {
-            font-size: 2rem;
+        .tab-btn:hover {
+            border-color: var(--neon-red);
+        }
+
+        .tab-btn.active {
+            background-color: var(--tab-active-bg);
+            color: white;
+            border-color: var(--neon-red);
+            box-shadow: var(--neon-glow);
+        }
+
+        .card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--neon-glow);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
 
-    <div class="hub-container">
-        <h1>Dark Bulls Hub</h1>
-        <p>Wähle den gewünschten Bereich für das Allianz-Management aus:</p>
-        
-        <div class="hub-buttons">
-            <a href="Elo_rechner.html" class="hub-btn">
-                <span>📊</span>
-                Rohstoff & ELO Rechner
-            </a>
-            <a href="Elo_map.html" class="hub-btn">
-                <span>🗺️</span>
-                Europakarte & Lagebild
-            </a>
-        </div>
+<div class="container">
+    <h1>Dark Bulls Alliance Steuerung</h1>
+    
+    <!-- ZENTRALE NAVIGATION (Intelligente Weiche) -->
+    <div class="main-nav">
+        <a href="Elo_uebersicht.html" class="tab-btn">📊 Übersicht</a>
+        <a href="Elo_land1.html" class="tab-btn">Land 1</a>
+        <a href="Elo_land2.html" class="tab-btn">Land 2</a>
+        <a href="Elo_land3.html" class="tab-btn">Land 3</a>
+        <a href="Elo_land4.html" class="tab-btn">Land 4</a>
+        <a href="Elo_land5.html" class="tab-btn">Land 5</a>
+        <a href="Elo_land6.html" class="tab-btn">Land 6</a>
+        <a href="Elo_map.html" class="tab-btn">🗺️ Map</a>
+        <a href="Elo_feinde.html" class="tab-btn" style="border-color: #ff4d4d; color: #ff9999;">⚠️ Feinde</a>
     </div>
+
+    <div class="card">
+        <h2>Zentrale Weiche aktiv</h2>
+        <p style="color: var(--text-muted);">Nutze die obere Navigation, um fehlerfrei zwischen den einzelnen Modulen zu wechseln.</p>
+    </div>
+
+    <div class="footer-note">
+        Dark Bulls Alliance Control Panel &bull; Elo_weiche v1.0
+    </div>
+</div>
 
 </body>
 </html>
